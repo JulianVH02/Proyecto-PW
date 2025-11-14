@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Estudiante - Sinergia</title>
+    <style>
+        /* --- Estilos Globales (Iguales a los anteriores) --- */
+        :root {
+            --primary-color: #ff6200;
+            --white-color: #ffffff;
+            --dark-text: #333;
+            --light-bg: #f4f4f4;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+
+        /* --- Navbar --- */
+        nav.navbar {
+            background-color: var(--white-color);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .logo img {
+            height: 70px;
+            width: auto;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+        }
+
+        .btn-logout {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+        }
+
+        /* --- Dashboard Container --- */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* --- Header de Bienvenida --- */
+        .welcome-header {
+            background-color: var(--white-color);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .welcome-text h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        .welcome-text p {
+            margin: 0.5rem 0 0;
+            color: #666;
+        }
+
+        /* --- Grid de Tarjetas --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--white-color);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--dark-text);
+            font-size: 1.5rem;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .card-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Iconos simulados con Emojis para prototipo */
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="dashboard-estudiante.html" class="logo">
+            <img src="/images/1.png" alt="Sinergia Logo" onerror="this.src='https://placehold.co/150x40/ff6200/ffffff?text=Sinergia'">
+        </a>
+        <ul class="nav-links">
+            <li><a href="#">Mi Perfil</a></li>
+            <li><button onclick="cerrarSesion()" class="btn-logout">Cerrar Sesión</button></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-header">
+            <div class="welcome-text">
+                <h1 id="saludo-usuario">Hola, Estudiante</h1>
+                <p>Bienvenido a tu espacio de aprendizaje.</p>
+            </div>
+            </div>
+
+        <div class="dashboard-grid">
+            
+            <div class="card">
+                <div class="card-icon">🎓</div>
+                <h3>Buscar Tutor</h3>
+                <p>Encuentra expertos en Matemáticas, Programación y más para reforzar tus conocimientos.</p>
+                <a href="#" class="card-btn">Ir al Marketplace</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📚</div>
+                <h3>Recursos Educativos</h3>
+                <p>Accede a guías, apuntes y material de estudio compartido por la comunidad.</p>
+                <a href="#" class="card-btn">Ver Recursos</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🧠</div>
+                <h3>Repaso Activo</h3>
+                <p>Practica con Flashcards y Quizzes generados manualmente o con IA.</p>
+                <a href="#" class="card-btn">Practicar Ahora</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📅</div>
+                <h3>Mis Tareas</h3>
+                <p>Organiza tu semana y mantén al día tus entregas y sesiones de estudio.</p>
+                <a href="#" class="card-btn">Ver Calendario</a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 1. Verificar Autenticación al cargar
+        document.addEventListener('DOMContentLoaded', async function() {
+            const token = localStorage.getItem('jwtToken');
+
+            // Si no hay token, expulsar al usuario
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 2. Obtener datos del usuario (Nombre)
+            try {
+                const response = await fetch('http://localhost:8080/api/auth/mi-perfil', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const usuario = await response.json();
+                    // Actualizar el saludo con el nombre real
+                    document.getElementById('saludo-usuario').textContent = `Hola, ${usuario.nombre}`;
+                    
+                    // Validación de Rol (Opcional): Si un tutor intenta entrar aquí, podrías redirigirlo
+                    // if (usuario.rol === 'TUTOR') window.location.href = 'dashboard-tutor.html';
+
+                } else {
+                    // Si el token es inválido o expiró
+                    cerrarSesion();
+                }
+            } catch (error) {
+                console.error("Error al cargar perfil:", error);
+            }
+        });
+
+        // Función para cerrar sesión
+        function cerrarSesion() {
+            localStorage.removeItem('jwtToken');
+            window.location.href = 'index.html';
+        }
+    </script>
+
+</body>
+</html>

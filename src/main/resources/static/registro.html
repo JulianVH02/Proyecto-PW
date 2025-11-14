@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Sinergia</title>
+    <style>
+        /* --- Reset y Estilos Globales --- */
+        :root {
+            --primary-color: #ff6200;
+            --white-color: #ffffff;
+            --dark-text: #333;
+            --light-bg: #f4f4f4;
+            --grey-border: #ddd;
+            --error-color: #d9534f;
+        }
+
+        html {
+            height: 100%;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--dark-text);
+            /* --- CÓDIGO CLAVE PARA LA IMAGEN DE FONDO --- */
+            background-image: url('/images/fondologreg.png'); /* ⬅️ REEMPLAZA ESTA RUTA */
+            background-size: cover; /* Cubre todo el área sin distorsión */
+            background-repeat: no-repeat;
+            background-position: center center; /* Centra la imagen */
+            background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll (opcional) */
+            /* ------------------------------------------- */
+            background-color: var(--light-bg); /* Fondo de respaldo si la imagen no carga */
+            min-height: 100vh; /* Asegura que ocupe al menos la altura de la vista */
+        }
+
+        /* --- Navegación --- */
+        nav.navbar {
+            background-color: var(--white-color);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .logo img {
+            height: 70px; 
+            width: auto;
+            margin-right: 0.5rem; 
+        }
+
+        .navbar .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .navbar .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* --- Estilos Dropdown --- */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--white-color);
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 1001;
+            border-radius: 5px;
+            margin-top: 0.5rem; 
+        }
+        
+        .dropdown-content a {
+            color: var(--dark-text);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: var(--light-bg);
+            color: var(--primary-color);
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        .dropdown .dropbtn {
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: inherit;
+        }
+        .dropdown .dropbtn:hover {
+            color: var(--primary-color);
+        }
+
+        /* --- Contenedor de Formulario Centrado --- */
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem 1rem;
+        }
+
+        .form-card {
+            background: var(--white-color);
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .form-card h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--grey-border);
+            border-radius: 5px;
+            box-sizing: border-box; 
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .button-submit {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: opacity 0.3s ease;
+        }
+
+        .button-submit:hover {
+            opacity: 0.9;
+        }
+
+        .form-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .form-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        #tutor-fields {
+            display: none; 
+            border: 1px solid var(--grey-border);
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            background-color: #fafafa;
+        }
+
+        #tutor-fields legend {
+            font-weight: bold;
+            color: var(--primary-color);
+            padding: 0 0.5rem;
+        }
+
+        #mensaje {
+            color: var(--error-color);
+            font-weight: bold;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Navegación -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <img src="/images/1.png" alt="Sinergia Logo">
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="#">Recursos Educativos</a></li>
+            <li><a href="#">Marketplace de Tutores</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Repaso Activo &#9662;</a>
+                <div class="dropdown-content">
+                    <a href="#">Flashcards</a>
+                    <a href="#">Quizzes</a>
+                    <a href="#">Planificador</a>
+                </div>
+            </li>
+            <li><a href="login.html">Iniciar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <!-- Formulario de Registro -->
+    <div class="form-container">
+        <div class="form-card">
+            <h2>Crea tu Cuenta</h2>
+            <form id="registro-form">
+        
+                <!-- Datos Básicos -->
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="apellido">Apellido:</label>
+                    <input type="text" id="apellido">
+                </div>
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico:</label>
+                    <input type="email" id="correo" required>
+                </div>
+                <div class="form-group">
+                    <label for="contraseña">Contraseña:</label>
+                    <input type="password" id="contraseña" required>
+                </div>
+                <div class="form-group">
+                    <label for="rol">Quiero ser:</label>
+                    <select id="rol" onchange="toggleTutorFields()">
+                        <!-- 
+                          ¡IMPORTANTE!
+                          Los valores (value) deben coincidir con tu Enum de Java
+                          Si tu RolUsuario.java usa @JsonValue("estudiante"), déjalo en minúsculas.
+                          Si no lo usa, ponlos en MAYÚSCULAS: value="ESTUDIANTE"
+                          
+                          Asumiré que SÍ estás usando el @JsonValue que te di, así que los dejo en minúsculas.
+                        -->
+                        <option value="estudiante">Estudiante</option>
+                        <option value="tutor">Tutor</option>
+                    </select>
+                </div>
+        
+                <!-- Campos específicos del Tutor -->
+                <fieldset id="tutor-fields">
+                    <legend>Información de Tutor</legend>
+                    
+                    <div class="form-group">
+                        <label for="materia">Materia Principal:</label>
+                        <!-- 
+                          NOTA: El 'required' se añade y quita con JavaScript
+                        -->
+                        <select id="materia" name="materia">
+                            <option value="" disabled selected>Cargando materias...</option>
+                        </select>
+                    </div>
+                    
+                     <div class="form-group">
+                        <label for="evidencia">URL Evidencia (CV, Certificado):</label>
+                        <!-- 
+                          NOTA: El 'required' se añade y quita con JavaScript
+                        -->
+                        <input type="text" id="evidencia" placeholder="https://drive.google.com/...">
+                    </div>
+                </fieldset>
+        
+                <button type="submit" class="button-submit">Registrar</button>
+            </form>
+            <p id="mensaje"></p>
+            <div class="form-link">
+                <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de funcionalidad -->
+    <script>
+        
+        // --- FUNCIÓN DE CARGAR MATERIAS (NO CAMBIA) ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const materiaSelect = document.getElementById('materia');
+            
+            async function cargarMaterias() {
+                try {
+                    const response = await fetch('http://localhost:8080/api/public/materias');
+                    if (!response.ok) throw new Error('No se pudieron cargar las materias.');
+                    const materias = await response.json(); 
+                    
+                    materiaSelect.innerHTML = ''; 
+                    if (materias.length === 0) {
+                         materiaSelect.innerHTML = '<option value="">No hay materias disponibles</option>';
+                         return;
+                    }
+
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = "";
+                    defaultOption.textContent = "Selecciona una materia";
+                    defaultOption.disabled = true;
+                    defaultOption.selected = true;
+                    materiaSelect.appendChild(defaultOption);
+
+                    materias.forEach(materia => {
+                        const option = document.createElement('option');
+                        option.value = materia.id; 
+                        option.textContent = materia.nombre; 
+                        materiaSelect.appendChild(option);
+                    });
+                    
+                } catch (error) {
+                    console.error('Error cargando materias:', error);
+                    materiaSelect.innerHTML = '<option value="">Error al cargar materias</option>';
+                    materiaSelect.disabled = true;
+                }
+            }
+            
+            cargarMaterias();
+            
+            // --- ¡NUEVO! ---
+            // Ejecutar esto al cargar la página para asegurar 
+            // que los campos de tutor estén des-requeridos al inicio.
+            toggleTutorFields();
+        });
+
+
+        // --- ¡¡FUNCIÓN CORREGIDA!! ---
+        function toggleTutorFields() {
+            var rol = document.getElementById('rol').value;
+            var tutorFields = document.getElementById('tutor-fields');
+            
+            // Obtenemos los campos que vamos a manipular
+            var materiaSelect = document.getElementById('materia');
+            var evidenciaInput = document.getElementById('evidencia');
+
+            // Asumimos que el value="tutor" (minúsculas)
+            if (rol === 'tutor') {
+                // 1. Mostrar campos
+                tutorFields.style.display = 'block';
+                
+                // 2. Hacerlos OBLIGATORIOS
+                materiaSelect.setAttribute('required', 'true');
+                evidenciaInput.setAttribute('required', 'true');
+                
+            } else { // Si es 'estudiante'
+                // 1. Ocultar campos
+                tutorFields.style.display = 'none';
+                
+                // 2. QUITAR LO OBLIGATORIO (Esta es la corrección clave)
+                materiaSelect.removeAttribute('required');
+                evidenciaInput.removeAttribute('required');
+                
+                // 3. (Opcional) Limpiar los valores por si cambió de opinión
+                materiaSelect.value = ""; 
+                evidenciaInput.value = "";
+            }
+        }
+
+
+        // --- FUNCIÓN DE ENVÍO (NO CAMBIA) ---
+        document.getElementById('registro-form').addEventListener('submit', async function(event) {
+            event.preventDefault(); 
+
+            var rol = document.getElementById('rol').value;
+            var mensajeEl = document.getElementById('mensaje');
+            mensajeEl.textContent = 'Procesando...'; // Mensaje de carga
+            
+            var usuario = {
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                correo: document.getElementById('correo').value,
+                contraseña: document.getElementById('contraseña').value,
+                rol: rol 
+            };
+
+            var tutor = null;
+            if (rol === 'tutor') {
+                tutor = {
+                    descripcion: null,
+                    contacto: null,
+                    precioPorClase: null,
+                    evidencia: document.getElementById('evidencia').value,
+                    materia: { id: parseInt(document.getElementById('materia').value) } 
+                };
+            }
+
+            var requestBody = {
+                usuario: usuario,
+                tutor: tutor
+            };
+            
+            console.log("Enviando al backend:", JSON.stringify(requestBody, null, 2));
+
+            try {
+                const response = await fetch('http://localhost:8080/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    mensajeEl.style.color = 'green';
+                    mensajeEl.textContent = '¡Registro exitoso! Serás redirigido al login.';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+
+                } else {
+                    let errorMsg = `Error ${response.status}:`;
+                    try {
+                        const errorData = await response.json();
+                        // El error de Enum (si lo hay) vendrá aquí
+                        errorMsg += " " + (errorData.message || JSON.stringify(errorData));
+                    } catch(e) {
+                        errorMsg += " " + response.statusText;
+                    }
+                    
+                    mensajeEl.style.color = 'var(--error-color)';
+                    mensajeEl.textContent = errorMsg;
+                    console.error("Respuesta de error del backend:", errorMsg);
+                }
+            } catch (error) {
+                mensajeEl.style.color = 'var(--error-color)';
+                mensajeEl.textContent = 'Error de red. Revisa la consola (F12) y el log de Spring Boot.';
+                console.error("Error de Fetch (JavaScript):", error);
+            }
+        });
+    </script>
+
+</body>
+</html>

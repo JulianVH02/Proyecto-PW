@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Sinergia</title>
+    <style>
+        /* --- Estilos Globales --- */
+        :root {
+            --primary-color: #ff6200;
+            --white-color: #ffffff;
+            --dark-text: #333;
+            --light-bg: #f4f4f4;
+            --grey-border: #ddd;
+            --error-color: #d9534f;
+        }
+
+        html {
+            height: 100%;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--dark-text);
+            /* --- CÓDIGO CLAVE PARA LA IMAGEN DE FONDO --- */
+            background-image: url('/images/fondologreg.png'); /* ⬅️ REEMPLAZA ESTA RUTA */
+            background-size: cover; /* Cubre todo el área sin distorsión */
+            background-repeat: no-repeat;
+            background-position: center center; /* Centra la imagen */
+            background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll (opcional) */
+            /* ------------------------------------------- */
+            background-color: var(--light-bg); /* Fondo de respaldo si la imagen no carga */
+            min-height: 100vh; /* Asegura que ocupe al menos la altura de la vista */
+        }
+
+        /* --- Navegación --- */
+        nav.navbar {
+            background-color: var(--white-color);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .logo img {
+            height: 70px;
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        .navbar .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .navbar .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .button-primary {
+            background-color: var(--primary-color);
+            color: var(--white-color) !important;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        /* --- Dropdown --- */
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content {
+            display: none; position: absolute; background-color: var(--white-color);
+            min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); z-index: 1001;
+            border-radius: 5px; margin-top: 0.5rem;
+        }
+        .dropdown-content a { color: var(--dark-text); padding: 12px 16px; text-decoration: none; display: block; }
+        .dropdown-content a:hover { background-color: var(--light-bg); color: var(--primary-color); }
+        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown .dropbtn {
+            cursor: pointer; text-decoration: none; color: var(--dark-text);
+            font-weight: 500; background: none; border: none; font-family: inherit; font-size: inherit;
+        }
+
+        /* --- Formulario --- */
+        .form-container {
+            display: flex; justify-content: center; align-items: center;
+            padding: 3rem 1rem; min-height: 80vh;
+        }
+        .form-card {
+            background: var(--white-color); padding: 2.5rem; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px;
+        }
+        .form-card h2 {
+            text-align: center; color: var(--primary-color); margin-top: 0; margin-bottom: 2rem; font-size: 2rem;
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-group input {
+            width: 100%; padding: 0.75rem; border: 1px solid var(--grey-border);
+            border-radius: 5px; box-sizing: border-box;
+        }
+        .button-submit {
+            width: 100%; padding: 0.8rem; background-color: var(--primary-color);
+            color: var(--white-color); border: none; border-radius: 5px; cursor: pointer;
+            font-size: 1rem; font-weight: bold; transition: opacity 0.3s ease;
+        }
+        .button-submit:hover { opacity: 0.9; }
+        .form-link { text-align: center; margin-top: 1.5rem; }
+        .form-link a { color: var(--primary-color); text-decoration: none; font-weight: 500; }
+        #mensaje { color: var(--error-color); text-align: center; font-weight: bold; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <img src="/images/1.png" alt="Sinergia Logo">
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="#">Recursos Educativos</a></li>
+            <li><a href="#">Marketplace de Tutores</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Repaso Activo &#9662;</a>
+                <div class="dropdown-content">
+                    <a href="#">Flashcards</a>
+                    <a href="#">Quizzes</a>
+                    <a href="#">Planificador</a>
+                </div>
+            </li>
+            <li><a href="registro.html" class="button-primary">Regístrate</a></li>
+        </ul>
+    </nav>
+
+    <div class="form-container">
+        <div class="form-card">
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico:</label>
+                    <input type="email" id="correo" required>
+                </div>
+                <div class="form-group">
+                    <label for="contraseña">Contraseña:</label>
+                    <input type="password" id="contraseña" required>
+                </div>
+                <button type="submit" class="button-submit">Ingresar</button>
+            </form>
+            <p id="mensaje"></p>
+            <div class="form-link">
+                <p>¿No tienes cuenta? <a href="registro.html">Regístrate</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            var mensajeEl = document.getElementById('mensaje');
+            mensajeEl.textContent = 'Conectando...'; 
+
+            // 1. Crear el objeto JSON (Asegúrate que coincida con LoginRequest.java)
+            var loginRequest = {
+                correo: document.getElementById('correo').value,
+                contraseña: document.getElementById('contraseña').value
+            };
+            
+            console.log("Enviando datos:", JSON.stringify(loginRequest));
+
+            try {
+                const response = await fetch('http://localhost:8080/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginRequest)
+                });
+                
+                console.log("Status del servidor:", response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Respuesta OK:", data);
+                    
+                    mensajeEl.style.color = 'green';
+                    mensajeEl.textContent = '¡Login exitoso! Redirigiendo...';
+                    
+                    // Guardar Token
+                    localStorage.setItem('jwtToken', data.token);
+                    
+                    setTimeout(() => {
+                        // Redirigir al dashboard de estudiante (o al que corresponda)
+                        window.location.href = 'dashboard-estudiante.html';
+                    }, 1000);
+
+                } else {
+                    // Leer el error del backend si existe
+                    let errorTexto = 'Correo o contraseña incorrectos.';
+                    if (response.status === 403) {
+                        errorTexto = 'Error 403: Acceso denegado (Revisa SecurityConfig).';
+                    } else if (response.status === 401) {
+                        errorTexto = 'Error 401: Credenciales inválidas.';
+                    }
+                    
+                    mensajeEl.style.color = 'var(--error-color)';
+                    mensajeEl.textContent = errorTexto;
+                }
+            } catch (error) {
+                console.error("Error de red:", error);
+                mensajeEl.style.color = 'var(--error-color)';
+                mensajeEl.textContent = 'Error de conexión con el servidor.';
+            }
+        });
+    </script>
+
+</body>
+</html>

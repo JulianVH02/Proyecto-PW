@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinergia - Plataforma LMS</title>
+    <style>
+        /* --- Reset y Estilos Globales --- */
+        :root {
+            --primary-color: #ff6200;
+            --white-color: #ffffff;
+            --dark-text: #333;
+            --light-bg: #f4f4f4;
+            --grey-border: #ddd;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--dark-text);
+            /* Mantenemos el fondo del body */
+            background-image: url('/images/fondologreg.png'); 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-color: var(--light-bg);
+            min-height: 100vh;
+        }
+
+        /* --- Navegación --- */
+        nav.navbar {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .logo img {
+            height: 70px; /* Ajustada a un tamaño más común */
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        .navbar .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .navbar .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .navbar .nav-links .button-primary,
+        .button-primary {
+            background-color: var(--primary-color);
+            color: var(--white-color) !important;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .navbar .nav-links .button-primary:hover,
+        .button-primary:hover {
+            color: var(--white-color) !important;
+            opacity: 0.9;
+        }
+
+        /* --- Estilos para el Dropdown --- */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--white-color);
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 1001;
+            border-radius: 5px;
+            margin-top: 0.5rem;
+        }
+        
+        .dropdown-content a {
+            color: var(--dark-text);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: var(--light-bg);
+            color: var(--primary-color);
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        .dropdown .dropbtn {
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: inherit;
+        }
+        .dropdown .dropbtn:hover {
+            color: var(--primary-color);
+        }
+
+
+        /* --- Sección Hero --- */
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 4rem 5%; /* Padding ajustado a porcentaje */
+            background-color: var(--white-color);
+            gap: 2rem;
+            background-image: url('/images/fondohero.png'); 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-color: var(--light-bg);
+            min-height: 70vh;
+        }
+
+        .hero-content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            color: var(--dark-text);
+            margin: 0 0 1rem 0;
+        }
+
+        .hero-content h1 span {
+            color: var(--primary-color);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .hero-image {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        /* ---------------------------------------------------- */
+        /* --- NUEVOS ESTILOS PARA SECCIONES DE ANCHO COMPLETO --- */
+        /* ---------------------------------------------------- */
+        .main-tools-section {
+            padding: 5rem 5%; 
+            background-color: var(--light-bg);
+        }
+
+        .section-title {
+            text-align: center;
+            color: var(--dark-text);
+            font-size: 2.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .full-width-card {
+            display: flex; 
+            flex-direction: row; 
+            align-items: center;
+            justify-content: space-between;
+            
+            background-color: var(--white-color);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 3.5rem 5rem; /* Padding interno grande */
+            margin-bottom: 4rem; /* Espacio entre cada sección */
+            gap: 3rem;
+            min-height: 300px;
+        }
+
+        /* Estilos para el texto */
+        .full-width-card .card-content {
+            max-width: 60%; 
+        }
+
+        .full-width-card h3 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-top: 0;
+        }
+
+        .full-width-card p {
+            font-size: 1.15rem;
+            line-height: 1.6;
+        }
+
+        .full-width-card .details {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 4px solid var(--primary-color);
+            background-color: #fff8f5;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        .full-width-card .details ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .full-width-card .details li {
+            padding: 0.2rem 0;
+            font-size: 0.95rem;
+            position: relative;
+            padding-left: 1.2rem;
+        }
+        .full-width-card .details li:before {
+            content: '•';
+            color: var(--primary-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+   
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--dark-text);
+            color: var(--white-color);
+        }
+
+        /* --- Media Queries (Responsivo) --- */
+        @media (max-width: 1024px) {
+            .full-width-card {
+                padding: 2rem;
+            }
+        }
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .hero {
+                flex-direction: column-reverse; 
+                text-align: center;
+            }
+            .full-width-card, .flashcards-section {
+                flex-direction: column; /* Apila el texto y el ícono/imagen */
+                padding: 1.5rem;
+            }
+            .full-width-card .card-content, .flashcards-section .card-content {
+                max-width: 100%;
+                text-align: left !important;
+            }
+            .flashcards-section .details {
+                border-right: none;
+                border-left: 4px solid var(--primary-color);
+                padding-left: 1rem;
+                padding-right: 0;
+            }
+            .flashcards-section .details ul {
+                text-align: left;
+            }
+            .flashcards-section .details li {
+                 padding-left: 1.2rem;
+                 padding-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <img src="/images/1.png" alt="Sinergia Logo">
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="#">Recursos Educativos</a></li>
+            <li><a href="#">Marketplace de Tutores</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Repaso Activo &#9662;</a>
+                <div class="dropdown-content">
+                    <a href="#">Flashcards</a>
+                    <a href="#">Quizzes</a>
+                    <a href="#">Planificador</a>
+                </div>
+            </li>
+            <li><a href="login.html" class="button-primary">Iniciar Sesión</a></li>
+            <li><a href="registro.html">Regístrate</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Bienvenido a <span>Sinergia</span></h1>
+            <p>Tu plataforma de aprendizaje (LMS) todo en uno. Conecta con tutores, practica con flashcards y organiza tu estudio.</p>
+            <a href="registro.html" class="button-primary">Empezar ahora</a>
+        </div>
+        <div class="hero-image">
+            
+        </div>
+    </header>
+
+    <main class="main-tools-section">
+        <h2 class="section-title">Herramientas para tu Éxito</h2>
+
+        <div class="full-width-card marketplace-section">
+            <div class="card-content">
+                <h3>Marketplace de Tutores</h3>
+                <p>Encuentra y conecta con tutores expertos verificados en la materia que necesitas. Aprueba tus exámenes con ayuda personalizada.</p>
+                <div class="details">
+                    <p>Nuestra plataforma te permite filtrar por precio, disponibilidad y calificaciones reales. Todos los tutores pasan por un proceso de verificación riguroso.</p>
+                    <ul>
+                        <li>Tutores verificados en más de 50 materias.</li>
+                        <li>Plataforma de videollamadas integrada.</li>
+                        <li>Reserva y paga de forma segura.</li>
+                    </ul>
+                </div>
+                <a href="#" class="button-primary">Ir al Marketplace</a>
+            </div>
+            
+        </div>
+
+        <div class="full-width-card flashcards-section">
+            <div class="card-content">
+                <h3>Flashcards y Quizzes</h3>
+                <p>Crea tus propias flashcards o usa las de la comunidad. Mide tu conocimiento con quizzes interactivos.</p>
+                <div class="details">
+                    <p>Potencia tu memoria a largo plazo con el algoritmo de repetición espaciada. Genera tests automáticos para prepararte para exámenes finales.</p>
+                    <ul>
+                        <li>Algoritmo de repetición espaciada.</li>
+                        <li>Generación de preguntas con IA.</li>
+                        <li>Biblioteca comunitaria de temas populares.</li>
+                    </ul>
+                </div>
+                <a href="#" class="button-primary">Practicar Ahora</a>
+            </div>
+            
+        </div>
+
+        <div class="full-width-card planner-section">
+            <div class="card-content">
+                <h3>Planificador de Tareas</h3>
+                <p>Organiza tu calendario de estudio, establece fechas límite y lleva un seguimiento de tus tareas y objetivos de aprendizaje.</p>
+                <div class="details">
+                    <p>Sincroniza tus tareas con tu calendario personal y recibe recordatorios automáticos. Nunca más olvides una entrega importante.</p>
+                    <ul>
+                        <li>Integración con Google Calendar.</li>
+                        <li>Sistema de recordatorios personalizado.</li>
+                        <li>Visualización semanal y mensual.</li>
+                    </ul>
+                </div>
+                <a href="#" class="button-primary">Ver Calendario</a>
+            </div>
+            
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Sinergia. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>
