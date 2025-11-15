@@ -3,11 +3,11 @@ package com.proyecto.sinergia.model;
 import com.proyecto.sinergia.model.enums.RolUsuario; 
 import com.proyecto.sinergia.model.enums.RolUsuarioConverter; // Importamos el conversor
 import jakarta.persistence.*;
-import java.sql.Timestamp;
 import java.util.List;
 import lombok.Data;
 import jakarta.persistence.CascadeType;
-
+import org.hibernate.annotations.CreationTimestamp; // ¡Nueva importación!
+import java.time.LocalDateTime; // ¡Nuevo tipo de dato!
 
 @Data
 @Entity
@@ -36,8 +36,9 @@ public class Usuario {
     @Convert(converter = RolUsuarioConverter.class) 
     private RolUsuario rol;
 
-    @Column(name = "fecha_registro", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp fechaRegistro;
+    @Column(name = "fecha_registro", updatable = false, nullable = false)
+    @CreationTimestamp // Esta anotación le dice a Hibernate que la genere al crear
+    private LocalDateTime fechaRegistro;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean activo;
