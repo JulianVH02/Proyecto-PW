@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Quizzes - Sinergia</title>
+    <style>
+        :root { --primary: #ff6200; --white: #fff; --bg: #f4f4f4; --dark: #333; --success: #28a745; --danger: #dc3545; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); margin: 0; height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Navbar */
+        nav { background: var(--white); padding: 1rem 2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; }
+        .logo { color: var(--primary); font-weight: bold; font-size: 1.5rem; text-decoration: none; }
+        .nav-links a { margin-left: 1rem; text-decoration: none; color: var(--dark); }
+
+        /* Layout */
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 250px; background: var(--white); border-right: 1px solid #ddd; padding: 1.5rem; overflow-y: auto; }
+        .content { flex: 1; padding: 2rem; overflow-y: auto; position: relative; }
+
+        /* Sidebar Buttons */
+        .topic-btn { width: 100%; padding: 10px; border: none; background: none; text-align: left; cursor: pointer; border-radius: 5px; display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .topic-btn:hover { background: #eee; }
+        .topic-btn.active { background: #ffe6cc; color: var(--primary); font-weight: bold; }
+        .badge { background: #ddd; padding: 2px 6px; border-radius: 10px; font-size: 0.8rem; }
+
+        /* Grid & Cards */
+        .quiz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .quiz-card { background: var(--white); padding: 1.5rem; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s; border-top: 5px solid var(--primary); position: relative; }
+        .quiz-card:hover { transform: translateY(-5px); }
+        .quiz-title { margin: 0 0 0.5rem 0; font-size: 1.2rem; }
+        .quiz-meta { font-size: 0.9rem; color: #666; margin-bottom: 1rem; }
+        .btn { padding: 0.6rem 1.2rem; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; background: var(--primary); }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; padding: 0.6rem 1.2rem; border-radius: 5px; }
+        .delete-icon { position: absolute; top: 10px; right: 10px; cursor: pointer; color: #ccc; }
+        .delete-icon:hover { color: var(--danger); }
+
+        /* CREATION FORM STYLES */
+        #view-create { display: none; max-width: 800px; margin: 0 auto; background: var(--white); padding: 2rem; border-radius: 10px; }
+        .question-block { background: #f9f9f9; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #eee; }
+        .option-row { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        input[type="text"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        
+        /* GAME MODE STYLES */
+        #view-game { display: none; max-width: 700px; margin: 0 auto; text-align: center; }
+        .game-question { font-size: 1.5rem; margin-bottom: 2rem; }
+        .game-options { display: grid; gap: 1rem; }
+        .game-btn { padding: 1rem; background: var(--white); border: 2px solid #eee; border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: all 0.2s; }
+        .game-btn:hover { border-color: var(--primary); background: #fff8f0; }
+        .game-btn.correct { background-color: var(--success); color: white; border-color: var(--success); }
+        .game-btn.wrong { background-color: var(--danger); color: white; border-color: var(--danger); }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="dashboard-estudiante.html" class="logo">Sinergia</a>
+        <div class="nav-links">
+            <a href="dashboard-estudiante.html">Inicio</a>
+            <a href="flashcards.html">Flashcards</a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <aside class="sidebar" id="sidebar">
+            <h3>📚 Materias</h3>
+            <div id="topics-list"></div>
+        </aside>
+
+        <main class="content">
+            
+            <div id="view-list">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                    <h1 id="page-title" style="margin:0;">Mis Quizzes</h1>
+                    <button class="btn" onclick="showCreateView()">+ Crear Quiz</button>
+                </div>
+                <div id="quiz-grid" class="quiz-grid">
+                    <p>Cargando...</p>
+                </div>
+            </div>
+
+            <div id="view-create">
+                <h2 style="margin-top:0;">Crear Nuevo Quiz</h2>
+                <div style="margin-bottom:1rem;">
+                    <input type="text" id="quiz-title" placeholder="Título del Quiz (Ej. Matemáticas Básicas)" style="font-size:1.2rem; margin-bottom:0.5rem;">
+                    
+                    <input type="text" id="quiz-desc" placeholder="Descripción del Quiz (Ej: Repaso para el parcial)" style="margin-bottom: 10px;">
+                    
+                    <input type="text" id="quiz-materia" placeholder="Materia (Ej. Matemáticas)" list="materias-sugeridas">
+                    <datalist id="materias-sugeridas"></datalist>
+                </div>
+                
+                <div id="questions-container"></div>
+                
+                <button class="btn-outline" onclick="addQuestionBlock()" style="width:100%; margin:1rem 0;">+ Agregar Pregunta</button>
+                
+                <div style="text-align:right; gap:10px; display:flex; justify-content:flex-end;">
+                    <button class="btn-outline" onclick="showListView()">Cancelar</button>
+                    <button class="btn" onclick="saveQuiz()">Guardar Quiz</button>
+                </div>
+            </div>
+
+            <div id="view-game">
+                <h2 id="game-materia" style="color:#666; font-size:1rem; text-transform:uppercase;"></h2>
+                <div class="game-question" id="game-question-text"></div>
+                <div class="game-options" id="game-options-container"></div>
+                <p id="game-score" style="margin-top:2rem; font-weight:bold; font-size:1.2rem;"></p>
+                <button id="btn-next-q" class="btn" style="margin-top:1rem; display:none;" onclick="nextQuestion()">Siguiente</button>
+                <button id="btn-finish" class="btn" style="margin-top:1rem; display:none;" onclick="showListView()">Volver al inicio</button>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Asegúrate de que esta es la clave correcta que usaste en login.html (token o jwtToken)
+        const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
+        if (!token) window.location.href = 'login.html';
+
+        let allQuizzes = [];
+        let currentFilter = 'TODAS';
+        let activeQuiz = null;
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        document.addEventListener('DOMContentLoaded', loadData);
+
+        async function loadData() {
+            try {
+                const res = await fetch('http://localhost:8080/api/quizzes', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    allQuizzes = await res.json();
+                    renderSidebar();
+                    renderQuizzes('TODAS');
+                } else {
+                    console.error("Error cargando quizzes");
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // --- RENDERIZADO ---
+        function renderSidebar() {
+            const sidebar = document.getElementById('topics-list');
+            const datalist = document.getElementById('materias-sugeridas');
+            const counts = {};
+            
+            allQuizzes.forEach(q => {
+                let m = q.materia ? capitalize(q.materia) : 'General';
+                counts[m] = (counts[m] || 0) + 1;
+            });
+
+            sidebar.innerHTML = `<button class="topic-btn active" onclick="filterBy('TODAS', this)">Todas <span class="badge">${allQuizzes.length}</span></button>`;
+            datalist.innerHTML = '';
+
+            Object.keys(counts).sort().forEach(m => {
+                sidebar.innerHTML += `<button class="topic-btn" onclick="filterBy('${m}', this)">${m} <span class="badge">${counts[m]}</span></button>`;
+                datalist.innerHTML += `<option value="${m}">`;
+            });
+        }
+
+        function renderQuizzes(filter) {
+            const grid = document.getElementById('quiz-grid');
+            grid.innerHTML = '';
+            
+            const filtered = allQuizzes.filter(q => {
+                let m = q.materia ? capitalize(q.materia) : 'General';
+                return filter === 'TODAS' || m === filter;
+            });
+
+            if(filtered.length === 0) {
+                grid.innerHTML = '<p style="color:#777;">No hay quizzes disponibles.</p>';
+                return;
+            }
+
+            filtered.forEach(q => {
+                // Protección contra nulos
+                const numPreguntas = (q.preguntas) ? q.preguntas.length : 0;
+                
+                grid.innerHTML += `
+                    <div class="quiz-card">
+                        <span class="delete-icon" onclick="deleteQuiz(${q.id})">&times;</span>
+                        <div class="quiz-title">${q.titulo}</div>
+                        <div class="quiz-meta">${q.materia || 'General'} • ${numPreguntas} Preguntas</div>
+                        <div style="font-size:0.8rem; color:#888; margin-bottom:10px;">${q.descripcion || ''}</div>
+                        <button class="btn" onclick='startQuiz(${JSON.stringify(q)})'>Comenzar Quiz</button>
+                    </div>
+                `;
+            });
+        }
+
+        function filterBy(materia, btnElement) {
+            currentFilter = materia;
+            document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            document.getElementById('page-title').textContent = materia === 'TODAS' ? 'Mis Quizzes' : materia;
+            renderQuizzes(materia);
+        }
+
+        // --- LÓGICA DE CREACIÓN ---
+        function showCreateView() {
+            document.getElementById('view-list').style.display = 'none';
+            document.getElementById('view-create').style.display = 'block';
+            document.getElementById('questions-container').innerHTML = '';
+            
+            // Limpiar inputs
+            document.getElementById('quiz-title').value = '';
+            document.getElementById('quiz-desc').value = '';
+            document.getElementById('quiz-materia').value = '';
+            
+            addQuestionBlock(); 
+        }
+
+        function showListView() {
+            document.getElementById('view-create').style.display = 'none';
+            document.getElementById('view-game').style.display = 'none';
+            document.getElementById('view-list').style.display = 'block';
+            loadData();
+        }
+
+        function addQuestionBlock() {
+            const container = document.getElementById('questions-container');
+            const index = container.children.length + 1;
+            
+            // CORRECCIÓN 3: Usar las clases correctas (input-pregunta, input-opcion)
+            const html = `
+                <div class="question-block">
+                    <label><strong>Pregunta ${index}:</strong></label>
+                    <input type="text" class="input-pregunta" placeholder="Escribe la pregunta..." style="margin-bottom:10px;">
+                    
+                    <div class="options-list">
+                        ${[1,2,3,4].map(i => `
+                            <div class="option-row">
+                                <input type="radio" name="correct-${index}" ${i===1?'checked':''}>
+                                <input type="text" class="input-opcion" placeholder="Opción ${i}">
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        async function saveQuiz() {
+            // CORRECCIÓN 4: IDs coinciden con el HTML ahora
+            const titulo = document.getElementById('quiz-title').value;
+            const descripcion = document.getElementById('quiz-desc').value; 
+            const materia = document.getElementById('quiz-materia').value;
+
+            if (!titulo || !materia) {
+                alert("Por favor completa el título y la materia");
+                return;
+            }
+
+            const preguntasElements = document.querySelectorAll('.question-block');
+            const preguntas = [];
+
+            preguntasElements.forEach(block => {
+                // CORRECCIÓN 5: Selectores coinciden con addQuestionBlock
+                const textoPregunta = block.querySelector('.input-pregunta').value;
+                const opcionesElements = block.querySelectorAll('.option-row');
+                const opciones = [];
+
+                opcionesElements.forEach(row => {
+                    const textoOpcion = row.querySelector('.input-opcion').value;
+                    const esCorrecta = row.querySelector('input[type="radio"]').checked;
+                    
+                    if(textoOpcion) {
+                        opciones.push({ textoOpcion: textoOpcion, esCorrecta: esCorrecta });
+                    }
+                });
+
+                if(textoPregunta && opciones.length > 0) {
+                    preguntas.push({ 
+                        textoPregunta: textoPregunta, 
+                        opciones: opciones 
+                    });
+                }
+            });
+
+            const quizData = {
+                titulo: titulo,
+                descripcion: descripcion,
+                materia: materia,
+                preguntas: preguntas
+            };
+
+            try {
+                const response = await fetch('http://localhost:8080/api/quizzes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(quizData)
+                });
+
+                if (response.ok) {
+                    alert("¡Quiz guardado exitosamente!");
+                    showListView();
+                } else {
+                    alert("Error al guardar el quiz. Verifica la consola.");
+                    console.error(await response.text());
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Error de conexión");
+            }
+        }
+
+        // --- JUGAR ---
+        function startQuiz(quiz) {
+            if (!quiz.preguntas || quiz.preguntas.length === 0) {
+                alert("⚠️ Este quiz no tiene preguntas cargadas.");
+                return;
+            }
+
+            activeQuiz = quiz;
+            currentQuestionIndex = 0;
+            score = 0;
+            
+            document.getElementById('view-list').style.display = 'none';
+            document.getElementById('view-game').style.display = 'block';
+            document.getElementById('game-materia').textContent = quiz.materia;
+            document.getElementById('btn-finish').style.display = 'none';
+            document.getElementById('game-score').textContent = '';
+            
+            showGameQuestion();
+        }
+
+        function showGameQuestion() {
+            const q = activeQuiz.preguntas[currentQuestionIndex];
+            document.getElementById('game-question-text').textContent = q.textoPregunta;
+            const optContainer = document.getElementById('game-options-container');
+            document.getElementById('btn-next-q').style.display = 'none';
+            
+            optContainer.innerHTML = '';
+            q.opciones.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'game-btn';
+                btn.textContent = opt.textoOpcion;
+                btn.onclick = () => selectAnswer(btn, opt.esCorrecta);
+                optContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(btn, isCorrect) {
+            const allBtns = document.querySelectorAll('.game-btn');
+            allBtns.forEach(b => b.onclick = null); // Bloquear clicks
+
+            if(isCorrect) {
+                btn.classList.add('correct');
+                score++;
+            } else {
+                btn.classList.add('wrong');
+            }
+
+            if(currentQuestionIndex < activeQuiz.preguntas.length - 1) {
+                document.getElementById('btn-next-q').style.display = 'inline-block';
+            } else {
+                const finalBtn = document.getElementById('btn-finish');
+                finalBtn.style.display = 'inline-block';
+                finalBtn.textContent = "Finalizar - Ver Resultado";
+                finalBtn.onclick = showResults;
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            showGameQuestion();
+        }
+
+        function showResults() {
+            const total = activeQuiz.preguntas.length;
+            const percent = Math.round((score / total) * 100);
+            let msg = percent >= 60 ? "¡Buen trabajo! 🎉" : "Sigue practicando 📚";
+            
+            document.getElementById('game-question-text').innerHTML = `<h1>Puntaje: ${score} / ${total}</h1><h3>${percent}%</h3><p>${msg}</p>`;
+            document.getElementById('game-options-container').innerHTML = '';
+            
+            const finalBtn = document.getElementById('btn-finish');
+            finalBtn.textContent = "Volver a mis Quizzes";
+            finalBtn.onclick = showListView;
+            finalBtn.style.display = 'inline-block';
+        }
+
+        async function deleteQuiz(id) {
+            if(confirm("¿Eliminar este quiz?")) {
+                await fetch(`http://localhost:8080/api/quizzes/${id}`, { 
+                    method: 'DELETE', 
+                    headers: { 'Authorization': 'Bearer ' + token } 
+                });
+                loadData();
+            }
+        }
+
+        function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : ''; }
+    </script>
+</body>
+</html>

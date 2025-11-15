@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completa tu Perfil - Sinergia Tutor</title>
+    <style>
+        :root { --primary-color: #ff6200; --white-color: #ffffff; --dark-text: #333; --light-bg: #f4f4f4; --grey-border: #ddd; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: var(--dark-text); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background-color: var(--white-color); padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); width: 100%; max-width: 500px; text-align: center; }
+        h1 { color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.8rem; }
+        p { color: #666; margin-bottom: 2rem; }
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--dark-text); }
+        input[type="text"], input[type="number"], textarea { width: 100%; padding: 0.8rem; border: 1px solid var(--grey-border); border-radius: 6px; font-family: inherit; box-sizing: border-box; }
+        textarea { resize: vertical; min-height: 100px; }
+        button { width: 100%; padding: 0.9rem; background-color: var(--primary-color); color: var(--white-color); border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: background-color 0.3s ease; }
+        button:hover { background-color: #e05800; }
+        #message { margin-top: 1rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>¡Felicidades, Tutor!</h1>
+        <p>El administrador ha aprobado tu solicitud. Para aparecer en el Marketplace, por favor completa tu perfil profesional.</p>
+        
+        <form id="profile-form">
+            <div class="form-group">
+                <label for="descripcion">Descripción Profesional</label>
+                <textarea id="descripcion" required placeholder="Ej. 5 años de experiencia dando clases de cálculo."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="contacto">Contacto (Teléfono/WhatsApp)</label>
+                <input type="text" id="contacto" required placeholder="Ej. +57 300 123 4567">
+            </div>
+            <div class="form-group">
+                <label for="precio">Precio por Clase (COP)</label>
+                <input type="number" id="precio" required min="1000" placeholder="Ej. 45000" step="100">
+            </div>
+            <button type="submit" id="submit-btn">Guardar y Continuar</button>
+            <p id="message"></p>
+        </form>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('jwtToken');
+        if (!token) window.location.href = 'login.html';
+
+        document.getElementById('profile-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const messageEl = document.getElementById('message');
+            btn.disabled = true; btn.textContent = 'Guardando...'; messageEl.textContent = '';
+            
+            const dto = {
+                descripcion: document.getElementById('descripcion').value,
+                contacto: document.getElementById('contacto').value,
+                precioPorClase: document.getElementById('precio').value 
+            };
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/tutor/profile/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(dto)
+                });
+                
+                if (response.ok) {
+                    // La información se guardó correctamente en el Backend.
+                    alert('Perfil actualizado con éxito. Redirigiendo a tu Dashboard.');
+                    
+                    // --- REDIRECCIÓN LIMPIA Y DIRECTA AL DASHBOARD ---
+                    window.location.href = 'dashboard-tutor.html'; 
+                } else {
+                    const errorText = await response.text();
+                    messageEl.style.color = 'red';
+                    messageEl.textContent = `Error al guardar: ${errorText}`;
+                }
+            } catch (e) {
+                messageEl.style.color = 'red';
+                messageEl.textContent = 'Error de conexión. Inténtalo de nuevo.';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Guardar y Continuar';
+            }
+        });
+    </script>
+</body>
+</html>

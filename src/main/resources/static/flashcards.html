@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Flashcards - Sinergia</title>
+    <style>
+        :root { --primary-color: #ff6200; --white: #ffffff; --light-bg: #f4f4f4; --dark-text: #333; --active-bg: #ffe6cc; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: var(--light-bg); margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Navbar fija */
+        nav { background: var(--white); padding: 1rem 2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); text-decoration: none; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: 500; margin-left: 1.5rem; }
+        .nav-links a:hover { color: var(--primary-color); }
+
+        /* Layout Principal */
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
+
+        /* Sidebar de Temas */
+        .topics-sidebar { width: 260px; background: var(--white); border-right: 1px solid #ddd; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; }
+        .topics-sidebar h3 { margin-top: 0; color: #555; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .topic-btn {
+            background: none; border: none; text-align: left; padding: 0.8rem 1rem; 
+            margin-bottom: 0.5rem; border-radius: 8px; cursor: pointer; 
+            color: var(--dark-text); font-size: 0.95rem; display: flex; justify-content: space-between;
+            transition: background 0.2s;
+        }
+        .topic-btn:hover { background-color: var(--light-bg); }
+        .topic-btn.active { background-color: var(--active-bg); color: var(--primary-color); font-weight: bold; }
+        .badge { background: #eee; color: #666; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; }
+        .topic-btn.active .badge { background: var(--primary-color); color: white; }
+
+        /* Área de Contenido */
+        .content-area { flex: 1; padding: 2rem; overflow-y: auto; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .btn-add { background-color: var(--primary-color); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(255, 98, 0, 0.3); transition: transform 0.2s; }
+        .btn-add:hover { transform: scale(1.05); }
+
+        /* Grid de Tarjetas */
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+        
+        /* FLIP CARD */
+        .scene { width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; }
+        .card.is-flipped { transform: rotateY(180deg); }
+        
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; box-sizing: border-box; text-align: center; border: 1px solid #eee; background: white; }
+        
+        .card-front { border-top: 6px solid var(--primary-color); }
+        .card-back { background-color: #2c3e50; color: white; transform: rotateY(180deg); border-top: 6px solid #27ae60; }
+        
+        .card-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; opacity: 0.6; font-weight: bold; }
+        .card-text { font-size: 1.1rem; line-height: 1.5; font-weight: 500; }
+        .hint-text { margin-top: auto; font-size: 0.8rem; color: #999; font-style: italic; }
+        
+        .delete-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ccc; font-size: 1.2rem; cursor: pointer; z-index: 10; transition: color 0.2s; }
+        .delete-btn:hover { color: #e74c3c; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: #444; }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--primary-color); outline: none; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
+        
+        @media (max-width: 768px) {
+            .main-wrapper { flex-direction: column; overflow-y: auto; }
+            .topics-sidebar { width: 100%; border-right: none; border-bottom: 1px solid #ddd; padding: 1rem; max-height: 150px; flex-direction: row; overflow-x: auto; gap: 10px; }
+            .topic-btn { margin-bottom: 0; white-space: nowrap; flex-shrink: 0; }
+            .content-area { overflow: visible; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="dashboard-estudiante.html" class="logo">Sinergia</a>
+        <div class="nav-links">
+            <a href="dashboard-estudiante.html">Inicio</a>
+            <a href="planificador.html">Planificador</a>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        
+        <aside class="topics-sidebar">
+            <h3>📚 Tus Materias</h3>
+            <div id="topics-list">
+                </div>
+        </aside>
+
+        <main class="content-area">
+            <div class="header-content">
+                <div>
+                    <h1 style="margin:0; color:#333;" id="page-title">Todas las Flashcards</h1>
+                    <p style="margin:5px 0 0; color:#666;">Haz clic para voltear la tarjeta.</p>
+                </div>
+                <button class="btn-add" onclick="abrirModal()">+ Nueva Tarjeta</button>
+            </div>
+
+            <div id="cards-container" class="cards-grid">
+                <p>Cargando...</p>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-crear" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0; color: var(--primary-color);">Crear Flashcard</h2>
+            <form id="form-flashcard">
+                <div class="form-group">
+                    <label>Materia / Tema</label>
+                    <input type="text" id="materia" placeholder="Ej. Historia, Inglés..." required list="materias-sugeridas">
+                    <datalist id="materias-sugeridas"></datalist> </div>
+                <div class="form-group">
+                    <label>Pregunta (Frente)</label>
+                    <textarea id="pregunta" rows="2" required placeholder="Escribe la pregunta o concepto..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Respuesta (Reverso)</label>
+                    <textarea id="respuesta" rows="3" required placeholder="Escribe la respuesta o definición..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" onclick="cerrarModal()" style="background:none; border:1px solid #ccc; padding:0.6rem 1.2rem; border-radius:6px; cursor:pointer;">Cancelar</button>
+                    <button type="submit" class="btn-add" style="border-radius:6px;">Guardar Tarjeta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('jwtToken');
+        if (!token) window.location.href = 'login.html';
+
+        let allFlashcards = []; // Variable global para guardar todas las tarjetas
+        let currentFilter = 'TODAS'; // Filtro actual
+
+        document.addEventListener('DOMContentLoaded', cargarDatosIniciales);
+
+        async function cargarDatosIniciales() {
+            try {
+                const response = await fetch('http://localhost:8080/api/flashcards', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (response.ok) {
+                    allFlashcards = await response.json();
+                    renderizarSidebar();
+                    renderizarTarjetas('TODAS');
+                }
+            } catch (e) { console.error("Error cargando flashcards", e); }
+        }
+
+        // --- 1. Renderizar Sidebar (Agrupación) ---
+        function renderizarSidebar() {
+            const sidebar = document.getElementById('topics-list');
+            const datalist = document.getElementById('materias-sugeridas');
+            
+            // Obtener materias únicas y contar cuántas cartas hay por materia
+            const conteoMaterias = {};
+            allFlashcards.forEach(card => {
+                // Si materia es null o vacío, asignar "General"
+                let mat = card.materia ? capitalize(card.materia.trim()) : 'General';
+                conteoMaterias[mat] = (conteoMaterias[mat] || 0) + 1;
+            });
+
+            // Botón "Todas"
+            sidebar.innerHTML = `
+                <button class="topic-btn ${currentFilter === 'TODAS' ? 'active' : ''}" onclick="filtrarPorMateria('TODAS')">
+                    Todas <span class="badge">${allFlashcards.length}</span>
+                </button>
+            `;
+
+            // Botones por Materia
+            datalist.innerHTML = ''; // Limpiar sugerencias
+            Object.keys(conteoMaterias).sort().forEach(materia => {
+                sidebar.innerHTML += `
+                    <button class="topic-btn ${currentFilter === materia ? 'active' : ''}" onclick="filtrarPorMateria('${materia}')">
+                        ${materia} <span class="badge">${conteoMaterias[materia]}</span>
+                    </button>
+                `;
+                // Agregar a datalist para autocompletar en el formulario
+                datalist.innerHTML += `<option value="${materia}">`;
+            });
+        }
+
+        // --- 2. Filtrado ---
+        function filtrarPorMateria(materia) {
+            currentFilter = materia;
+            
+            // Actualizar estilos de botones
+            const botones = document.querySelectorAll('.topic-btn');
+            botones.forEach(btn => btn.classList.remove('active'));
+            // (Un poco rústico pero efectivo para encontrar el botón activo visualmente)
+            event.currentTarget.classList.add('active'); 
+
+            // Actualizar título
+            document.getElementById('page-title').textContent = materia === 'TODAS' ? 'Todas las Flashcards' : materia;
+
+            renderizarTarjetas(materia);
+        }
+
+        // --- 3. Renderizar Tarjetas ---
+        function renderizarTarjetas(filtro) {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+
+            const filtradas = allFlashcards.filter(c => {
+                let mat = c.materia ? capitalize(c.materia.trim()) : 'General';
+                return filtro === 'TODAS' || mat === filtro;
+            });
+
+            if (filtradas.length === 0) {
+                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#777; margin-top:2rem;">No hay tarjetas en esta categoría.</div>';
+                return;
+            }
+
+            filtradas.forEach(c => {
+                let materiaDisplay = c.materia ? capitalize(c.materia) : 'General';
+                const cardHtml = `
+                    <div class="scene">
+                        <div class="card" onclick="this.classList.toggle('is-flipped')">
+                            <div class="card-face card-front">
+                                <button class="delete-btn" onclick="eliminarCard(event, ${c.id})">&times;</button>
+                                <div class="card-label">${materiaDisplay}</div>
+                                <div class="card-text">${c.pregunta}</div>
+                                <div class="hint-text">Clic para ver respuesta</div>
+                            </div>
+                            <div class="card-face card-back">
+                                <div class="card-label" style="opacity:0.8;">Respuesta</div>
+                                <div class="card-text">${c.respuesta}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        // --- Crear Nueva ---
+        document.getElementById('form-flashcard').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Formatear materia (Capitalizar primera letra)
+            let rawMateria = document.getElementById('materia').value;
+            let formattedMateria = rawMateria ? capitalize(rawMateria.trim()) : 'General';
+
+            const data = {
+                materia: formattedMateria,
+                pregunta: document.getElementById('pregunta').value,
+                respuesta: document.getElementById('respuesta').value
+            };
+
+            try {
+                const res = await fetch('http://localhost:8080/api/flashcards', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    cerrarModal();
+                    document.getElementById('form-flashcard').reset();
+                    cargarDatosIniciales(); // Recargar todo para actualizar sidebar y grid
+                }
+            } catch (err) { alert("Error al guardar"); }
+        });
+
+        // --- Eliminar ---
+        async function eliminarCard(event, id) {
+            event.stopPropagation(); 
+            if (!confirm("¿Borrar esta tarjeta?")) return;
+            
+            try {
+                const res = await fetch(`http://localhost:8080/api/flashcards/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if(res.ok) cargarDatosIniciales();
+            } catch(e) { console.error(e); }
+        }
+
+        // --- Utilidades ---
+        function capitalize(str) {
+            if(!str) return '';
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        }
+
+        function abrirModal() { document.getElementById('modal-crear').style.display = 'flex'; }
+        function cerrarModal() { document.getElementById('modal-crear').style.display = 'none'; }
+    </script>
+</body>
+</html>

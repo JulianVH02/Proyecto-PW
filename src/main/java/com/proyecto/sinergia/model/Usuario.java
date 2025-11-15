@@ -58,4 +58,14 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     private List<Quiz> quizzes;
+    
+    // --- NUEVA RELACIÓN DE RATINGS DADOS POR EL USUARIO ---
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecursoRating> ratingsDados;
+    // -----------------------------------------------------
+    
+ // --- NUEVA RELACIÓN DE RATINGS DADOS A TUTORES ---
+    @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TutorRating> ratingsTutorDados;
+    // -------------------------------------------------
 }

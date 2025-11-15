@@ -54,6 +54,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         return false; 
     }
 
+ // ... imports y resto de la clase ...
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, 
                                     HttpServletResponse response, 
@@ -63,9 +65,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
 
-        // Si shouldNotFilter devuelve true, el código de abajo no se ejecuta.
-        // Si llegamos aquí, es porque la ruta requiere verificación de token.
-        
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -76,7 +75,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             userEmail = jwtService.extractUsername(jwt);
         } catch (Exception e) {
-            // Si el token no es válido o está expirado, devuelve 401
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token JWT inválido");
             return;
         }
@@ -85,6 +83,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
             if (jwtService.validateToken(jwt, userDetails)) {
+                
+                // --- 🕵️‍♂️ ZONA DE ESPIONAJE (DEBUG) ---
+                System.out.println(">>> INTENTO DE ACCESO A: " + request.getRequestURI());
+                System.out.println(">>> USUARIO: " + userDetails.getUsername());
+                System.out.println(">>> AUTORIDADES (ROLES) CARGADOS: " + userDetails.getAuthorities());
+                // ---------------------------------------
+
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 

@@ -1,7 +1,6 @@
 package com.proyecto.sinergia.model;
 
 import jakarta.persistence.*;
-import java.sql.Timestamp;
 import lombok.Data;
 
 @Data
@@ -13,20 +12,17 @@ public class Flashcard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, length = 500)
     private String pregunta;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, length = 1000)
     private String respuesta;
 
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp fecha;
+    // Opcional: Para organizarlas por materia
+    @Column(name = "materia_nombre")
+    private String materia; 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_usuario") // ON DELETE CASCADE
+    @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_materia") // ON DELETE SET NULL
-    private Materia materia;
 }

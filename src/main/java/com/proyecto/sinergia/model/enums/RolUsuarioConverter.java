@@ -12,7 +12,7 @@ public class RolUsuarioConverter implements AttributeConverter<RolUsuario, Strin
         if (rol == null) {
             return null;
         }
-        // Guarda en la base de datos como minúsculas (ej. "estudiante")
+        // Siempre guardamos en minúsculas para mantener el estándar
         return rol.getValue(); 
     }
 
@@ -21,11 +21,13 @@ public class RolUsuarioConverter implements AttributeConverter<RolUsuario, Strin
         if (dbData == null) {
             return null;
         }
-        
-        // Busca la constante Enum comparando el valor en minúsculas de la DB.
+
+        // --- CORRECCIÓN AQUÍ ---
+        // Usamos 'equalsIgnoreCase' para que no importe si en la BD 
+        // está guardado como "ESTUDIANTE" o "estudiante".
         return Stream.of(RolUsuario.values())
-          .filter(c -> c.getValue().equals(dbData))
+          .filter(c -> c.getValue().equalsIgnoreCase(dbData)) 
           .findFirst()
-          .orElseThrow(IllegalArgumentException::new);
+          .orElseThrow(() -> new IllegalArgumentException("Rol desconocido en BD: " + dbData));
     }
 }

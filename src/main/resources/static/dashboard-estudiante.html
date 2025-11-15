@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Estudiante - Sinergia</title>
     <style>
-        /* --- Estilos Globales (Iguales a los anteriores) --- */
         :root {
             --primary-color: #ff6200;
             --white-color: #ffffff;
             --dark-text: #333;
             --light-bg: #f4f4f4;
-            --card-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --grey-border: #ddd;
+            --secondary-color: #007bff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             margin: 0;
@@ -21,141 +22,148 @@
             background-color: var(--light-bg);
             color: var(--dark-text);
         }
-
+        
         /* --- Navbar --- */
         nav.navbar {
             background-color: var(--white-color);
             padding: 1rem 2rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
-
         .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
             text-decoration: none;
-            display: flex;
-            align-items: center;
+            display: flex; align-items: center;
         }
-
-        .navbar .logo img {
-            height: 70px;
-            width: auto;
-        }
-
-        .nav-links {
+        .navbar .logo img { height: 70px; width: auto; margin-right: 0.5rem; }
+        .navbar .nav-links {
             list-style: none;
+            margin: 0;
+            padding: 0;
             display: flex;
             gap: 1.5rem;
             align-items: center;
         }
-
-        .nav-links a {
+        .navbar .nav-links a {
             text-decoration: none;
             color: var(--dark-text);
             font-weight: 500;
+            transition: color 0.3s ease;
         }
-
-        .btn-logout {
-            background-color: transparent;
-            border: 1px solid var(--primary-color);
+        .navbar .nav-links a:hover, .navbar .nav-links a.active {
             color: var(--primary-color);
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .btn-logout:hover {
-            background-color: var(--primary-color);
-            color: var(--white-color);
+        /* Dropdown */
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { 
+            display: none; 
+            position: absolute; 
+            background-color: var(--white-color); 
+            min-width: 160px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1); 
+            z-index: 1001; 
+            border-radius: 5px; 
+            margin-top: 0.5rem; 
         }
+        .dropdown-content a { 
+            color: var(--dark-text); 
+            padding: 12px 16px; 
+            text-decoration: none; 
+            display: block; 
+        }
+        .dropdown-content a:hover { 
+            background-color: var(--light-bg); 
+            color: var(--primary-color); 
+        }
+        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown .dropbtn { cursor: pointer; text-decoration: none; color: var(--dark-text); font-weight: 500; background: none; border: none; font-family: inherit; font-size: inherit; }
+        .dropdown .dropbtn:hover { color: var(--primary-color); }
 
-        /* --- Dashboard Container --- */
-        .container {
+        /* User Section */
+        .user-section { display: flex; align-items: center; gap: 1rem; }
+        .button-logout {
+            padding: 0.5rem 1rem; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; font-size: 0.9rem;
+        }
+        .button-logout:hover { background: var(--primary-color); color: white; }
+
+        /* --- Layout --- */
+        .main-container {
             max-width: 1200px;
             margin: 2rem auto;
             padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Columna ancha para Tareas/Actividad, estrecha para Accesos */
+            gap: 2rem;
         }
+        @media (max-width: 768px) { .main-container { grid-template-columns: 1fr; } }
 
-        /* --- Header de Bienvenida --- */
-        .welcome-header {
+        /* --- Welcome Header --- */
+        .welcome-banner {
             background-color: var(--white-color);
             padding: 2rem;
             border-radius: 10px;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             margin-bottom: 2rem;
+            grid-column: 1 / -1;
+        }
+        .welcome-banner h1 { margin: 0 0 0.5rem 0; color: var(--primary-color); }
+        .welcome-banner p { margin: 0; color: #666; }
+
+        /* --- Cards & Sections --- */
+        .section-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; color: #444; display: flex; justify-content: space-between; align-items: center; }
+        .section-link { font-size: 0.9rem; color: var(--secondary-color); text-decoration: none; }
+        
+        .card { background: var(--white-color); border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        
+        /* Tasks Preview Styles */
+        .task-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
         }
-
-        .welcome-text h1 {
-            margin: 0;
-            color: var(--primary-color);
-            font-size: 2rem;
-        }
-
-        .welcome-text p {
-            margin: 0.5rem 0 0;
-            color: #666;
-        }
-
-        /* --- Grid de Tarjetas --- */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .card {
-            background-color: var(--white-color);
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: var(--card-shadow);
-            transition: transform 0.2s ease;
+        .task-item:last-child { border-bottom: none; }
+        .task-date-box {
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            padding: 0.5rem;
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            box-sizing: border-box;
+            min-width: 60px;
+            margin-right: 1rem;
         }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card h3 {
-            margin-top: 0;
-            color: var(--dark-text);
-            font-size: 1.5rem;
-        }
-
-        .card p {
-            color: #666;
-            margin-bottom: 1.5rem;
-        }
-
-        .card-btn {
-            display: inline-block;
-            background-color: var(--primary-color);
-            color: var(--white-color);
-            padding: 0.8rem 1.5rem;
-            border-radius: 5px;
-            text-decoration: none;
+        .task-date-box .day { font-size: 1.2rem; font-weight: bold; display: block; line-height: 1; }
+        .task-date-box .month { font-size: 0.8rem; color: #666; text-transform: uppercase; }
+        .task-info h4 { margin: 0 0 0.3rem 0; font-size: 1rem; }
+        .task-info p { margin: 0; font-size: 0.85rem; color: #777; }
+        .task-tag {
+            margin-left: auto;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: bold;
+            color: white;
         }
+        .task-empty { text-align: center; color: #888; padding: 2rem; }
 
-        .card-btn:hover {
-            opacity: 0.9;
+        /* Study Cards Styles */
+        .study-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .study-card {
+            background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 1.5rem;
+            text-align: center; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;
+            text-decoration: none; color: inherit;
         }
-
-        /* Iconos simulados con Emojis para prototipo */
-        .card-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
+        .study-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-color: var(--primary-color); }
+        .study-icon { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+        .study-title { font-weight: bold; display: block; }
+        .study-meta { font-size: 0.8rem; color: #888; margin-top: 0.5rem; display: block; }
 
     </style>
 </head>
@@ -163,99 +171,193 @@
 
     <nav class="navbar">
         <a href="dashboard-estudiante.html" class="logo">
-            <img src="/images/1.png" alt="Sinergia Logo" onerror="this.src='https://placehold.co/150x40/ff6200/ffffff?text=Sinergia'">
+             <img src="/images/1.png" alt="Sinergia Logo">
         </a>
+        
         <ul class="nav-links">
-            <li><a href="#">Mi Perfil</a></li>
-            <li><button onclick="cerrarSesion()" class="btn-logout">Cerrar Sesión</button></li>
+            <li><a href="dashboard-estudiante.html" class="active">Inicio</a></li>
+            <li><a href="recursos.html">Recursos</a></li>
+            <li><a href="marketplace.html">Marketplace</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Repaso &#9662;</a>
+                <div class="dropdown-content">
+                    <a href="planificador.html">📅 Planificador</a>
+                    <a href="flashcards.html">🧠 Flashcards</a>
+                    <a href="quizzes.html">📝 Quizzes</a>
+                </div>
+            </li>
         </ul>
+
+        <div class="user-section">
+            <span id="user-name" style="font-weight: 500;"></span>
+            <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
+        </div>
     </nav>
 
-    <div class="container">
-        <div class="welcome-header">
-            <div class="welcome-text">
-                <h1 id="saludo-usuario">Hola, Estudiante</h1>
-                <p>Bienvenido a tu espacio de aprendizaje.</p>
-            </div>
-            </div>
-
-        <div class="dashboard-grid">
-            
-            <div class="card">
-                <div class="card-icon">🎓</div>
-                <h3>Buscar Tutor</h3>
-                <p>Encuentra expertos en Matemáticas, Programación y más para reforzar tus conocimientos.</p>
-                <a href="#" class="card-btn">Ir al Marketplace</a>
-            </div>
-
-            <div class="card">
-                <div class="card-icon">📚</div>
-                <h3>Recursos Educativos</h3>
-                <p>Accede a guías, apuntes y material de estudio compartido por la comunidad.</p>
-                <a href="#" class="card-btn">Ver Recursos</a>
-            </div>
-
-            <div class="card">
-                <div class="card-icon">🧠</div>
-                <h3>Repaso Activo</h3>
-                <p>Practica con Flashcards y Quizzes generados manualmente o con IA.</p>
-                <a href="#" class="card-btn">Practicar Ahora</a>
-            </div>
-
-            <div class="card">
-                <div class="card-icon">📅</div>
-                <h3>Mis Tareas</h3>
-                <p>Organiza tu semana y mantén al día tus entregas y sesiones de estudio.</p>
-                <a href="#" class="card-btn">Ver Calendario</a>
-            </div>
-
+    <div class="main-container">
+        
+        <div class="welcome-banner">
+            <h1 id="welcome-msg">Hola, Estudiante</h1>
+            <p>Bienvenido a tu espacio de aprendizaje. Aquí tienes un resumen de tu día.</p>
         </div>
+
+        <section>
+            <div class="section-title">
+                <span>📅 Tu Próxima Agenda</span>
+                <a href="planificador.html" class="section-link">Ver calendario completo →</a>
+            </div>
+            
+            <div class="card" id="tasks-container">
+                <p class="task-empty">Cargando tareas...</p>
+            </div>
+        </section>
+
+        <aside>
+            <div class="section-title">
+                <span>🚀 Repaso Rápido</span>
+            </div>
+
+            <div class="study-grid">
+                <a href="flashcards.html" class="study-card">
+                    <span class="study-icon">🧠</span>
+                    <span class="study-title">Flashcards</span>
+                    <span class="study-meta">Repasar conceptos</span>
+                </a>
+                
+                <a href="quizzes.html" class="study-card">
+                    <span class="study-icon">📝</span>
+                    <span class="study-title">Quizzes</span>
+                    <span class="study-meta">Pon a prueba tu saber</span>
+                </a>
+            </div>
+
+            <div class="card" style="margin-top: 1.5rem; background-color: #e6f7ff; border: 1px solid #b3e0ff;">
+                <h4 style="margin-top:0; color: #0056b3;">¿Necesitas ayuda hoy?</h4>
+                <p style="font-size: 0.9rem; color: #555;">Hay nuevos tutores disponibles en Matemáticas y Física.</p>
+                <a href="marketplace.html" style="display:block; text-align:center; margin-top:10px; background:#0056b3; color:white; padding:8px; border-radius:5px; text-decoration:none; font-weight:bold;">Buscar Tutor</a>
+            </div>
+        </aside>
+
     </div>
 
     <script>
-        // 1. Verificar Autenticación al cargar
-        document.addEventListener('DOMContentLoaded', async function() {
-            const token = localStorage.getItem('jwtToken');
+        const token = localStorage.getItem('jwtToken');
+        if (!token) window.location.href = 'login.html';
 
-            // Si no hay token, expulsar al usuario
-            if (!token) {
-                window.location.href = 'login.html';
-                return;
+        document.addEventListener('DOMContentLoaded', () => {
+            const payload = parseJwt(token);
+            if (payload) {
+                const nombre = payload.sub ? payload.sub.split('@')[0] : 'Estudiante';
+                document.getElementById('user-name').textContent = `Hola, ${nombre}`;
+                document.getElementById('welcome-msg').textContent = `Hola, ${nombre}`;
             }
-
-            // 2. Obtener datos del usuario (Nombre)
-            try {
-                const response = await fetch('http://localhost:8080/api/auth/mi-perfil', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    const usuario = await response.json();
-                    // Actualizar el saludo con el nombre real
-                    document.getElementById('saludo-usuario').textContent = `Hola, ${usuario.nombre}`;
-                    
-                    // Validación de Rol (Opcional): Si un tutor intenta entrar aquí, podrías redirigirlo
-                    // if (usuario.rol === 'TUTOR') window.location.href = 'dashboard-tutor.html';
-
-                } else {
-                    // Si el token es inválido o expiró
-                    cerrarSesion();
-                }
-            } catch (error) {
-                console.error("Error al cargar perfil:", error);
-            }
+            cargarTareasPreview();
         });
 
-        // Función para cerrar sesión
-        function cerrarSesion() {
+        // --- Lógica para mostrar las tareas más cercanas ---
+        async function cargarTareasPreview() {
+            const container = document.getElementById('tasks-container');
+            try {
+                const response = await fetch('http://localhost:8080/api/tareas', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (response.ok) {
+                    const tareas = await response.json();
+                    
+                    // 1. Filtrar tareas futuras o de hoy
+                    const ahora = new Date();
+                    ahora.setHours(0,0,0,0); // Normalizar a inicio del día
+                    
+                    const tareasPendientes = tareas.filter(t => {
+                        const fechaTarea = new Date(t.start);
+                        return fechaTarea >= ahora;
+                    });
+
+                    // 2. Ordenar por fecha más cercana
+                    tareasPendientes.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+                    // 3. Tomar solo las 3 primeras
+                    const proximas = tareasPendientes.slice(0, 3);
+
+                    if (proximas.length === 0) {
+                        container.innerHTML = `
+                            <div class="task-empty">
+                                <p>🎉 ¡No tienes tareas pendientes!</p>
+                                <a href="planificador.html" style="color:var(--primary-color); font-weight:bold;">Agendar algo nuevo</a>
+                            </div>`;
+                        return;
+                    }
+
+                    container.innerHTML = ''; // Limpiar loader
+                    
+                    proximas.forEach(t => {
+                        const fecha = new Date(t.start);
+                        const dia = fecha.getDate();
+                        const mes = fecha.toLocaleString('es-CO', { month: 'short' });
+                        const esHoy = isToday(fecha);
+                        const esManana = isTomorrow(fecha);
+
+                        let etiqueta = '';
+                        let colorEtiqueta = '#666';
+
+                        if (esHoy) { etiqueta = 'HOY'; colorEtiqueta = 'var(--danger-color)'; }
+                        else if (esManana) { etiqueta = 'MAÑANA'; colorEtiqueta = 'var(--primary-color)'; }
+                        else { etiqueta = 'PENDIENTE'; colorEtiqueta = 'var(--success-color)'; }
+
+                        const item = `
+                            <div class="task-item">
+                                <div class="task-date-box">
+                                    <span class="day">${dia}</span>
+                                    <span class="month">${mes}</span>
+                                </div>
+                                <div class="task-info">
+                                    <h4>${t.title}</h4>
+                                    <p>${t.description || 'Sin descripción'}</p>
+                                </div>
+                                <span class="task-tag" style="background-color: ${colorEtiqueta}">${etiqueta}</span>
+                            </div>
+                        `;
+                        container.innerHTML += item;
+                    });
+
+                } else {
+                    container.innerHTML = '<p class="task-empty">No se pudieron cargar las tareas.</p>';
+                }
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p class="task-empty">Error de conexión.</p>';
+            }
+        }
+
+        // --- Utilidades ---
+        function isToday(date) {
+            const today = new Date();
+            return date.getDate() === today.getDate() &&
+                   date.getMonth() === today.getMonth() &&
+                   date.getFullYear() === today.getFullYear();
+        }
+        function isTomorrow(date) {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            return date.getDate() === tomorrow.getDate() &&
+                   date.getMonth() === tomorrow.getMonth() &&
+                   date.getFullYear() === tomorrow.getFullYear();
+        }
+
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) { return null; }
+        }
+
+        function logout() {
             localStorage.removeItem('jwtToken');
             window.location.href = 'index.html';
         }
     </script>
-
 </body>
 </html>

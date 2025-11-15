@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administrador - Sinergia</title>
+    
+    <!-- 🛡️ SCRIPT DE SEGURIDAD ADMIN 🛡️ -->
+    <script>
+        (function() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                // Verificación rápida: Si falla la API de admin, redirigir
+                fetch('http://localhost:8080/api/admin/stats', { // Usamos el nuevo endpoint
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                }).then(response => {
+                    if (response.status === 403) {
+                        window.location.href = '403.html';
+                    }
+                });
+            } catch (e) {
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+    
+    <style>
+        /* --- Estilos Globales (Heredados) --- */
+        :root {
+            --primary-color: #ff6200;
+            --secondary-color: #d9534f; /* Rojo */
+            --success-color: #5cb85c;   /* Verde */
+            --white-color: #ffffff;
+            --dark-text: #333;
+            --light-bg: #f4f4f4;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+        nav.navbar {
+            background-color: var(--white-color);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex; 
+            align-items: center;
+        }
+        .navbar .logo img { height: 70px; width: auto; margin-right: 0.5rem; }
+        .button-logout {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary-color);
+            background: transparent;
+            color: var(--primary-color);
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .button-logout:hover { background: var(--primary-color); color: white; }
+
+        /* --- Contenedor Principal --- */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .welcome-banner {
+            background-color: var(--white-color);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            border-left: 5px solid var(--primary-color);
+        }
+        .welcome-banner h1 { margin: 0; color: var(--primary-color); }
+        .welcome-banner p { margin: 0.5rem 0 0; color: #666; }
+
+        /* --- NUEVO: ESTADÍSTICAS --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background-color: var(--white-color);
+            padding: 1.5rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary-color);
+        }
+        .stat-card.tutores {
+            border-left-color: var(--success-color); /* Verde para tutores */
+        }
+        .stat-card.pendientes {
+            border-left-color: var(--secondary-color); /* Rojo/Naranja para pendientes */
+        }
+        .stat-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: #666;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .stat-card p {
+            margin: 0;
+            color: var(--dark-text);
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        /* --- FIN NUEVO --- */
+
+        /* --- SECCIÓN ADMIN: SOLICITUDES --- */
+        .admin-section {
+            background-color: var(--white-color);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .requests-table th, .requests-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .requests-table th {
+            background-color: #f9f9f9;
+            color: var(--primary-color);
+        }
+        .btn-action {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        .btn-approve { background-color: var(--success-color); }
+        .btn-reject { background-color: var(--secondary-color); }
+        .btn-approve:hover, .btn-reject:hover { opacity: 0.8; }
+
+        /* --- Grid de Herramientas --- */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .tool-card {
+            background: var(--white-color);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .admin-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .tool-card h3 { color: var(--dark-text); margin-bottom: 1rem; }
+        .tool-card p { color: #666; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .btn-card {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--dark-text);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn-card:hover { background-color: var(--primary-color); }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="logo">
+             <img src="/images/1.png" alt="Sinergia Logo">
+        </a>
+        <div>
+            <span id="user-name" style="margin-right: 1rem; font-weight: 500;">Administrador</span>
+            <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        
+        <!-- Bienvenida -->
+        <div class="welcome-banner">
+            <h1>Panel de Administración</h1>
+            <p>Gestiona usuarios, revisa solicitudes y administra el contenido de la plataforma.</p>
+        </div>
+
+        <!-- NUEVA SECCIÓN DE ESTADÍSTICAS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Estudiantes</h3>
+                <p id="stat-estudiantes">--</p>
+            </div>
+            <div class="stat-card tutores">
+                <h3>Tutores Aprobados</h3>
+                <p id="stat-tutores">--</p>
+            </div>
+            <div class="stat-card pendientes">
+                <h3>Solicitudes Pendientes</h3>
+                <p id="stat-pendientes">--</p>
+            </div>
+        </div>
+
+        <!-- Sección de Aprobaciones (Existente) -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h2>Solicitudes de Tutores Pendientes</h2>
+                <button onclick="cargarPendientes()" class="button-logout" style="font-size: 0.8rem;">Actualizar</button>
+            </div>
+            <table class="requests-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Materia</th>
+                        <th>Evidencia</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-pendientes">
+                    <tr><td colspan="5" style="text-align: center;">Cargando...</td></tr>
+                </tbody>
+            </table>
+            <p id="mensaje-admin" style="text-align: center; margin-top: 1rem; font-weight: bold;"></p>
+        </div>
+
+        <!-- Herramientas Generales (Existente) -->
+        <h2 style="margin-bottom: 1.5rem; color: var(--dark-text);">Gestión de Plataforma</h2>
+        <div class="tools-grid">
+            <div class="tool-card">
+                <span class="admin-badge">EDITAR</span>
+                <h3>Gestión de Tutores</h3>
+                <p>Ver lista completa de tutores, editar perfiles o eliminar cuentas.</p>
+                <a href="#" class="btn-card">Administrar</a>
+            </div>
+            <div class="tool-card">
+                <span class="admin-badge">EDITAR</span>
+                <h3>Gestión de Recursos</h3>
+                <p>Subir, modificar o eliminar recursos educativos globales.</p>
+                <a href="#" class="btn-card">Administrar</a>
+            </div>
+            <div class="tool-card">
+                <h3>Mi Planificador</h3>
+                <p>Acceso personal al calendario y tareas (modo usuario).</p>
+                <a href="#" class="btn-card">Ver Calendario</a>
+            </div>
+             <div class="tool-card">
+                <h3>Repaso Activo</h3>
+                <p>Crear o moderar Flashcards y Quizzes de la comunidad.</p>
+                <a href="#" class="btn-card">Ir a Repaso</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('jwtToken');
+
+        // --- NUEVA FUNCIÓN PARA CARGAR ESTADÍSTICAS ---
+        async function cargarEstadisticas() {
+            try {
+                const response = await fetch('http://localhost:8080/api/admin/stats', {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('stat-estudiantes').textContent = stats.totalEstudiantes;
+                    document.getElementById('stat-tutores').textContent = stats.totalTutores;
+                    document.getElementById('stat-pendientes').textContent = stats.totalPendientes;
+                } else {
+                    console.error("Error al cargar estadísticas");
+                }
+            } catch (error) {
+                console.error("Error de red", error);
+            }
+        }
+
+        // --- Función existente (sin cambios) ---
+        async function cargarPendientes() {
+            const tbody = document.getElementById('lista-pendientes');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Buscando...</td></tr>';
+
+            try {
+                const response = await fetch('http://localhost:8080/api/admin/pendientes', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const pendientes = await response.json();
+                    tbody.innerHTML = '';
+                    if (pendientes.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay solicitudes pendientes.</td></tr>';
+                        return;
+                    }
+                    pendientes.forEach(p => {
+                        const fila = `
+                            <tr>
+                                <td>${p.nombre} ${p.apellido}</td>
+                                <td>${p.correo}</td>
+                                <td>${p.materia ? p.materia : 'N/A'}</td>
+                                <td>${p.evidencia ? `<a href="${p.evidencia}" target="_blank" style="color: var(--primary-color);">Ver Link</a>` : 'N/A'}</td>
+                                <td>
+                                    <button class="btn-action btn-approve" onclick="gestionarTutor(${p.id}, 'APROBAR')">✓</button>
+                                    <button class="btn-action btn-reject" onclick="gestionarTutor(${p.id}, 'RECHAZAR')">✕</button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += fila;
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error cargando datos (403/500).</td></tr>';
+                }
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error de conexión.</td></tr>';
+            }
+        }
+
+        // --- Función existente (sin cambios) ---
+        async function gestionarTutor(idUsuario, accion) {
+            const mensajeEl = document.getElementById('mensaje-admin');
+            const endpoint = accion === 'APROBAR' 
+                ? `http://localhost:8080/api/admin/aprobar/${idUsuario}`
+                : `http://localhost:8080/api/admin/rechazar/${idUsuario}`;
+
+            if(!confirm(`¿Estás seguro de que deseas ${accion} a este usuario?`)) return;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                if (response.ok) {
+                    mensajeEl.style.color = 'green';
+                    mensajeEl.textContent = `Usuario ${accion === 'APROBAR' ? 'aprobado' : 'rechazado'} con éxito.`;
+                    cargarPendientes(); // Recargar la tabla
+                    cargarEstadisticas(); // --- AÑADIDO: Recargar estadísticas
+                } else {
+                    mensajeEl.style.color = 'red';
+                    mensajeEl.textContent = 'Error al procesar la solicitud.';
+                }
+            } catch (error) {
+                console.error(error);
+                mensajeEl.style.color = 'red';
+                mensajeEl.textContent = 'Error de red.';
+            }
+        }
+
+        // --- Función existente (sin cambios) ---
+        function logout() {
+            localStorage.removeItem('jwtToken');
+            window.location.href = 'index.html';
+        }
+
+        // Cargar al inicio
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarPendientes();
+            cargarEstadisticas(); // --- AÑADIDO: Cargar estadísticas al iniciar
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca de Recursos - Sinergia</title>
+    <style>
+        :root {
+            --primary-color: #ff6200;
+            --white-color: #ffffff;
+            --dark-text: #333;
+            --light-bg: #f4f4f4;
+            --grey-border: #ddd;
+            --secondary-color: #007bff; /* Usado para enlaces de calificación */
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+        
+        /* --- Navbar --- */
+        nav.navbar {
+            background-color: var(--white-color);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex; align-items: center;
+        }
+        .navbar .logo img { height: 70px; width: auto; margin-right: 0.5rem; }
+        .navbar .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .navbar .nav-links a:hover, .navbar .nav-links a.active {
+            color: var(--primary-color);
+        }
+        /* Dropdown */
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { 
+            display: none; 
+            position: absolute; 
+            background-color: var(--white-color); 
+            min-width: 160px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1); 
+            z-index: 1001; 
+            border-radius: 5px; 
+            margin-top: 0.5rem; 
+        }
+        .dropdown-content a { 
+            color: var(--dark-text); 
+            padding: 12px 16px; 
+            text-decoration: none; 
+            display: block; 
+        }
+        .dropdown-content a:hover { 
+            background-color: var(--light-bg); 
+            color: var(--primary-color); 
+        }
+        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown .dropbtn { cursor: pointer; text-decoration: none; color: var(--dark-text); font-weight: 500; background: none; border: none; font-family: inherit; font-size: inherit; }
+        .dropdown .dropbtn:hover { color: var(--primary-color); }
+        /* Sección de Usuario */
+        .user-section { display: flex; align-items: center; gap: 1rem; }
+        .button-logout {
+            padding: 0.5rem 1rem; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; font-size: 0.9rem;
+        }
+        .button-logout:hover { background: var(--primary-color); color: white; }
+
+        /* --- Layout Principal --- */
+        .dashboard-container { max-width: 1300px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        @media (min-width: 1024px) { .dashboard-container { grid-template-columns: 300px 1fr; align-items: start; } }
+        /* --- Tarjetas y Componentes --- */
+        .section-card { background-color: var(--white-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        .section-card h3 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 0.5rem; font-size: 1.2rem; }
+        .filter-group { margin-bottom: 1rem; }
+        .filter-group select, .filter-group input { width: 100%; padding: 0.6rem; border: 1px solid var(--grey-border); border-radius: 5px; font-family: inherit; }
+
+        /* Grid Recursos */
+        .library-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        #recursos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .recurso-card { background-color: #fff; border: 1px solid var(--grey-border); border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+        .recurso-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .recurso-card-content { padding: 1.5rem; flex-grow: 1; }
+        .recurso-card-tag { display: inline-block; background-color: var(--primary-color); color: white; padding: 3px 8px; font-size: 0.7rem; font-weight: bold; border-radius: 4px; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .recurso-info-mini { font-size: 0.8rem; color: #999; margin-top: 1rem; display: flex; justify-content: space-between; }
+        .recurso-card-link { background-color: var(--primary-color); color: white; text-decoration: none; padding: 0.8rem; text-align: center; font-weight: bold; transition: background-color 0.3s ease; }
+        
+        /* --- RATING COMPONENT STYLES --- */
+        .resource-rating {
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .rating-text {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+        .star {
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #ffd700; /* Dorado */
+            line-height: 1;
+        }
+        .star.empty {
+            color: #ccc;
+        }
+        .rate-link {
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        /* Modal Estilos */
+        .rating-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .rating-modal-content {
+            background: var(--white-color);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
+        .rating-modal-content label {
+            margin: 0 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        .button-submit { width: 100%; padding: 0.8rem; background-color: var(--primary-color); color: var(--white-color); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .button-clear { background: none; border: 1px solid var(--grey-border); color: var(--dark-text); padding: 0.8rem; border-radius: 5px; width: 100%; cursor: pointer;}
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="dashboard-estudiante.html" class="logo">
+             <img src="/images/1.png" alt="Sinergia Logo">
+        </a>
+        
+        <ul class="nav-links">
+            <li><a href="dashboard-estudiante.html">Inicio</a></li>
+            <li><a href="recursos.html" class="active">Recursos Educativos</a></li>
+            <li><a href="marketplace.html">Marketplace de Tutores</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Repaso Activo &#9662;</a>
+                <div class="dropdown-content">
+                    <a href="#">Flashcards</a>
+                    <a href="#">Quizzes</a>
+                    <a href="#">Planificador</a>
+                </div>
+            </li>
+        </ul>
+
+        <div class="user-section">
+            <span id="user-name" style="font-weight: 500;"></span>
+            <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        
+        <aside class="sidebar">
+            <div class="section-card">
+                <h3>🔍 Filtrar Recursos</h3>
+                <div class="filter-group">
+                    <label for="filtro-materia">Por Materia:</label>
+                    <select id="filtro-materia" onchange="aplicarFiltros()">
+                        <option value="TODAS">Todas las materias</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filtro-tipo">Por Tipo:</label>
+                    <select id="filtro-tipo" onchange="aplicarFiltros()">
+                        <option value="TODOS">Todos los tipos</option>
+                        <option value="Video">Video</option>
+                        <option value="Artículo">Artículo</option>
+                        <option value="Guía/PDF">Guía/PDF</option>
+                        <option value="Simulador">Simulador</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <button class="btn-clear" onclick="limpiarFiltros()">Limpiar filtros</button>
+            </div>
+
+            <div class="section-card">
+                <h3 class="upload-toggle" onclick="toggleUploadForm()">
+                    📤 Subir Nuevo Recurso 
+                    <span>&#9662;</span>
+                </h3>
+                <div id="upload-container" class="upload-form-container">
+                    <form id="recurso-form">
+                        <div class="filter-group">
+                            <label>Título</label>
+                            <input type="text" id="titulo" required placeholder="Ej. Introducción a Java">
+                        </div>
+                        <div class="filter-group">
+                            <label>Enlace (URL)</label>
+                            <input type="url" id="url" required placeholder="https://...">
+                        </div>
+                        <div class="filter-group">
+                            <label>Materia</label>
+                            <select id="materia" required>
+                                <option value="">Cargando...</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Tipo</label>
+                            <select id="tipo" required>
+                                <option value="Video">Video</option>
+                                <option value="Artículo">Artículo</option>
+                                <option value="Guía/PDF">Guía/PDF</option>
+                                <option value="Simulador">Simulador</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Descripción</label>
+                            <input type="text" id="descripcion" placeholder="Breve descripción...">
+                        </div>
+                        <button type="submit" class="button-submit">Publicar</button>
+                        <p id="mensaje"></p>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <main class="recursos-main">
+            <div class="library-header">
+                <h2>📚 Biblioteca de Recursos</h2>
+                <span style="color: #666; font-size: 0.9rem;">Mostrando <b id="contador-recursos">0</b> recursos</span>
+            </div>
+            <div id="recursos-grid">
+                <p>Cargando biblioteca...</p>
+            </div>
+        </main>
+    </div>
+
+    <div id="rating-modal" class="rating-modal-overlay" style="display:none;">
+        <div class="rating-modal-content">
+            <h3>Calificar Recurso</h3>
+            <p>Selecciona tu puntuación (1 a 5):</p>
+            
+            <form id="rating-form">
+                <div style="margin-bottom: 20px;">
+                    <label><input type="radio" name="puntuacion" value="1"> 1</label>
+                    <label><input type="radio" name="puntuacion" value="2"> 2</label>
+                    <label><input type="radio" name="puntuacion" value="3"> 3</label>
+                    <label><input type="radio" name="puntuacion" value="4"> 4</label>
+                    <label><input type="radio" name="puntuacion" value="5"> 5</label>
+                </div>
+                <button type="button" onclick="enviarRating()" class="button-submit" style="margin-bottom: 10px;">Enviar Calificación</button>
+                <button type="button" onclick="document.getElementById('rating-modal').style.display='none'" class="button-clear">Cancelar</button>
+            </form>
+            <p id="rating-message" style="margin-top:10px;"></p>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('jwtToken');
+        let todosLosRecursos = []; 
+        let todasLasMaterias = [];
+        let recursoIdActual = null; // Variable para almacenar el ID del recurso a calificar
+
+        if (!token) window.location.href = 'login.html';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const payload = parseJwt(token);
+            if (payload) document.getElementById('user-name').textContent = `Hola, ${payload.sub ? payload.sub.split('@')[0] : 'Usuario'}`;
+            cargarDatosIniciales();
+        });
+
+        async function cargarDatosIniciales() {
+            await fetchMaterias(); 
+            await fetchRecursos(); 
+        }
+
+        async function fetchMaterias() {
+            const selectForm = document.getElementById('materia');
+            const selectFiltro = document.getElementById('filtro-materia');
+            try {
+                const response = await fetch('http://localhost:8080/api/public/materias');
+                if (response.ok) {
+                    todasLasMaterias = await response.json();
+                    selectForm.innerHTML = '<option value="" disabled selected>Selecciona materia</option>';
+                    todasLasMaterias.forEach(m => selectForm.innerHTML += `<option value="${m.id}">${m.nombre}</option>`);
+                    todasLasMaterias.forEach(m => selectFiltro.innerHTML += `<option value="${m.nombre}">${m.nombre}</option>`);
+                }
+            } catch (e) { console.error("Error materias", e); }
+        }
+
+        async function fetchRecursos() {
+            const grid = document.getElementById('recursos-grid');
+            try {
+                const response = await fetch('http://localhost:8080/api/recursos', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (response.ok) {
+                    todosLosRecursos = await response.json();
+                    renderizarRecursos(todosLosRecursos);
+                } else { grid.innerHTML = '<p style="color: red;">Error al cargar.</p>'; }
+            } catch (e) { console.error("Error recursos", e); }
+        }
+        
+        // --- FUNCIONES DE RATING ---
+
+        function generarEstrellas(rating) {
+            const maxEstrellas = 5;
+            let html = '';
+            const ratingRedondeado = Math.round(rating); // Redondeo simple para la visualización
+
+            for (let i = 1; i <= maxEstrellas; i++) {
+                if (i <= ratingRedondeado) {
+                    html += '<span class="star filled">★</span>'; // Estrella llena
+                } else {
+                    html += '<span class="star empty">☆</span>'; // Estrella vacía
+                }
+            }
+            return html;
+        }
+
+        function abrirModalRating(event, idRecurso) {
+            event.preventDefault();
+            recursoIdActual = idRecurso;
+            
+            const modal = document.getElementById('rating-modal');
+            const form = document.getElementById('rating-form');
+            
+            form.reset();
+            document.getElementById('rating-message').textContent = '';
+            
+            if (modal) modal.style.display = 'flex'; // Usamos 'flex' para centrar el modal
+        }
+
+        async function enviarRating() {
+            const puntuacionInput = document.querySelector('input[name="puntuacion"]:checked');
+            const mensajeEl = document.getElementById('rating-message');
+
+            if (!puntuacionInput || !recursoIdActual) {
+                mensajeEl.style.color = 'red';
+                mensajeEl.textContent = "Selecciona una puntuación.";
+                return;
+            }
+
+            const ratingValue = parseInt(puntuacionInput.value);
+            
+            try {
+                const response = await fetch(`http://localhost:8080/api/ratings/recurso/${recursoIdActual}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ puntuacion: ratingValue })
+                });
+
+                if (response.ok) {
+                    mensajeEl.style.color = 'green';
+                    mensajeEl.textContent = "¡Gracias! Calificación guardada.";
+                    
+                    setTimeout(() => {
+                        const modal = document.getElementById('rating-modal');
+                        if (modal) modal.style.display = 'none';
+                        fetchRecursos(); // Recarga la lista para ver el nuevo promedio
+                    }, 800);
+                    
+                } else {
+                    const errorText = await response.text();
+                    mensajeEl.style.color = 'red';
+                    mensajeEl.textContent = `Error: ${errorText}`;
+                }
+            } catch (e) {
+                mensajeEl.style.color = 'red';
+                mensajeEl.textContent = "Error de conexión al servidor.";
+            }
+        }
+        // -----------------------------
+
+        function renderizarRecursos(listaRecursos) {
+            const grid = document.getElementById('recursos-grid');
+            const contador = document.getElementById('contador-recursos');
+            grid.innerHTML = '';
+            contador.textContent = listaRecursos.length;
+
+            if (listaRecursos.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #666;">No se encontraron recursos.</div>';
+                return;
+            }
+
+            listaRecursos.forEach(r => {
+                const estrellasHtml = generarEstrellas(r.ratingPromedio); 
+                const card = `
+                    <div class="recurso-card">
+                        <div class="recurso-card-content">
+                            <span class="recurso-card-tag" style="background-color: ${getTagColor(r.tipoRecurso)}">${r.tipoRecurso}</span>
+                            <h3>${r.titulo}</h3>
+                            <p>${r.descripcion || 'Sin descripción.'}</p>
+                            
+                            <div class="resource-rating">
+                                <span class="rating-text">${r.ratingPromedio ? r.ratingPromedio.toFixed(1) : '0.0'}</span>
+                                <span class="stars">${estrellasHtml}</span>
+                                <a href="#" class="rate-link" data-recurso-id="${r.id}" onclick="abrirModalRating(event, ${r.id})">Calificar</a>
+                            </div>
+
+                            <div class="recurso-info-mini">
+                                <span>📂 ${r.materiaNombre}</span>
+                                <span>👤 ${r.usuarioNombre.split(' ')[0]}</span>
+                            </div>
+                        </div>
+                        <a href="${r.url}" target="_blank" class="recurso-card-link">Ver Recurso ↗</a>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        function aplicarFiltros() {
+            const materiaSel = document.getElementById('filtro-materia').value;
+            const tipoSel = document.getElementById('filtro-tipo').value;
+            const filtrados = todosLosRecursos.filter(r => {
+                return ((materiaSel === 'TODAS') || (r.materiaNombre === materiaSel)) &&
+                       ((tipoSel === 'TODOS') || (r.tipoRecurso === tipoSel));
+            });
+            renderizarRecursos(filtrados);
+        }
+
+        function limpiarFiltros() {
+            document.getElementById('filtro-materia').value = 'TODAS';
+            document.getElementById('filtro-tipo').value = 'TODOS';
+            renderizarRecursos(todosLosRecursos);
+        }
+
+        function getTagColor(tipo) {
+            switch(tipo) {
+                case 'Video': return '#FF0000'; 
+                case 'Guía/PDF': return '#007BFF'; 
+                case 'Artículo': return '#28a745'; 
+                case 'Simulador': return '#17a2b8'; 
+                default: return 'var(--primary-color)';
+            }
+        }
+
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) { return null; }
+        }
+
+        function toggleUploadForm() {
+            document.getElementById('upload-container').classList.toggle('active');
+        }
+
+        function logout() {
+            localStorage.removeItem('jwtToken');
+            window.location.href = 'index.html';
+        }
+
+        document.getElementById('recurso-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const mensajeEl = document.getElementById('mensaje');
+            const btn = event.target.querySelector('button');
+            btn.disabled = true; btn.textContent = 'Publicando...'; mensajeEl.textContent = '';
+
+            const requestBody = {
+                titulo: document.getElementById('titulo').value,
+                url: document.getElementById('url').value,
+                descripcion: document.getElementById('descripcion').value,
+                tipoRecurso: document.getElementById('tipo').value,
+                materiaId: document.getElementById('materia').value
+            };
+
+            try {
+                const response = await fetch('http://localhost:8080/api/recursos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(requestBody)
+                });
+                if (response.ok) {
+                    mensajeEl.style.color = 'green'; mensajeEl.textContent = '¡Subido!';
+                    event.target.reset(); fetchRecursos(); toggleUploadForm();
+                } else { mensajeEl.style.color = 'red'; mensajeEl.textContent = 'Error al subir.'; }
+            } catch (e) { mensajeEl.style.color = 'red'; mensajeEl.textContent = 'Error de conexión.'; }
+            finally { btn.disabled = false; btn.textContent = 'Publicar'; }
+        });
+    </script>
+</body>
+</html>

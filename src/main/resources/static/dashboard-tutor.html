@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Tutor - Sinergia</title>
+    <style>
+        :root { --primary-color: #ff6200; --white-color: #ffffff; --dark-text: #333; --light-bg: #f4f4f4; --grey-border: #ddd; --secondary-color: #007bff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: var(--dark-text); }
+        
+        /* --- Navbar --- */
+        nav.navbar { background-color: var(--white-color); padding: 1rem 2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .navbar .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; }
+        .navbar .logo img { height: 40px; width: auto; margin-right: 0.5rem; }
+        .navbar .nav-links { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.5rem; align-items: center; }
+        .navbar .nav-links a { text-decoration: none; color: var(--dark-text); font-weight: 500; transition: color 0.3s ease; }
+        .navbar .nav-links a:hover, .navbar .nav-links a.active { color: var(--primary-color); }
+        .user-section { display: flex; align-items: center; gap: 1rem; }
+        .button-logout { 
+            padding: 0.5rem 1rem; border: 1px solid var(--primary-color); background: transparent; 
+            color: var(--primary-color); border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none;
+            /* Importante: Añadir la clase para que el JS lo capture */
+            display: inline-block;
+        }
+        .button-logout:hover { background: var(--primary-color); color: white; }
+        
+        /* --- Layout Principal --- */
+        .dashboard-container { max-width: 1300px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        @media (min-width: 1024px) { .dashboard-container { grid-template-columns: 300px 1fr; align-items: start; } }
+        /* --- Componentes --- */
+        .section-card { background-color: var(--white-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        .section-card h3 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 0.5rem; font-size: 1.2rem; }
+        .main-content { display: none; } 
+        #status-message { text-align: center; padding: 3rem; background-color: var(--white-color); border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 5rem; }
+        .tutor-info-box { background-color: #e6f7ff; border: 1px solid #b3e0ff; color: #0056b3; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.95rem; }
+        .tutor-info-box strong { font-weight: 700; color: var(--secondary-color); }
+        
+        /* Ajuste de Grid: Ahora solo dos columnas */
+        .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
+        .metric-card { background-color: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; border-left: 5px solid var(--primary-color); }
+        .metric-value { font-size: 2rem; font-weight: bold; color: var(--dark-text); }
+        .metric-label { font-size: 0.9rem; color: #666; margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+
+    <div id="status-message">
+        <p>Verificando tu estado como tutor...</p>
+    </div>
+    
+    <div id="main-dashboard" class="main-content">
+
+        <nav class="navbar">
+            <a href="dashboard-tutor.html" class="logo">
+                <img src="/images/1.png" alt="Sinergia Logo">
+            </a>
+            <ul class="nav-links">
+                <!-- CORRECCIÓN 2: Inicio apunta al propio dashboard -->
+                <li><a href="dashboard-tutor.html" class="active">Inicio (Tutor)</a></li> 
+                <li><a href="recursos.html">Recursos Educativos</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="planificador.html">Planificador</a></li>
+                <!-- Otras secciones -->
+            </ul>
+            <div class="user-section">
+                <span id="user-name" style="margin-right: 1rem; font-weight: 500;"></span>
+                <!-- CORRECCIÓN 1: El botón usa la función logout -->
+                <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            
+            <!-- Sidebar -->
+            <aside>
+                <div class="section-card tutor-info-box">
+                    <strong>¡Bienvenido, Tutor!</strong>
+                    <p id="tutor-name-info" style="margin: 0.5rem 0 0;"></p>
+                    <p id="tutor-materia-info" style="margin: 0; font-size: 0.85rem; color: #0056b3;"></p>
+                </div>
+                
+                <div class="section-card">
+                    <h3>🛠️ Gestión de Perfil</h3>
+                    <p><a href="tutor-profile-setup.html" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Actualizar Precio y Contacto</a></p>
+                    <p><a href="#" style="color: var(--secondary-color); text-decoration: none; font-weight: 600;">Ver/Modificar Horarios</a></p>
+                </div>
+
+                <div class="section-card">
+                    <h3>📊 Sesiones y Pagos</h3>
+                    <p>Calendario de Sesiones (Próximamente)</p>
+                    <p>Historial de Pagos (Próximamente)</p>
+                </div>
+            </aside>
+
+            <!-- Main Content (Métricas) -->
+            <main>
+                <div class="marketplace-header">
+                    <h2>Panel de Control</h2>
+                    <p style="color: #666;">Tu resumen de actividad y desempeño como tutor en Sinergia.</p>
+                </div>
+
+                <!-- CORRECCIÓN 3: Solo Clases Impartidas y Tasa de Respuesta -->
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">12</div>
+                        <div class="metric-label">Clases impartidas (Mes)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">85%</div>
+                        <div class="metric-label">Tasa de respuesta</div>
+                    </div>
+                </div>
+
+                <div class="section-card" style="margin-top: 2rem;">
+                    <h3>📝 Tu Descripción Actual</h3>
+                    <p id="current-description" style="color: #444; font-style: italic;"></p>
+                    <h3>💵 Precio por Hora</h3>
+                    <p id="current-price" style="font-size: 1.5rem; font-weight: bold; color: var(--primary-color);"></p>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Script Corregido (mantenemos la encapsulación IIFE) -->
+    <script>
+        (function() { 
+            const token = localStorage.getItem('jwtToken');
+            const statusMessageEl = document.getElementById('status-message');
+            const mainDashboardEl = document.getElementById('main-dashboard');
+
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.addEventListener('DOMContentLoaded', checkTutorStatus);
+
+            // --- CORRECCIÓN 1: Función Logout funcional ---
+            window.logout = function() {
+                localStorage.removeItem('jwtToken');
+                window.location.href = 'http://localhost:8080/index.html'; 
+            }
+            // ---------------------------------------------
+            
+            async function checkTutorStatus() {
+                try {
+                    const response = await fetch('http://localhost:8080/api/tutor/profile', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        
+                        // Si el perfil NO está completo, redirige inmediatamente
+                        if (!data.profileComplete) {
+                            window.location.href = 'http://localhost:8080/tutor-profile-setup.html'; 
+                            return;
+                        }
+                        
+                        // Perfil completo: renderiza el dashboard
+                        renderDashboard(data);
+                        
+                    } else if (response.status === 403) {
+                        // Tutor no aprobado
+                        alert("Tu solicitud de tutoría aún no ha sido aprobada. Serás redirigido al dashboard de estudiante.");
+                        window.location.href = 'dashboard-estudiante.html';
+                        
+                    } else {
+                        // Error 500, etc.
+                        statusMessageEl.classList.add('error');
+                        statusMessageEl.innerHTML = `<p style="color: red;">Error al cargar el estado del perfil. Intenta de nuevo más tarde.</p>`;
+                    }
+
+                } catch (e) {
+                    console.error("Error de conexión:", e);
+                    statusMessageEl.classList.add('error');
+                    statusMessageEl.innerHTML = `<p style="color: red;">Error de conexión con el servidor. Verifica que esté corriendo.</p>`;
+                }
+            }
+
+            function renderDashboard(data) {
+                const statusMessageEl = document.getElementById('status-message');
+                const mainDashboardEl = document.getElementById('main-dashboard');
+                
+                if (statusMessageEl) statusMessageEl.style.display = 'none';
+                if (mainDashboardEl) mainDashboardEl.style.display = 'block';
+
+                const userNameEl = document.getElementById('user-name');
+                if (userNameEl) {
+                    const payload = parseJwt(token);
+                    if (payload) {
+                        // Usamos data.nombre si está disponible, si no, el del token
+                        userNameEl.textContent = `Hola, ${data.nombre ? data.nombre.split(' ')[0] : payload.sub.split('@')[0]}`;
+                    }
+                }
+
+                if (document.getElementById('tutor-name-info')) {
+                    document.getElementById('tutor-name-info').textContent = data.nombre || 'N/A';
+                }
+                if (document.getElementById('tutor-materia-info')) {
+                    document.getElementById('tutor-materia-info').textContent = `Materia: ${data.materia || 'No Asignada'}`;
+                }
+                if (document.getElementById('current-description')) {
+                    document.getElementById('current-description').textContent = data.descripcion || 'Sin descripción';
+                }
+                
+                if (document.getElementById('current-price')) {
+                    const precio = data.precioPorClase;
+                    document.getElementById('current-price').textContent = (precio && precio > 0) 
+                        ? `$${formatoMoneda(precio)}` 
+                        : '¡Añade un precio!'; 
+                }
+            }
+            
+            // --- Utilidades ---
+            function formatoMoneda(valor) {
+                return new Intl.NumberFormat('es-CO', { 
+                    style: 'decimal', 
+                    minimumFractionDigits: 0, 
+                    maximumFractionDigits: 0 
+                }).format(valor);
+            }
+
+            function parseJwt(token) {
+                if (!token) return null;
+                try {
+                    const base64Url = token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+                    return JSON.parse(jsonPayload);
+                } catch (e) {
+                    console.error("Error al decodificar JWT:", e);
+                    return null;
+                }
+            }
+
+        })(); 
+    </script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 package com.proyecto.sinergia.model;
 
 import jakarta.persistence.*;
-import java.sql.Date;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -13,21 +13,22 @@ public class Tarea {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String titulo;
 
-    @Column(columnDefinition = "TEXT")
     private String descripcion;
 
-    @Column(name = "fecha_inicio")
-    private Date fechaInicio;
+    // Fecha de inicio del evento/tarea
+    @Column(nullable = false)
+    private LocalDateTime fechaInicio;
 
-    @Column(name = "fecha_fin")
-    private Date fechaFin;
+    // Fecha de fin (opcional, si es solo un recordatorio puntual)
+    private LocalDateTime fechaFin;
 
-    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean completada;
+    @Column(nullable = false)
+    private String color; // Para que el usuario elija el color en el calendario (ej. #ff0000)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_usuario") // ON DELETE CASCADE
+    @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 }

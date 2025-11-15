@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Planificador - Sinergia</title>
+    <style>
+        :root { --primary-color: #ff6200; --light-bg: #f4f4f4; --white: #fff; }
+        body { font-family: sans-serif; background: var(--light-bg); margin: 0; }
+        
+        /* Navbar simplificado */
+        nav { background: var(--white); padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .logo { color: var(--primary-color); font-weight: bold; font-size: 1.5rem; text-decoration: none; }
+        
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 300px 1fr; gap: 2rem; }
+        
+        .card { background: var(--white); padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        
+        /* Formulario */
+        input, textarea, select { width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;}
+        button { width: 100%; padding: 0.7rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { opacity: 0.9; }
+        
+        /* Calendario container */
+        #calendar { max-width: 100%; height: 700px; background: white; padding: 10px; border-radius: 8px; }
+        
+        /* Responsive */
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+    </style>
+    
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+</head>
+<body>
+
+    <nav>
+        <a href="dashboard-estudiante.html" class="logo">Sinergia</a>
+        <a href="dashboard-estudiante.html" style="text-decoration: none; color: #333;">Volver al Inicio</a>
+    </nav>
+
+    <div class="container">
+        
+        <div class="card">
+            <h3 style="color: var(--primary-color); margin-top: 0;">📅 Nueva Tarea</h3>
+            <form id="form-tarea">
+                <label>Título</label>
+                <input type="text" id="titulo" required placeholder="Ej. Examen de Cálculo">
+                
+                <label>Descripción</label>
+                <textarea id="descripcion" rows="2"></textarea>
+                
+                <label>Fecha y Hora Inicio</label>
+                <input type="datetime-local" id="fechaInicio" required>
+                
+                <label>Fecha y Hora Fin (Opcional)</label>
+                <input type="datetime-local" id="fechaFin">
+                
+                <label>Color de Etiqueta</label>
+                <select id="color">
+                    <option value="#ff6200">Naranja (Sinergia)</option>
+                    <option value="#dc3545">Rojo (Urgente)</option>
+                    <option value="#28a745">Verde (Personal)</option>
+                    <option value="#007bff">Azul (Estudio)</option>
+                </select>
+                
+                <button type="submit">Guardar Evento</button>
+            </form>
+            <p id="mensaje" style="text-align: center; margin-top: 10px; font-size: 0.9rem;"></p>
+        </div>
+
+        <div id='calendar'></div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('jwtToken');
+        if (!token) window.location.href = 'login.html';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'es', // Idioma español
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: function(info, successCallback, failureCallback) {
+                    // Cargar eventos desde nuestro Backend
+                    fetch('http://localhost:8080/api/tareas', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    })
+                    .then(response => response.json())
+                    .then(data => successCallback(data))
+                    .catch(error => failureCallback(error));
+                },
+                eventClick: function(info) {
+                    // Al hacer clic en un evento, preguntar si borrar
+                    if(confirm("¿Eliminar tarea: " + info.event.title + "?")) {
+                        eliminarTarea(info.event.id);
+                    }
+                }
+            });
+            
+            calendar.render();
+
+            // --- Lógica para Guardar Tarea ---
+            document.getElementById('form-tarea').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button');
+                btn.disabled = true; 
+                
+                const nuevaTarea = {
+                    titulo: document.getElementById('titulo').value,
+                    descripcion: document.getElementById('descripcion').value,
+                    fechaInicio: document.getElementById('fechaInicio').value,
+                    fechaFin: document.getElementById('fechaFin').value || null,
+                    color: document.getElementById('color').value
+                };
+
+                try {
+                    const resp = await fetch('http://localhost:8080/api/tareas', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token 
+                        },
+                        body: JSON.stringify(nuevaTarea)
+                    });
+
+                    if(resp.ok) {
+                        document.getElementById('form-tarea').reset();
+                        calendar.refetchEvents(); // Recargar calendario sin F5
+                        alert("Tarea guardada con éxito");
+                    } else {
+                        alert("Error al guardar");
+                    }
+                } catch(err) {
+                    console.error(err);
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+
+            async function eliminarTarea(id) {
+                await fetch(`http://localhost:8080/api/tareas/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                calendar.refetchEvents();
+            }
+        });
+    </script>
+</body>
+</html>

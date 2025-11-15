@@ -1,34 +1,34 @@
 package com.proyecto.sinergia.model;
 
 import jakarta.persistence.*;
-import java.sql.Timestamp;
-import java.util.List;
 import lombok.Data;
+import lombok.ToString; // IMPORTANTE
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @Entity
 @Table(name = "quiz")
 public class Quiz {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String titulo;
-    private String tema;
 
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp fecha;
+    private String descripcion;
+    private String materia;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_usuario") // ON DELETE CASCADE
+    @JoinColumn(name = "id_usuario", nullable = false)
+    @ToString.Exclude // <--- AGREGA ESTO: Evita bucles al imprimir
+    @JsonIgnore //
     private Usuario usuario;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_materia") // ON DELETE SET NULL
-    private Materia materia;
-
-    // Relación: Un Quiz tiene muchas Preguntas
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @ToString.Exclude // <--- AGREGA ESTO: Vital para que funcione EAGER
+    @JsonManagedReference
     private List<Pregunta> preguntas;
 }

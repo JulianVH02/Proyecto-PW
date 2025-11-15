@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace de Tutores - Sinergia</title>
+    <style>
+        :root {
+            --primary-color: #ff6200;
+            --white-color: #ffffff;
+            --dark-text: #333;
+            --light-bg: #f4f4f4;
+            --grey-border: #ddd;
+            --secondary-color: #007bff;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+        
+        /* --- Navbar --- */
+        nav.navbar {
+            background-color: var(--white-color);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex; align-items: center;
+        }
+        .navbar .logo img { height: 70px; width: auto; margin-right: 0.5rem; }
+        .navbar .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .navbar .nav-links a:hover, .navbar .nav-links a.active {
+            color: var(--primary-color);
+        }
+        /* Dropdown */
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { 
+            display: none; 
+            position: absolute; 
+            background-color: var(--white-color); 
+            min-width: 160px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1); 
+            z-index: 1001; 
+            border-radius: 5px; 
+            margin-top: 0.5rem; 
+        }
+        .dropdown-content a { 
+            color: var(--dark-text); 
+            padding: 12px 16px; 
+            text-decoration: none; 
+            display: block; 
+        }
+        .dropdown-content a:hover { 
+            background-color: var(--light-bg); 
+            color: var(--primary-color); 
+        }
+        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown .dropbtn { cursor: pointer; text-decoration: none; color: var(--dark-text); font-weight: 500; background: none; border: none; font-family: inherit; font-size: inherit; }
+        .dropdown .dropbtn:hover { color: var(--primary-color); }
+        
+        /* Sección de Usuario */
+        .user-section { display: flex; align-items: center; gap: 1rem; }
+        .button-logout {
+            padding: 0.5rem 1rem; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; font-size: 0.9rem;
+        }
+        .button-logout:hover { background: var(--primary-color); color: white; }
+
+        /* --- Layout Principal --- */
+        .dashboard-container { max-width: 1300px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        @media (min-width: 1024px) { .dashboard-container { grid-template-columns: 280px 1fr; align-items: start; } }
+
+        /* --- Sidebar & Filtros --- */
+        .section-card { background-color: var(--white-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        .section-card h3 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 0.5rem; font-size: 1.2rem; }
+        .filter-group { margin-bottom: 1rem; }
+        .filter-group label { display: block; margin-bottom: 0.3rem; font-weight: 600; font-size: 0.9rem; }
+        .filter-group select, .filter-group input { width: 100%; padding: 0.6rem; border: 1px solid var(--grey-border); border-radius: 5px; font-family: inherit; }
+        .btn-clear { background: none; border: none; color: #666; text-decoration: underline; cursor: pointer; font-size: 0.85rem; margin-top: 0.5rem; }
+
+        /* --- Grid de Tutores --- */
+        .marketplace-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        #tutores-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }
+        
+        .tutor-card { background-color: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; display: flex; flex-direction: column; border: 1px solid var(--grey-border); }
+        .tutor-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        
+        .tutor-header { background-color: var(--primary-color); color: white; padding: 1.5rem; text-align: center; position: relative; }
+        .tutor-avatar-placeholder { width: 80px; height: 80px; background-color: white; color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 0.5rem; border: 3px solid rgba(255,255,255,0.3); }
+        .tutor-name { font-size: 1.2rem; font-weight: 700; margin: 0; }
+        .tutor-materia { font-size: 0.9rem; opacity: 0.9; margin-top: 0.2rem; }
+        
+        .tutor-body { padding: 1.5rem; flex-grow: 1; }
+        .tutor-desc { color: #555; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1rem; display: -webkit-box; -webkit-line-camp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .tutor-price { font-size: 1.4rem; font-weight: bold; color: var(--dark-text); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .tutor-price small { font-size: 0.8rem; color: #777; font-weight: normal; }
+        
+        /* --- RATING STYLES --- */
+        .tutor-rating { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
+        .rating-number { font-weight: bold; color: var(--primary-color); font-size: 1.1rem; }
+        .stars { color: #ffd700; font-size: 1.1rem; letter-spacing: 2px; }
+        .star.filled { color: #ffd700; }
+        .star.empty { color: #ddd; }
+        .rate-link { font-size: 0.85rem; color: var(--secondary-color); text-decoration: underline; cursor: pointer; margin-left: auto; }
+
+        .tutor-footer { padding: 1rem 1.5rem; background-color: #f9f9f9; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .btn-contact { background-color: #25D366; color: white; padding: 0.6rem 1rem; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; transition: background 0.3s; }
+        .btn-contact:hover { background-color: #128C7E; }
+
+        /* Modal Estilos */
+        .rating-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .rating-modal-content { background: var(--white-color); padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); width: 90%; max-width: 350px; text-align: center; }
+        .rating-modal-content label { margin: 0 5px; font-size: 1.1rem; cursor: pointer; }
+        .button-submit { width: 100%; padding: 0.8rem; background-color: var(--primary-color); color: var(--white-color); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        .button-clear { background: none; border: 1px solid var(--grey-border); color: var(--dark-text); padding: 0.8rem; border-radius: 5px; width: 100%; cursor: pointer;}
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="dashboard-estudiante.html" class="logo">
+             <img src="/images/1.png" alt="Sinergia Logo">
+        </a>
+        
+        <ul class="nav-links">
+            <li><a href="dashboard-estudiante.html">Inicio</a></li>
+            <li><a href="recursos.html">Recursos Educativos</a></li>
+            <li><a href="marketplace.html" class="active">Marketplace de Tutores</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Repaso Activo &#9662;</a>
+                <div class="dropdown-content">
+                    <a href="#">Flashcards</a>
+                    <a href="#">Quizzes</a>
+                    <a href="#">Planificador</a>
+                </div>
+            </li>
+        </ul>
+
+        <div class="user-section">
+            <span id="user-name" style="font-weight: 500;"></span>
+            <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        
+        <aside>
+            <div class="section-card">
+                <h3>🔍 Filtrar Tutores</h3>
+                <div class="filter-group">
+                    <label for="filtro-materia">Materia:</label>
+                    <select id="filtro-materia" onchange="aplicarFiltros()">
+                        <option value="TODAS">Todas las materias</option>
+                        </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filtro-precio">Precio Máximo:</label>
+                    <input type="number" id="filtro-precio" placeholder="Ej. 50000" oninput="aplicarFiltros()">
+                </div>
+                <button class="btn-clear" onclick="limpiarFiltros()">Limpiar filtros</button>
+            </div>
+
+            <div class="section-card" style="background-color: #e6f7ff; border: 1px solid #b3e0ff;">
+                <h3 style="color: #0056b3; font-size: 1rem; border-bottom: none;">¿Eres bueno en algo?</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 1rem;">Comparte tu conocimiento y gana dinero extra convirtiéndote en tutor.</p>
+                <a href="tutor-registro.html" style="display: block; text-align: center; background: #0056b3; color: white; padding: 0.5rem; border-radius: 5px; text-decoration: none; font-weight: bold;">Aplicar como Tutor</a>
+            </div>
+        </aside>
+
+        <main>
+            <div class="marketplace-header">
+                <h2>👨‍🏫 Encuentra a tu Tutor Ideal</h2>
+                <span style="color: #666;">Mostrando <b id="contador-tutores">0</b> tutores disponibles</span>
+            </div>
+            <div id="tutores-grid">
+                <p>Cargando tutores...</p>
+            </div>
+        </main>
+    </div>
+
+    <div id="rating-modal" class="rating-modal-overlay" style="display:none;">
+        <div class="rating-modal-content">
+            <h3>Calificar Tutor</h3>
+            <p>Selecciona tu puntuación (1 a 5):</p>
+            
+            <form id="rating-form">
+                <div style="margin-bottom: 20px;">
+                    <label><input type="radio" name="puntuacion" value="1"> 1</label>
+                    <label><input type="radio" name="puntuacion" value="2"> 2</label>
+                    <label><input type="radio" name="puntuacion" value="3"> 3</label>
+                    <label><input type="radio" name="puntuacion" value="4"> 4</label>
+                    <label><input type="radio" name="puntuacion" value="5"> 5</label>
+                </div>
+                <button type="button" onclick="enviarRating()" class="button-submit">Enviar Calificación</button>
+                <button type="button" onclick="document.getElementById('rating-modal').style.display='none'" class="button-clear">Cancelar</button>
+            </form>
+            <p id="rating-message" style="margin-top:10px;"></p>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('jwtToken');
+        let todosLosTutores = []; 
+        let todasLasMaterias = [];
+        let tutorIdActual = null;
+
+        if (!token) window.location.href = 'login.html';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const payload = parseJwt(token);
+            if (payload) document.getElementById('user-name').textContent = `Hola, ${payload.sub ? payload.sub.split('@')[0] : 'Usuario'}`;
+            cargarDatosIniciales();
+        });
+
+        async function cargarDatosIniciales() {
+            await fetchMaterias(); 
+            await fetchTutores(); 
+        }
+
+        async function fetchMaterias() {
+            try {
+                const response = await fetch('http://localhost:8080/api/public/materias');
+                if (response.ok) {
+                    todasLasMaterias = await response.json();
+                    const selectFiltro = document.getElementById('filtro-materia');
+                    todasLasMaterias.forEach(m => selectFiltro.innerHTML += `<option value="${m.nombre}">${m.nombre}</option>`);
+                }
+            } catch (e) { console.error("Error materias", e); }
+        }
+
+        async function fetchTutores() {
+            const grid = document.getElementById('tutores-grid');
+            try {
+                // Endpoint actualizado: MarketplaceController
+                const response = await fetch('http://localhost:8080/api/marketplace/tutores', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (response.ok) {
+                    todosLosTutores = await response.json();
+                    renderizarTutores(todosLosTutores);
+                } else { 
+                    grid.innerHTML = '<p style="color: red;">Error al cargar tutores. Intenta más tarde.</p>'; 
+                }
+            } catch (e) { 
+                console.error("Error tutores", e);
+                grid.innerHTML = '<p style="color: red;">Error de conexión.</p>';
+            }
+        }
+
+        // --- FUNCIONES DE RATING ---
+        function generarEstrellas(rating) {
+            const maxEstrellas = 5;
+            let html = '';
+            const ratingRedondeado = Math.round(rating); 
+
+            for (let i = 1; i <= maxEstrellas; i++) {
+                if (i <= ratingRedondeado) {
+                    html += '<span class="star filled">★</span>'; 
+                } else {
+                    html += '<span class="star empty">☆</span>'; 
+                }
+            }
+            return html;
+        }
+
+        function abrirModalRating(event, idTutor) {
+            event.preventDefault();
+            tutorIdActual = idTutor;
+            
+            const modal = document.getElementById('rating-modal');
+            const form = document.getElementById('rating-form');
+            
+            form.reset();
+            document.getElementById('rating-message').textContent = '';
+            
+            if (modal) modal.style.display = 'flex';
+        }
+
+        async function enviarRating() {
+            const puntuacionInput = document.querySelector('input[name="puntuacion"]:checked');
+            const mensajeEl = document.getElementById('rating-message');
+
+            if (!puntuacionInput || !tutorIdActual) {
+                mensajeEl.style.color = 'red';
+                mensajeEl.textContent = "Selecciona una puntuación.";
+                return;
+            }
+
+            const ratingValue = parseInt(puntuacionInput.value);
+            
+            try {
+                // Llamada al endpoint de RatingController para Tutores
+                const response = await fetch(`http://localhost:8080/api/ratings/tutor/${tutorIdActual}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ puntuacion: ratingValue })
+                });
+
+                if (response.ok) {
+                    mensajeEl.style.color = 'green';
+                    mensajeEl.textContent = "¡Gracias! Calificación guardada.";
+                    
+                    setTimeout(() => {
+                        document.getElementById('rating-modal').style.display = 'none';
+                        fetchTutores(); // Recargar para ver el nuevo promedio
+                    }, 800);
+                    
+                } else {
+                    const errorText = await response.text();
+                    mensajeEl.style.color = 'red';
+                    mensajeEl.textContent = `Error: ${errorText}`;
+                }
+            } catch (e) {
+                mensajeEl.style.color = 'red';
+                mensajeEl.textContent = "Error de conexión al servidor.";
+            }
+        }
+        // -----------------------------
+
+        function renderizarTutores(listaTutores) {
+            const grid = document.getElementById('tutores-grid');
+            const contador = document.getElementById('contador-tutores');
+            grid.innerHTML = '';
+            contador.textContent = listaTutores.length;
+
+            if (listaTutores.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #666;">No se encontraron tutores con estos filtros.</div>';
+                return;
+            }
+
+            listaTutores.forEach(t => {
+                const iniciales = t.nombreCompleto.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const estrellasHtml = generarEstrellas(t.ratingPromedio);
+
+                const card = `
+                    <div class="tutor-card">
+                        <div class="tutor-header">
+                            <div class="tutor-avatar-placeholder">${iniciales}</div>
+                            <h3 class="tutor-name">${t.nombreCompleto}</h3>
+                            <div class="tutor-materia">${t.materia}</div>
+                        </div>
+                        <div class="tutor-body">
+                            <div class="tutor-rating">
+                                <span class="rating-number">${t.ratingPromedio ? t.ratingPromedio.toFixed(1) : '0.0'}</span>
+                                <span class="stars">${estrellasHtml}</span>
+                                <a href="#" class="rate-link" onclick="abrirModalRating(event, ${t.idTutor})">Calificar</a>
+                            </div>
+
+                            <div class="tutor-price">
+                                $${formatoMoneda(t.precioPorClase)} <small>/ hora</small>
+                            </div>
+                            <p class="tutor-desc">${t.descripcion || 'Sin descripción disponible.'}</p>
+                        </div>
+                        <div class="tutor-footer">
+                            <a href="https://wa.me/${limpiarTelefono(t.contacto)}" target="_blank" class="btn-contact">
+                                📱 Contactar
+                            </a>
+                            <span style="font-size: 0.8rem; color: #888;">Verificado ✅</span>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        function aplicarFiltros() {
+            const materiaSel = document.getElementById('filtro-materia').value;
+            const precioMax = document.getElementById('filtro-precio').value;
+
+            const filtrados = todosLosTutores.filter(t => {
+                const cumpleMateria = (materiaSel === 'TODAS') || (t.materia === materiaSel);
+                const cumplePrecio = !precioMax || (t.precioPorClase <= parseFloat(precioMax));
+                return cumpleMateria && cumplePrecio;
+            });
+            renderizarTutores(filtrados);
+        }
+
+        function limpiarFiltros() {
+            document.getElementById('filtro-materia').value = 'TODAS';
+            document.getElementById('filtro-precio').value = '';
+            renderizarTutores(todosLosTutores);
+        }
+
+        function formatoMoneda(valor) {
+            return new Intl.NumberFormat('es-CO', { style: 'decimal', minimumFractionDigits: 0 }).format(valor);
+        }
+
+        function limpiarTelefono(telefono) {
+            // Elimina todo lo que no sea número para el enlace de WhatsApp
+            return telefono ? telefono.replace(/\D/g, '') : '';
+        }
+
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) { return null; }
+        }
+
+        function logout() {
+            localStorage.removeItem('jwtToken');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

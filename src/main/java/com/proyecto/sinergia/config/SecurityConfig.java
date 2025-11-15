@@ -5,6 +5,8 @@ import com.proyecto.sinergia.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpMethod; // IMPORTANTE
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,9 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.context.annotation.Primary;
 
-// --- IMPORTACIONES DE CORS (NECESARIAS) ---
+// --- IMPORTACIONES DE CORS ---
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -50,31 +51,49 @@ public class SecurityConfig {
     @Primary
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. HABILITAR CORS (Evita errores de red en el navegador)
+            // 1. VINCULACIÓN EXPLÍCITA DE CORS (Para evitar errores 403 en POST/PUT)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             
-            // 2. DESHABILITAR CSRF (¡ESTO ES LO QUE ARREGLA EL ERROR 403!)
+            // 2. DESACTIVAR CSRF (Obligatorio para APIs Stateless con Token)
             .csrf(csrf -> csrf.disable()) 
             
-            // 3. Sesiones sin estado (Stateless) para JWT
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
-            // 4. Configurar permisos de rutas
             .authorizeHttpRequests(authz -> authz
-                // Archivos estáticos
-                .requestMatchers("/", "/index.html", "/*.html", "/static/**", "/images/**").permitAll()
-                // Swagger UI
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                // APIs Públicas
-                .requestMatchers("/api/public/**").permitAll() 
-                // Login y Registro (¡IMPORTANTE!)
-                .requestMatchers("/api/auth/**").permitAll() 
-                // Cualquier otra cosa requiere Token
-                .anyRequest().authenticated()
-            )
+                    // --- REGLA DE ORO PARA EL NAVEGADOR ---
+                    // Permitir peticiones OPTIONS (preflight) globalmente para evitar bloqueos de CORS
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                    // 1. PERMISOS PÚBLICOS (HTMLs, Auth, Estáticos)
+                 // Busca la línea donde tienes los .permitAll()
+                    .requestMatchers("/", "/index.html", "/*.html", "/static/**", "/images/**", "/js/**", "/css/**", "/favicon.ico").permitAll() // <--- Agrega /favicon.ico
+                    .requestMatchers("/static/**", "/images/**", "/css/**", "/js/**").permitAll()
+                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                    
+                    // Endpoints de autenticación y públicos
+                    .requestMatchers("/api/public/**").permitAll() 
+                    .requestMatchers("/api/auth/**").permitAll() 
+                    
+                    // 2. ENDPOINTS PROTEGIDOS (Usuario Logueado)
+                    // Aquí agregamos TODAS tus nuevas funcionalidades
+                    .requestMatchers("/api/quizzes/**").permitAll()
+                    .requestMatchers("/api/flashcards/**").authenticated()
+                    .requestMatchers("/api/tareas/**").authenticated()
+                    .requestMatchers("/api/recursos/**").authenticated()
+                    .requestMatchers("/api/marketplace/**").authenticated()
+                    .requestMatchers("/api/ratings/**").authenticated()
+                    
+                    // Regla específica del tutor
+                    .requestMatchers("/api/tutor/**").authenticated() 
+                    
+                    // 3. PROTECCIÓN DE API ADMIN (SOLO ADMIN)
+                    .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+
+                    // 4. CUALQUIER OTRA PETICIÓN debe estar autenticada
+                    .anyRequest().authenticated() 
+                )
             
-            // 5. Filtro JWT antes del filtro de autenticación
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -84,12 +103,11 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Permitir cualquier origen (localhost:8080, etc.)
-        configuration.setAllowedOrigins(Arrays.asList("*")); 
-        // Permitir todos los métodos HTTP
+        // En desarrollo es seguro usar *, pero asegúrate de permitir credenciales si lo necesitas
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080")); // O usar "*" si no usas cookies
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // Permitir todos los encabezados
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setAllowCredentials(true); // Importante para algunos navegadores
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); 
