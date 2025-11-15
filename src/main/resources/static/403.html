@@ -3,61 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Denegado - Sinergia</title>
+    <title>403 - Acceso Denegado</title>
     <style>
         :root {
             --primary-color: #ff6200;
+            --white-color: #ffffff;
             --dark-text: #333;
             --light-bg: #f4f4f4;
+            --error-color: #d9534f;
         }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             background-color: var(--light-bg);
+            color: var(--dark-text);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
             text-align: center;
         }
+
         .error-container {
-            background: white;
+            background: var(--white-color);
             padding: 3rem;
             border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             max-width: 500px;
+            width: 90%;
+            border-top: 5px solid var(--error-color);
         }
-        h1 {
-            font-size: 6rem;
+
+        .error-container h1 {
+            font-size: 5rem;
+            color: var(--error-color);
             margin: 0;
-            color: var(--primary-color);
         }
-        h2 {
-            margin-top: 0;
+
+        .error-container h2 {
+            font-size: 1.8rem;
             color: var(--dark-text);
+            margin: 0.5rem 0 1rem;
         }
-        p {
+
+        .error-container p {
             color: #666;
             margin-bottom: 2rem;
+            font-size: 1.1rem;
         }
-        .btn {
+
+        .button-home {
             background-color: var(--primary-color);
-            color: white;
+            color: var(--white-color);
             padding: 0.8rem 1.5rem;
-            text-decoration: none;
             border-radius: 5px;
+            text-decoration: none;
             font-weight: bold;
             transition: opacity 0.3s;
         }
-        .btn:hover { opacity: 0.9; }
+
+        .button-home:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
+
     <div class="error-container">
         <h1>403</h1>
         <h2>Acceso Denegado</h2>
-        <p>Lo sentimos, no tienes los permisos necesarios (Rol de Administrador) para ver esta página.</p>
-        <a href="index.html" class="btn">Volver al Inicio</a>
+        <p>No tienes los permisos necesarios para ver esta página. Por favor, asegúrate de haber iniciado sesión con la cuenta correcta.</p>
+        <a href="index.html" class="button-home">Volver al Inicio</a>
     </div>
+
 </body>
 </html>

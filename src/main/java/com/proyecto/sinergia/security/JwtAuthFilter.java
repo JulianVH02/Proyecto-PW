@@ -63,15 +63,33 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        final String userEmail;
+        String userEmail = null;
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        String tokenFromHeader = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            tokenFromHeader = authHeader.substring(7);
+        }
+
+        String tokenFromCookie = null;
+        if (request.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie c : request.getCookies()) {
+                if ("JWT".equals(c.getName())) {
+                    tokenFromCookie = c.getValue();
+                    break;
+                }
+            }
+        }
+
+        // Elegir el token disponible
+        if (tokenFromHeader != null) {
+            jwt = tokenFromHeader;
+        } else if (tokenFromCookie != null) {
+            jwt = tokenFromCookie;
+        } else {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwt = authHeader.substring(7);
-        
         try {
             userEmail = jwtService.extractUsername(jwt);
         } catch (Exception e) {
@@ -83,16 +101,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
             if (jwtService.validateToken(jwt, userDetails)) {
-                
-                // --- 🕵️‍♂️ ZONA DE ESPIONAJE (DEBUG) ---
+                // --- DEBUG ---
                 System.out.println(">>> INTENTO DE ACCESO A: " + request.getRequestURI());
                 System.out.println(">>> USUARIO: " + userDetails.getUsername());
                 System.out.println(">>> AUTORIDADES (ROLES) CARGADOS: " + userDetails.getAuthorities());
-                // ---------------------------------------
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
-                
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }

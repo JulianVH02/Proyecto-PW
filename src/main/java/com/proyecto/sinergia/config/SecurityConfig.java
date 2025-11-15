@@ -66,18 +66,21 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                     // 1. PERMISOS PÚBLICOS (HTMLs, Auth, Estáticos)
-                 // Busca la línea donde tienes los .permitAll()
-                    .requestMatchers("/", "/index.html", "/*.html", "/static/**", "/images/**", "/js/**", "/css/**", "/favicon.ico").permitAll() // <--- Agrega /favicon.ico
+                    .requestMatchers("/", "/index.html", "/login.html", "/registro.html", "/403.html").permitAll()
                     .requestMatchers("/static/**", "/images/**", "/css/**", "/js/**").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                    
+                    // Dashboards protegidos por rol
+                    .requestMatchers("/dashboard-estudiante.html").hasAnyAuthority("ESTUDIANTE")
+                    .requestMatchers("/dashboard-tutor.html").hasAnyAuthority("TUTOR")
+                    .requestMatchers("/dashboard-admin.html").hasAnyAuthority("ADMIN")
+
                     // Endpoints de autenticación y públicos
                     .requestMatchers("/api/public/**").permitAll() 
                     .requestMatchers("/api/auth/**").permitAll() 
                     
                     // 2. ENDPOINTS PROTEGIDOS (Usuario Logueado)
                     // Aquí agregamos TODAS tus nuevas funcionalidades
-                    .requestMatchers("/api/quizzes/**").permitAll()
+                    .requestMatchers("/api/quizzes/**").authenticated() 
                     .requestMatchers("/api/flashcards/**").authenticated()
                     .requestMatchers("/api/tareas/**").authenticated()
                     .requestMatchers("/api/recursos/**").authenticated()
@@ -94,6 +97,9 @@ public class SecurityConfig {
                     .anyRequest().authenticated() 
                 )
             
+            .exceptionHandling(ex -> ex
+                .accessDeniedPage("/403.html")
+            )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

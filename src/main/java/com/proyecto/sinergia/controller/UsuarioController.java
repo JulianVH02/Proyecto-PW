@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpHeaders;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -49,8 +52,20 @@ public class UsuarioController {
         
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtService.generateToken(userDetails);
-        
-        return ResponseEntity.ok(new LoginResponse(token));
+
+        // Enviar también el token en una cookie HttpOnly para que el navegador lo
+        // incluya automáticamente al navegar a los HTML estáticos.
+        ResponseCookie jwtCookie = ResponseCookie.from("JWT", token)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(7 * 24 * 60 * 60) // 7 días
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(new LoginResponse(token));
     }
     
     @GetMapping("/mi-perfil")
