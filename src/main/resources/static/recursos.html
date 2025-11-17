@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca de Recursos - Sinergia</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
         :root {
             --primary-color: #ff6200;
             --white-color: #ffffff;
@@ -14,12 +15,13 @@
             --secondary-color: #007bff; /* Usado para enlaces de calificación */
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            font-family: Calibri, "Segoe UI", Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--light-bg);
             color: var(--dark-text);
         }
+        h1, h2, h3, h4 { font-family: 'DM Serif Display', serif; }
         
         /* --- Navbar --- */
         nav.navbar {
@@ -165,17 +167,104 @@
         }
         .button-submit { width: 100%; padding: 0.8rem; background-color: var(--primary-color); color: var(--white-color); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .button-clear { background: none; border: 1px solid var(--grey-border); color: var(--dark-text); padding: 0.8rem; border-radius: 5px; width: 100%; cursor: pointer;}
+
+        /* --- Footer --- */
+        footer {
+            background-color: #1e1e1e;
+            color: var(--white-color);
+            padding: 3.5rem 8% 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column {
+            flex: 1 1 220px;
+            min-width: 200px;
+        }
+
+        .footer-column h4 {
+            font-family: 'DM Serif Display', serif;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-column p {
+            margin: 0.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.4rem;
+        }
+
+        .footer-links a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.12);
+            padding-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-social a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-social a:hover {
+            opacity: 1;
+        }
+        
+        .admin-resource-actions { margin-top: 0.8rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .admin-resource-actions button { padding: 0.4rem 0.7rem; border-radius: 4px; border: none; font-size: 0.8rem; cursor: pointer; color: #fff; }
+        .admin-resource-actions .btn-edit { background-color: #5cb85c; }
+        .admin-resource-actions .btn-delete { background-color: #d9534f; }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="dashboard-estudiante.html" class="logo">
+        <a href="#" class="logo" onclick="goToDashboardSegunRol()">
              <img src="/images/1.png" alt="Sinergia Logo">
         </a>
         
         <ul class="nav-links">
-            <li><a href="dashboard-estudiante.html">Inicio</a></li>
+            <li><a href="#" onclick="goToDashboardSegunRol()">Inicio</a></li>
             <li><a href="recursos.html" class="active">Recursos Educativos</a></li>
             <li><a href="marketplace.html">Marketplace de Tutores</a></li>
             <li class="dropdown">
@@ -297,12 +386,16 @@
         let todosLosRecursos = []; 
         let todasLasMaterias = [];
         let recursoIdActual = null; // Variable para almacenar el ID del recurso a calificar
+        let currentRole = 'ESTUDIANTE';
 
         if (!token) window.location.href = 'login.html';
 
         document.addEventListener('DOMContentLoaded', () => {
             const payload = parseJwt(token);
-            if (payload) document.getElementById('user-name').textContent = `Hola, ${payload.sub ? payload.sub.split('@')[0] : 'Usuario'}`;
+            if (payload) {
+                document.getElementById('user-name').textContent = `Hola, ${payload.sub ? payload.sub.split('@')[0] : 'Usuario'}`;
+                currentRole = payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+            }
             cargarDatosIniciales();
         });
 
@@ -423,8 +516,16 @@
                 return;
             }
 
+            const esAdmin = currentRole === 'ADMIN';
+
             listaRecursos.forEach(r => {
                 const estrellasHtml = generarEstrellas(r.ratingPromedio); 
+                const adminBtns = esAdmin
+                    ? `<div class="admin-resource-actions">
+                            <button class="btn-edit" onclick="editarRecursoDesdeRecursos(${r.id})">Editar</button>
+                            <button class="btn-delete" onclick="eliminarRecursoDesdeRecursos(${r.id})">Eliminar</button>
+                       </div>`
+                    : '';
                 const card = `
                     <div class="recurso-card">
                         <div class="recurso-card-content">
@@ -442,6 +543,7 @@
                                 <span>📂 ${r.materiaNombre}</span>
                                 <span>👤 ${r.usuarioNombre.split(' ')[0]}</span>
                             </div>
+                            ${adminBtns}
                         </div>
                         <a href="${r.url}" target="_blank" class="recurso-card-link">Ver Recurso ↗</a>
                     </div>
@@ -487,6 +589,21 @@
             } catch (e) { return null; }
         }
 
+        function goToDashboardSegunRol() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) { window.location.href = 'login.html'; return; }
+            const payload = parseJwt(token);
+            const role = payload && payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+
+            if (role === 'ADMIN') {
+                window.location.href = 'dashboard-admin.html';
+            } else if (role === 'TUTOR') {
+                window.location.href = 'dashboard-tutor.html';
+            } else {
+                window.location.href = 'dashboard-estudiante.html';
+            }
+        }
+
         function toggleUploadForm() {
             document.getElementById('upload-container').classList.toggle('active');
         }
@@ -523,6 +640,110 @@
             } catch (e) { mensajeEl.style.color = 'red'; mensajeEl.textContent = 'Error de conexión.'; }
             finally { btn.disabled = false; btn.textContent = 'Publicar'; }
         });
+
+        // --- Acciones de administración sobre recursos (solo ADMIN) ---
+        async function editarRecursoDesdeRecursos(id) {
+            if (currentRole !== 'ADMIN') return;
+            try {
+                const resp = await fetch(`http://localhost:8080/api/admin/recursos/${id}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!resp.ok) {
+                    alert('No se pudo cargar el recurso.');
+                    return;
+                }
+                const recurso = await resp.json();
+
+                const nuevoTitulo = prompt('Título del recurso:', recurso.titulo);
+                if (nuevoTitulo === null) return;
+                const nuevaDescripcion = prompt('Descripción:', recurso.descripcion || '');
+                if (nuevaDescripcion === null) return;
+                const nuevaUrl = prompt('URL:', recurso.url);
+                if (nuevaUrl === null) return;
+
+                const body = {
+                    titulo: nuevoTitulo,
+                    descripcion: nuevaDescripcion,
+                    url: nuevaUrl,
+                    tipoRecurso: recurso.tipoRecurso,
+                    materiaId: null
+                };
+
+                const respUpdate = await fetch(`http://localhost:8080/api/admin/recursos/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (respUpdate.ok) {
+                    fetchRecursos();
+                } else {
+                    alert('No se pudo actualizar el recurso.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error de red al editar recurso.');
+            }
+        }
+
+        async function eliminarRecursoDesdeRecursos(id) {
+            if (currentRole !== 'ADMIN') return;
+            if (!confirm('¿Eliminar este recurso de forma permanente?')) return;
+            try {
+                const resp = await fetch(`http://localhost:8080/api/admin/recursos/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (resp.ok) {
+                    fetchRecursos();
+                } else {
+                    alert('No se pudo eliminar el recurso.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error de red al eliminar recurso.');
+            }
+        }
     </script>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>Sinergia</h4>
+                <p>Plataforma LMS que conecta estudiantes, tutores y recursos en un solo lugar.</p>
+                <p>Aprende de forma más inteligente, organizada y colaborativa.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Enlaces rápidos</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="#">Marketplace de tutores</a></li>
+                    <li><a href="#">Flashcards y quizzes</a></li>
+                    <li><a href="#">Planificador</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Contacto</h4>
+                <p>soporte@sinergia.com</p>
+                <p>+57 (000) 000 0000</p>
+                <p>Bogotá, Colombia</p>
+            </div>
+            <div class="footer-column">
+                <h4>Síguenos</h4>
+                <div class="footer-social">
+                    <a href="#">Instagram</a>
+                    <a href="#">LinkedIn</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2025 Sinergia. Todos los derechos reservados.</span>
+            <span>Términos y condiciones · Política de privacidad</span>
+        </div>
+    </footer>
 </body>
 </html>

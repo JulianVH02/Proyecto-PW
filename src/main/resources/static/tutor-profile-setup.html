@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Completa tu Perfil - Sinergia Tutor</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
         :root { --primary-color: #ff6200; --white-color: #ffffff; --dark-text: #333; --light-bg: #f4f4f4; --grey-border: #ddd; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: var(--dark-text); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        body { font-family: Calibri, "Segoe UI", Arial, sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: var(--dark-text); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .container { background-color: var(--white-color); padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); width: 100%; max-width: 500px; text-align: center; }
-        h1 { color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.8rem; }
+        h1 { color: var(--primary-color); margin-bottom: 0.5rem; font-size: 1.8rem; font-family: 'DM Serif Display', serif; }
         p { color: #666; margin-bottom: 2rem; }
         .form-group { margin-bottom: 1.5rem; text-align: left; }
         label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--dark-text); }
@@ -17,6 +18,88 @@
         button { width: 100%; padding: 0.9rem; background-color: var(--primary-color); color: var(--white-color); border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: background-color 0.3s ease; }
         button:hover { background-color: #e05800; }
         #message { margin-top: 1rem; font-weight: 600; }
+
+        /* --- Footer --- */
+        footer {
+            background-color: #1e1e1e;
+            color: var(--white-color);
+            padding: 3.5rem 8% 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column {
+            flex: 1 1 220px;
+            min-width: 200px;
+        }
+
+        .footer-column h4 {
+            font-family: 'DM Serif Display', serif;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-column p {
+            margin: 0.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.4rem;
+        }
+
+        .footer-links a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.12);
+            padding-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-social a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-social a:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -86,5 +169,42 @@
             }
         });
     </script>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>Sinergia</h4>
+                <p>Plataforma LMS que conecta estudiantes, tutores y recursos en un solo lugar.</p>
+                <p>Aprende de forma más inteligente, organizada y colaborativa.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Enlaces rápidos</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="#">Marketplace de tutores</a></li>
+                    <li><a href="#">Flashcards y quizzes</a></li>
+                    <li><a href="#">Planificador</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Contacto</h4>
+                <p>soporte@sinergia.com</p>
+                <p>+57 (000) 000 0000</p>
+                <p>Bogotá, Colombia</p>
+            </div>
+            <div class="footer-column">
+                <h4>Síguenos</h4>
+                <div class="footer-social">
+                    <a href="#">Instagram</a>
+                    <a href="#">LinkedIn</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2025 Sinergia. Todos los derechos reservados.</span>
+            <span>Términos y condiciones · Política de privacidad</span>
+        </div>
+    </footer>
 </body>
 </html>

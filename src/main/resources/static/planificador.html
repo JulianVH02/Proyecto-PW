@@ -4,13 +4,83 @@
     <meta charset="UTF-8">
     <title>Planificador - Sinergia</title>
     <style>
-        :root { --primary-color: #ff6200; --light-bg: #f4f4f4; --white: #fff; }
-        body { font-family: sans-serif; background: var(--light-bg); margin: 0; }
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
+        :root { --primary-color: #ff6200; --light-bg: #f4f4f4; --white: #fff; --dark-text: #333; --white-color: #ffffff; --grey-border: #ddd; --secondary-color: #007bff; }
+        body { font-family: Calibri, "Segoe UI", Arial, sans-serif; background: var(--light-bg); margin: 0; color: var(--dark-text); }
         
-        /* Navbar simplificado */
-        nav { background: var(--white); padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .logo { color: var(--primary-color); font-weight: bold; font-size: 1.5rem; text-decoration: none; }
-        
+        h1, h2, h3, h4 { font-family: 'DM Serif Display', serif; }
+
+        /* --- Navbar (copiado de dashboard-estudiante) --- */
+        nav.navbar {
+            background-color: var(--white-color);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex; align-items: center;
+        }
+        .navbar .logo img { height: 70px; width: auto; margin-right: 0.5rem; }
+        .navbar .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .navbar .nav-links a:hover, .navbar .nav-links a.active {
+            color: var(--primary-color);
+        }
+
+        /* Dropdown */
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { 
+            display: none; 
+            position: absolute; 
+            background-color: var(--white-color); 
+            min-width: 160px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1); 
+            z-index: 1001; 
+            border-radius: 5px; 
+            margin-top: 0.5rem; 
+        }
+        .dropdown-content a { 
+            color: var(--dark-text); 
+            padding: 12px 16px; 
+            text-decoration: none; 
+            display: block; 
+        }
+        .dropdown-content a:hover { 
+            background-color: var(--light-bg); 
+            color: var(--primary-color); 
+        }
+        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown .dropbtn { cursor: pointer; text-decoration: none; color: var(--dark-text); font-weight: 500; background: none; border: none; font-family: inherit; font-size: inherit; }
+        .dropdown .dropbtn:hover { color: var(--primary-color); }
+
+        /* User Section */
+        .user-section { display: flex; align-items: center; gap: 1rem; }
+        .button-logout {
+            padding: 0.5rem 1rem; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; font-size: 0.9rem;
+        }
+        .button-logout:hover { background: var(--primary-color); color: white; }
+
         .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 300px 1fr; gap: 2rem; }
         
         .card { background: var(--white); padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -22,18 +92,183 @@
         
         /* Calendario container */
         #calendar { max-width: 100%; height: 700px; background: white; padding: 10px; border-radius: 8px; }
-        
+
+        /* Toolbar de FullCalendar: organización y estilo de botones */
+        .fc .fc-toolbar.fc-header-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .fc .fc-toolbar-chunk {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .fc .fc-toolbar-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            text-transform: capitalize;
+        }
+
+        .fc .fc-button {
+            border-radius: 999px;
+            padding: 0.35rem 0.9rem;
+            border: 1px solid #d0d0d0;
+            background: #f4f4f4;
+            color: #333;
+            font-size: 0.85rem;
+            text-transform: capitalize;
+        }
+
+        .fc .fc-button-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+
+        .fc .fc-button-primary:not(:disabled).fc-button-active,
+        .fc .fc-button-primary:not(:disabled):active {
+            background: #e25700;
+            border-color: #e25700;
+        }
+
+        .fc .fc-button:focus,
+        .fc .fc-button-primary:focus {
+            box-shadow: 0 0 0 2px rgba(255,98,0,0.25);
+            outline: none;
+        }
+
+        /* Acomodar mejor el botón "today" con prev/next */
+        .fc .fc-prev-button,
+        .fc .fc-next-button,
+        .fc .fc-today-button {
+            margin: 0;
+        }
+
         /* Responsive */
-        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { 
+            .container { grid-template-columns: 1fr; }
+            .fc .fc-toolbar.fc-header-toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: #1e1e1e;
+            color: var(--white-color);
+            padding: 3.5rem 8% 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column {
+            flex: 1 1 220px;
+            min-width: 200px;
+        }
+
+        .footer-column h4 {
+            font-family: 'DM Serif Display', serif;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-column p {
+            margin: 0.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.4rem;
+        }
+
+        .footer-links a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.12);
+            padding-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-social a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-social a:hover {
+            opacity: 1;
+        }
     </style>
     
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 </head>
 <body>
 
-    <nav>
-        <a href="dashboard-estudiante.html" class="logo">Sinergia</a>
-        <a href="dashboard-estudiante.html" style="text-decoration: none; color: #333;">Volver al Inicio</a>
+    <nav class="navbar">
+        <a href="#" class="logo" onclick="goToDashboardSegunRol()">
+             <img src="/images/1.png" alt="Sinergia Logo">
+        </a>
+        
+        <ul class="nav-links">
+            <li><a href="#" onclick="goToDashboardSegunRol()">Inicio</a></li>
+            <li><a href="recursos.html">Recursos</a></li>
+            <li><a href="marketplace.html">Marketplace</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Repaso &#9662;</a>
+                <div class="dropdown-content">
+                    <a href="planificador.html" class="active">📅 Planificador</a>
+                    <a href="flashcards.html">🧠 Flashcards</a>
+                    <a href="quizzes.html">📝 Quizzes</a>
+                </div>
+            </li>
+        </ul>
+
+        <div class="user-section">
+            <span id="user-name" style="font-weight: 500;"></span>
+            <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
+        </div>
     </nav>
 
     <div class="container">
@@ -149,6 +384,72 @@
                 calendar.refetchEvents();
             }
         });
+
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) { return null; }
+        }
+
+        function goToDashboardSegunRol() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) { window.location.href = 'login.html'; return; }
+            const payload = parseJwt(token);
+            const role = payload && payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+
+            if (role === 'ADMIN') {
+                window.location.href = 'dashboard-admin.html';
+            } else if (role === 'TUTOR') {
+                window.location.href = 'dashboard-tutor.html';
+            } else {
+                window.location.href = 'dashboard-estudiante.html';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('jwtToken');
+            window.location.href = 'index.html';
+        }
     </script>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>Sinergia</h4>
+                <p>Plataforma LMS que conecta estudiantes, tutores y recursos en un solo lugar.</p>
+                <p>Aprende de forma más inteligente, organizada y colaborativa.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Enlaces rápidos</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="#">Marketplace de tutores</a></li>
+                    <li><a href="#">Flashcards y quizzes</a></li>
+                    <li><a href="#">Planificador</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Contacto</h4>
+                <p>soporte@sinergia.com</p>
+                <p>+57 (000) 000 0000</p>
+                <p>Bogotá, Colombia</p>
+            </div>
+            <div class="footer-column">
+                <h4>Síguenos</h4>
+                <div class="footer-social">
+                    <a href="#">Instagram</a>
+                    <a href="#">LinkedIn</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2025 Sinergia. Todos los derechos reservados.</span>
+            <span>Términos y condiciones · Política de privacidad</span>
+        </div>
+    </footer>
 </body>
 </html>

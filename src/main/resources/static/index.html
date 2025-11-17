@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sinergia - Plataforma LMS</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
+
         /* --- Reset y Estilos Globales --- */
         :root {
             --primary-color: #ff6200;
@@ -19,7 +21,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            font-family: Calibri, "Segoe UI", Arial, sans-serif;
             margin: 0;
             padding: 0;
             color: var(--dark-text);
@@ -149,26 +151,29 @@
         /* --- Sección Hero --- */
         .hero {
             display: flex;
+            flex-direction: row-reverse;
             flex-wrap: wrap;
             align-items: center;
-            padding: 4rem 5%; /* Padding ajustado a porcentaje */
-            background-color: var(--white-color);
-            gap: 2rem;
+            justify-content: space-between;
+            padding: 4rem 8%;
+            gap: 3rem;
             background-image: url('/images/fondohero.png'); 
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
             background-attachment: fixed;
             background-color: var(--light-bg);
-            min-height: 70vh;
+            min-height: 80vh;
         }
 
         .hero-content {
-            flex: 1;
-            min-width: 300px;
+            flex: 1 1 380px;
+            max-width: 520px;
+            text-align: left;
         }
 
         .hero-content h1 {
+            font-family: 'DM Serif Display', serif;
             font-size: 3rem;
             color: var(--dark-text);
             margin: 0 0 1rem 0;
@@ -179,21 +184,29 @@
         }
 
         .hero-content p {
-            font-size: 1.2rem;
-            line-height: 1.6;
+            font-size: 1.15rem;
+            line-height: 1.7;
             margin-bottom: 2rem;
         }
 
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
         .hero-image {
-            flex: 1;
-            min-width: 300px;
+            flex: 1 1 380px;
+            max-width: 520px;
             text-align: center;
         }
 
         .hero-image img {
             max-width: 100%;
             height: auto;
-            border-radius: 8px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
         /* ---------------------------------------------------- */
@@ -205,6 +218,7 @@
         }
 
         .section-title {
+            font-family: 'DM Serif Display', serif;
             text-align: center;
             color: var(--dark-text);
             font-size: 2.5rem;
@@ -214,32 +228,47 @@
         .full-width-card {
             display: flex; 
             flex-direction: row; 
-            align-items: center;
+            align-items: stretch;
             justify-content: space-between;
-            
             background-color: var(--white-color);
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem 3rem;
+            margin-bottom: 3rem;
+            gap: 2.5rem;
+            min-height: 260px;
+        }
+
+        .full-width-card .card-media {
+            flex: 0 0 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .full-width-card .card-media img {
+            max-width: 100%;
             border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            padding: 3.5rem 5rem; /* Padding interno grande */
-            margin-bottom: 4rem; /* Espacio entre cada sección */
-            gap: 3rem;
-            min-height: 300px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
         }
 
         /* Estilos para el texto */
         .full-width-card .card-content {
-            max-width: 60%; 
+            flex: 1;
+            max-width: 100%; 
         }
 
         .full-width-card h3 {
+            font-family: 'DM Serif Display', serif;
             color: var(--primary-color);
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-top: 0;
+            margin-bottom: 0.75rem;
         }
 
         .full-width-card p {
-            font-size: 1.15rem;
-            line-height: 1.6;
+            font-size: 1.05rem;
+            line-height: 1.7;
         }
 
         .full-width-card .details {
@@ -275,10 +304,84 @@
    
         /* --- Footer --- */
         footer {
-            text-align: center;
-            padding: 2rem;
-            background-color: var(--dark-text);
+            background-color: #1e1e1e;
             color: var(--white-color);
+            padding: 3.5rem 8% 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column {
+            flex: 1 1 220px;
+            min-width: 200px;
+        }
+
+        .footer-column h4 {
+            font-family: 'DM Serif Display', serif;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-column p {
+            margin: 0.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.4rem;
+        }
+
+        .footer-links a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.12);
+            padding-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-social a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-social a:hover {
+            opacity: 1;
         }
 
         /* --- Media Queries (Responsivo) --- */
@@ -293,16 +396,22 @@
                 gap: 1rem;
             }
             .hero {
-                flex-direction: column-reverse; 
-                text-align: center;
+                flex-direction: column; 
+                padding: 3rem 1.5rem;
+            }
+            .hero-actions {
+                justify-content: flex-start;
             }
             .full-width-card, .flashcards-section {
-                flex-direction: column; /* Apila el texto y el ícono/imagen */
-                padding: 1.5rem;
+                flex-direction: column; /* Apila el texto y la imagen */
+                padding: 1.75rem 1.5rem;
             }
             .full-width-card .card-content, .flashcards-section .card-content {
                 max-width: 100%;
                 text-align: left !important;
+            }
+            .full-width-card .card-media {
+                width: 100%;
             }
             .flashcards-section .details {
                 border-right: none;
@@ -317,6 +426,16 @@
                  padding-left: 1.2rem;
                  padding-right: 0;
             }
+            footer {
+                padding: 2.5rem 1.5rem 1.5rem;
+            }
+            .footer-content {
+                flex-direction: column;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -328,14 +447,14 @@
         </a>
         <ul class="nav-links">
             <li><a href="index.html">Inicio</a></li>
-            <li><a href="#">Recursos Educativos</a></li>
-            <li><a href="#">Marketplace de Tutores</a></li>
+            <li><a href="login.html">Recursos Educativos</a></li>
+            <li><a href="login.html">Marketplace de Tutores</a></li>
             <li class="dropdown">
                 <a href="#" class="dropbtn">Repaso Activo &#9662;</a>
                 <div class="dropdown-content">
-                    <a href="#">Flashcards</a>
-                    <a href="#">Quizzes</a>
-                    <a href="#">Planificador</a>
+                    <a href="login.html">Flashcards</a>
+                    <a href="login.html">Quizzes</a>
+                    <a href="login.html">Planificador</a>
                 </div>
             </li>
             <li><a href="login.html" class="button-primary">Iniciar Sesión</a></li>
@@ -347,10 +466,12 @@
         <div class="hero-content">
             <h1>Bienvenido a <span>Sinergia</span></h1>
             <p>Tu plataforma de aprendizaje (LMS) todo en uno. Conecta con tutores, practica con flashcards y organiza tu estudio.</p>
-            <a href="registro.html" class="button-primary">Empezar ahora</a>
+            <div class="hero-actions">
+                <a href="registro.html" class="button-primary">Empezar ahora</a>
+            </div>
         </div>
         <div class="hero-image">
-            
+            <img src="/images/hero-estudiantes.png" alt="Estudiantes estudiando en Sinergia">
         </div>
     </header>
 
@@ -358,6 +479,9 @@
         <h2 class="section-title">Herramientas para tu Éxito</h2>
 
         <div class="full-width-card marketplace-section">
+            <div class="card-media">
+                <img src="/images/marketplace-tutores.png" alt="Tutores disponibles en Sinergia">
+            </div>
             <div class="card-content">
                 <h3>Marketplace de Tutores</h3>
                 <p>Encuentra y conecta con tutores expertos verificados en la materia que necesitas. Aprueba tus exámenes con ayuda personalizada.</p>
@@ -369,12 +493,14 @@
                         <li>Reserva y paga de forma segura.</li>
                     </ul>
                 </div>
-                <a href="#" class="button-primary">Ir al Marketplace</a>
+                <a href="login.html" class="button-primary">Ir al Marketplace</a>
             </div>
-            
         </div>
 
         <div class="full-width-card flashcards-section">
+            <div class="card-media">
+                <img src="/images/flashcards-quizzes.png" alt="Flashcards y quizzes interactivos">
+            </div>
             <div class="card-content">
                 <h3>Flashcards y Quizzes</h3>
                 <p>Crea tus propias flashcards o usa las de la comunidad. Mide tu conocimiento con quizzes interactivos.</p>
@@ -386,12 +512,14 @@
                         <li>Biblioteca comunitaria de temas populares.</li>
                     </ul>
                 </div>
-                <a href="#" class="button-primary">Practicar Ahora</a>
+                <a href="login.html" class="button-primary">Practicar Ahora</a>
             </div>
-            
         </div>
 
         <div class="full-width-card planner-section">
+            <div class="card-media">
+                <img src="/images/planificador-tareas.png" alt="Planificador de tareas y calendario de estudio">
+            </div>
             <div class="card-content">
                 <h3>Planificador de Tareas</h3>
                 <p>Organiza tu calendario de estudio, establece fechas límite y lleva un seguimiento de tus tareas y objetivos de aprendizaje.</p>
@@ -403,15 +531,47 @@
                         <li>Visualización semanal y mensual.</li>
                     </ul>
                 </div>
-                <a href="#" class="button-primary">Ver Calendario</a>
+                <a href="login.html" class="button-primary">Ver Calendario</a>
             </div>
-            
         </div>
 
     </main>
 
     <footer>
-        <p>&copy; 2025 Sinergia. Todos los derechos reservados.</p>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>Sinergia</h4>
+                <p>Plataforma LMS que conecta estudiantes, tutores y recursos en un solo lugar.</p>
+                <p>Aprende de forma más inteligente, organizada y colaborativa.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Enlaces rápidos</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="#">Marketplace de tutores</a></li>
+                    <li><a href="#">Flashcards y quizzes</a></li>
+                    <li><a href="#">Planificador</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Contacto</h4>
+                <p>soporte@sinergia.com</p>
+                <p>+57 (000) 000 0000</p>
+                <p>Bogotá, Colombia</p>
+            </div>
+            <div class="footer-column">
+                <h4>Síguenos</h4>
+                <div class="footer-social">
+                    <a href="#">Instagram</a>
+                    <a href="#">LinkedIn</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2025 Sinergia. Todos los derechos reservados.</span>
+            <span>Términos y condiciones · Política de privacidad</span>
+        </div>
     </footer>
 
 </body>

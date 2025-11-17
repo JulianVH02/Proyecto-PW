@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketplace de Tutores - Sinergia</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
         :root {
             --primary-color: #ff6200;
             --white-color: #ffffff;
@@ -14,12 +15,13 @@
             --secondary-color: #007bff;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            font-family: Calibri, "Segoe UI", Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--light-bg);
             color: var(--dark-text);
         }
+        h1, h2, h3, h4 { font-family: 'DM Serif Display', serif; }
         
         /* --- Navbar --- */
         nav.navbar {
@@ -128,9 +130,11 @@
         .star.empty { color: #ddd; }
         .rate-link { font-size: 0.85rem; color: var(--secondary-color); text-decoration: underline; cursor: pointer; margin-left: auto; }
 
-        .tutor-footer { padding: 1rem 1.5rem; background-color: #f9f9f9; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .tutor-footer { padding: 1rem 1.5rem; background-color: #f9f9f9; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
         .btn-contact { background-color: #25D366; color: white; padding: 0.6rem 1rem; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; transition: background 0.3s; }
         .btn-contact:hover { background-color: #128C7E; }
+        .admin-delete-btn { background-color: #d9534f; color: #fff; border: none; padding: 0.4rem 0.7rem; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+        .admin-delete-btn:hover { opacity: 0.85; }
 
         /* Modal Estilos */
         .rating-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; }
@@ -138,17 +142,99 @@
         .rating-modal-content label { margin: 0 5px; font-size: 1.1rem; cursor: pointer; }
         .button-submit { width: 100%; padding: 0.8rem; background-color: var(--primary-color); color: var(--white-color); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
         .button-clear { background: none; border: 1px solid var(--grey-border); color: var(--dark-text); padding: 0.8rem; border-radius: 5px; width: 100%; cursor: pointer;}
+
+        /* --- Footer --- */
+        footer {
+            background-color: #1e1e1e;
+            color: var(--white-color);
+            padding: 3.5rem 8% 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column {
+            flex: 1 1 220px;
+            min-width: 200px;
+        }
+
+        .footer-column h4 {
+            font-family: 'DM Serif Display', serif;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-column p {
+            margin: 0.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.4rem;
+        }
+
+        .footer-links a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.12);
+            padding-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-social a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-social a:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="dashboard-estudiante.html" class="logo">
+        <a href="#" class="logo" onclick="goToDashboardSegunRol()">
              <img src="/images/1.png" alt="Sinergia Logo">
         </a>
         
         <ul class="nav-links">
-            <li><a href="dashboard-estudiante.html">Inicio</a></li>
+            <li><a href="#" onclick="goToDashboardSegunRol()">Inicio</a></li>
             <li><a href="recursos.html">Recursos Educativos</a></li>
             <li><a href="marketplace.html" class="active">Marketplace de Tutores</a></li>
             <li class="dropdown">
@@ -228,12 +314,16 @@
         let todosLosTutores = []; 
         let todasLasMaterias = [];
         let tutorIdActual = null;
+        let currentRole = 'ESTUDIANTE';
 
         if (!token) window.location.href = 'login.html';
 
         document.addEventListener('DOMContentLoaded', () => {
             const payload = parseJwt(token);
-            if (payload) document.getElementById('user-name').textContent = `Hola, ${payload.sub ? payload.sub.split('@')[0] : 'Usuario'}`;
+            if (payload) {
+                document.getElementById('user-name').textContent = `Hola, ${payload.sub ? payload.sub.split('@')[0] : 'Usuario'}`;
+                currentRole = payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+            }
             cargarDatosIniciales();
         });
 
@@ -356,9 +446,15 @@
                 return;
             }
 
+            const esAdmin = currentRole === 'ADMIN';
+
             listaTutores.forEach(t => {
                 const iniciales = t.nombreCompleto.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
                 const estrellasHtml = generarEstrellas(t.ratingPromedio);
+
+                const adminBtnHtml = esAdmin
+                    ? `<button class="admin-delete-btn" onclick="eliminarTutorDesdeMarketplace(${t.idTutor})">Eliminar</button>`
+                    : '';
 
                 const card = `
                     <div class="tutor-card">
@@ -384,6 +480,7 @@
                                 📱 Contactar
                             </a>
                             <span style="font-size: 0.8rem; color: #888;">Verificado ✅</span>
+                            ${adminBtnHtml}
                         </div>
                     </div>
                 `;
@@ -418,6 +515,25 @@
             return telefono ? telefono.replace(/\D/g, '') : '';
         }
 
+        async function eliminarTutorDesdeMarketplace(idTutor) {
+            if (!confirm('¿Eliminar definitivamente esta cuenta de tutor?')) return;
+            try {
+                const resp = await fetch(`http://localhost:8080/api/admin/tutores/${idTutor}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (resp.ok) {
+                    // Recargar lista de tutores después de eliminar
+                    fetchTutores();
+                } else {
+                    alert('No se pudo eliminar el tutor.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error de red al eliminar tutor.');
+            }
+        }
+
         function parseJwt(token) {
             try {
                 const base64Url = token.split('.')[1];
@@ -427,10 +543,62 @@
             } catch (e) { return null; }
         }
 
+        function goToDashboardSegunRol() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) { window.location.href = 'login.html'; return; }
+            const payload = parseJwt(token);
+            const role = payload && payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+
+            if (role === 'ADMIN') {
+                window.location.href = 'dashboard-admin.html';
+            } else if (role === 'TUTOR') {
+                window.location.href = 'dashboard-tutor.html';
+            } else {
+                window.location.href = 'dashboard-estudiante.html';
+            }
+        }
+
         function logout() {
             localStorage.removeItem('jwtToken');
             window.location.href = 'index.html';
         }
     </script>
 </body>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-column">
+            <h4>Sinergia</h4>
+            <p>Plataforma LMS que conecta estudiantes, tutores y recursos en un solo lugar.</p>
+            <p>Aprende de forma más inteligente, organizada y colaborativa.</p>
+        </div>
+        <div class="footer-column">
+            <h4>Enlaces rápidos</h4>
+            <ul class="footer-links">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="#">Marketplace de tutores</a></li>
+                <li><a href="#">Flashcards y quizzes</a></li>
+                <li><a href="#">Planificador</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h4>Contacto</h4>
+            <p>soporte@sinergia.com</p>
+            <p>+57 (000) 000 0000</p>
+            <p>Bogotá, Colombia</p>
+        </div>
+        <div class="footer-column">
+            <h4>Síguenos</h4>
+            <div class="footer-social">
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">YouTube</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>&copy; 2025 Sinergia. Todos los derechos reservados.</span>
+        <span>Términos y condiciones · Política de privacidad</span>
+    </div>
+</footer>
 </html>

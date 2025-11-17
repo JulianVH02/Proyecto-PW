@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Estudiante - Sinergia</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
         :root {
             --primary-color: #ff6200;
             --white-color: #ffffff;
@@ -16,12 +17,13 @@
             --danger-color: #dc3545;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            font-family: Calibri, "Segoe UI", Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--light-bg);
             color: var(--dark-text);
         }
+        h1, h2, h3, h4 { font-family: 'DM Serif Display', serif; }
         
         /* --- Navbar --- */
         nav.navbar {
@@ -165,17 +167,102 @@
         .study-title { font-weight: bold; display: block; }
         .study-meta { font-size: 0.8rem; color: #888; margin-top: 0.5rem; display: block; }
 
+        /* --- Footer --- */
+        footer {
+            background-color: #1e1e1e;
+            color: var(--white-color);
+            padding: 3.5rem 8% 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column {
+            flex: 1 1 220px;
+            min-width: 200px;
+        }
+
+        .footer-column h4 {
+            font-family: 'DM Serif Display', serif;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-column p {
+            margin: 0.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.4rem;
+        }
+
+        .footer-links a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.12);
+            padding-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-social a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-social a:hover {
+            opacity: 1;
+        }
+
+        .metric-card { background-color: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; border-left: 5px solid var(--primary-color); }
+        .metric-value { font-size: 2rem; font-weight: bold; color: var(--dark-text); }
+        .metric-label { font-size: 0.9rem; color: #666; margin-top: 0.5rem; }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="dashboard-estudiante.html" class="logo">
+        <a href="#" class="logo" onclick="goToDashboardSegunRol()">
              <img src="/images/1.png" alt="Sinergia Logo">
         </a>
         
         <ul class="nav-links">
-            <li><a href="dashboard-estudiante.html" class="active">Inicio</a></li>
+            <li><a href="#" class="active" onclick="goToDashboardSegunRol()">Inicio</a></li>
             <li><a href="recursos.html">Recursos</a></li>
             <li><a href="marketplace.html">Marketplace</a></li>
             <li class="dropdown">
@@ -354,10 +441,63 @@
             } catch (e) { return null; }
         }
 
+        function goToDashboardSegunRol() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) { window.location.href = 'login.html'; return; }
+            const payload = parseJwt(token);
+            const role = payload && payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+
+            if (role === 'ADMIN') {
+                window.location.href = 'dashboard-admin.html';
+            } else if (role === 'TUTOR') {
+                window.location.href = 'dashboard-tutor.html';
+            } else {
+                window.location.href = 'dashboard-estudiante.html';
+            }
+        }
+
         function logout() {
             localStorage.removeItem('jwtToken');
             window.location.href = 'index.html';
         }
     </script>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>Sinergia</h4>
+                <p>Plataforma LMS que conecta estudiantes, tutores y recursos en un solo lugar.</p>
+                <p>Aprende de forma más inteligente, organizada y colaborativa.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Enlaces rápidos</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="#">Marketplace de tutores</a></li>
+                    <li><a href="#">Flashcards y quizzes</a></li>
+                    <li><a href="#">Planificador</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Contacto</h4>
+                <p>soporte@sinergia.com</p>
+                <p>+57 (000) 000 0000</p>
+                <p>Bogotá, Colombia</p>
+            </div>
+            <div class="footer-column">
+                <h4>Síguenos</h4>
+                <div class="footer-social">
+                    <a href="#">Instagram</a>
+                    <a href="#">LinkedIn</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2025 Sinergia. Todos los derechos reservados.</span>
+            <span>Términos y condiciones · Política de privacidad</span>
+        </div>
+    </footer>
+
 </body>
 </html>

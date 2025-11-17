@@ -112,4 +112,84 @@ public class AdminController {
         
         return ResponseEntity.ok("Solicitud rechazada. El usuario volvió a ser Estudiante y la solicitud se marcó como RECHAZADA.");
     }
+
+    // --- NUEVOS ENDPOINTS: GESTIÓN DE TUTORES ---
+
+    /**
+     * Listar todos los tutores con información básica para el panel de administración.
+     */
+    @GetMapping("/tutores")
+    public ResponseEntity<List<Map<String, Object>>> getTodosLosTutores() {
+        List<Tutor> tutores = tutorRepository.findAll();
+
+        List<Map<String, Object>> respuesta = tutores.stream().map(tutor -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("idTutor", tutor.getId());
+
+            Usuario u = tutor.getUsuario();
+            if (u != null) {
+                map.put("idUsuario", u.getId());
+                map.put("nombre", u.getNombre());
+                map.put("apellido", u.getApellido());
+                map.put("correo", u.getCorreo());
+            }
+
+            map.put("estado", tutor.getEstado() != null ? tutor.getEstado().name() : null);
+            map.put("verificado", tutor.getVerificado());
+
+            return map;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(respuesta);
+    }
+
+    /**
+     * Actualizar el estado de un tutor (APROBADO, RECHAZADO, BLOQUEADO, etc.).
+     * El frontend enviará el nuevo estado como texto en el body.
+     */
+    @PutMapping("/tutores/{idTutor}/estado")
+    public ResponseEntity<?> actualizarEstadoTutor(@PathVariable Long idTutor, @RequestBody Map<String, String> body) {
+        String nuevoEstado = body.get("estado");
+        if (nuevoEstado == null || nuevoEstado.isBlank()) {
+            return ResponseEntity.badRequest().body("El campo 'estado' es obligatorio");
+        }
+
+        Tutor tutor = tutorRepository.findById(idTutor)
+                .orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
+
+        EstadoTutor estadoEnum;
+        try {
+            estadoEnum = EstadoTutor.valueOf(nuevoEstado.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Estado de tutor no válido");
+        }
+
+        tutor.setEstado(estadoEnum);
+        // Si se aprueba, marcamos verificado en true; si no, false.
+        tutor.setVerificado(estadoEnum == EstadoTutor.APROBADO);
+        tutorRepository.save(tutor);
+
+        return ResponseEntity.ok("Estado del tutor actualizado correctamente");
+    }
+
+    /**
+     * Eliminar la cuenta completa de un tutor (Usuario + Tutor).
+     * Debido al mapeo OneToOne con cascade=ALL desde Usuario -> Tutor,
+     * eliminamos el Usuario y JPA elimina el Tutor asociado.
+     */
+    @DeleteMapping("/tutores/{idTutor}")
+    public ResponseEntity<?> eliminarTutor(@PathVariable Long idTutor) {
+        Tutor tutor = tutorRepository.findById(idTutor)
+                .orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
+
+        Usuario usuario = tutor.getUsuario();
+        if (usuario != null) {
+            usuarioRepository.delete(usuario);
+        } else {
+            // Si por alguna razón no hay usuario asociado, eliminamos solo el tutor
+            tutorRepository.delete(tutor);
+        }
+
+        return ResponseEntity.ok("Cuenta de tutor eliminada correctamente");
+    }
 }

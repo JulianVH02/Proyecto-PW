@@ -9,6 +9,7 @@
     <script>
         (function() {
             const token = localStorage.getItem('jwtToken');
+
             if (!token) {
                 window.location.href = 'login.html';
                 return;
@@ -30,7 +31,9 @@
     </script>
     
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
         /* --- Estilos Globales (Heredados) --- */
+
         :root {
             --primary-color: #ff6200;
             --secondary-color: #d9534f; /* Rojo */
@@ -40,12 +43,14 @@
             --light-bg: #f4f4f4;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            font-family: Calibri, "Segoe UI", Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--light-bg);
             color: var(--dark-text);
         }
+        h1, h2, h3, h4 { font-family: 'DM Serif Display', serif; }
+
         nav.navbar {
             background-color: var(--white-color);
             padding: 1rem 2rem;
@@ -209,8 +214,118 @@
         }
         .btn-card:hover { background-color: var(--primary-color); }
 
+        /* --- Footer --- */
+        footer {
+            background-color: #1e1e1e;
+            color: var(--white-color);
+            padding: 3.5rem 8% 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column {
+            flex: 1 1 220px;
+            min-width: 200px;
+        }
+
+        .footer-column h4 {
+            font-family: 'DM Serif Display', serif;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-column p {
+            margin: 0.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.4rem;
+        }
+
+        .footer-links a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.12);
+            padding-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-social a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .footer-social a:hover {
+            opacity: 1;
+        }
+
+        /* --- Gestión extendida (tablas admin internas) --- */
+        .management-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .management-table th, .management-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        .management-table th {
+            background: #f9f9f9;
+            color: var(--primary-color);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            background: #eee;
+        }
+        .status-badge.aprobado { background: rgba(92,184,92,0.15); color: #3c763d; }
+        .status-badge.pendiente { background: rgba(255,98,0,0.1); color: #ff6200; }
+        .status-badge.rechazado { background: rgba(217,83,79,0.12); color: #a94442; }
+        .status-badge.bloqueado { background: rgba(51,51,51,0.15); color: #333; }
     </style>
 </head>
+
 <body>
 
     <nav class="navbar">
@@ -277,29 +392,291 @@
                 <span class="admin-badge">EDITAR</span>
                 <h3>Gestión de Tutores</h3>
                 <p>Ver lista completa de tutores, editar perfiles o eliminar cuentas.</p>
-                <a href="#" class="btn-card">Administrar</a>
+                <a href="#" class="btn-card" onclick="window.location.href='marketplace.html'; return false;">Administrar</a>
             </div>
             <div class="tool-card">
                 <span class="admin-badge">EDITAR</span>
                 <h3>Gestión de Recursos</h3>
                 <p>Subir, modificar o eliminar recursos educativos globales.</p>
-                <a href="#" class="btn-card">Administrar</a>
+                <a href="#" class="btn-card" onclick="window.location.href='recursos.html'; return false;">Administrar</a>
             </div>
             <div class="tool-card">
                 <h3>Mi Planificador</h3>
                 <p>Acceso personal al calendario y tareas (modo usuario).</p>
-                <a href="#" class="btn-card">Ver Calendario</a>
+                <a href="#" class="btn-card" onclick="irPlanificadorAdmin(); return false;">Ver Calendario</a>
             </div>
              <div class="tool-card">
                 <h3>Repaso Activo</h3>
                 <p>Crear o moderar Flashcards y Quizzes de la comunidad.</p>
-                <a href="#" class="btn-card">Ir a Repaso</a>
+                <a href="#" class="btn-card" onclick="irRepasoAdmin(); return false;">Ir a Repaso</a>
             </div>
+        </div>
+
+        <!-- Gestión interna de Tutores (sección oculta hasta que se pulse Administrar) -->
+        <div id="gestion-tutores-section" class="admin-section" style="display:none; margin-top: 2.5rem;">
+            <div class="section-header">
+                <h2>Gestión Completa de Tutores</h2>
+                <button onclick="cargarTutoresAdmin()" class="button-logout" style="font-size: 0.8rem;">Actualizar lista</button>
+            </div>
+            <table class="management-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-tutores-admin">
+                    <tr><td colspan="4" style="text-align:center;">Sin datos</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Gestión interna de Recursos (sección oculta) -->
+        <div id="gestion-recursos-section" class="admin-section" style="display:none; margin-top: 2.5rem;">
+            <div class="section-header">
+                <h2>Gestión de Recursos Educativos</h2>
+                <button onclick="cargarRecursosAdmin()" class="button-logout" style="font-size: 0.8rem;">Actualizar lista</button>
+            </div>
+            <table class="management-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Materia</th>
+                        <th>Creador</th>
+                        <th>Rating</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-recursos-admin">
+                    <tr><td colspan="5" style="text-align:center;">Sin datos</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <script>
         const token = localStorage.getItem('jwtToken');
+
+        // --- Navegación rápida desde las tarjetas ---
+        function irPlanificadorAdmin() {
+            window.location.href = 'planificador.html';
+        }
+
+        function irRepasoAdmin() {
+            // Puedes ajustar esto si quieres ir primero a flashcards u otra página
+            window.location.href = 'flashcards.html';
+        }
+
+        function mostrarGestionTutores() {
+            document.getElementById('gestion-tutores-section').style.display = 'block';
+            cargarTutoresAdmin();
+            // Scroll suave a la sección
+            document.getElementById('gestion-tutores-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function mostrarGestionRecursos() {
+            document.getElementById('gestion-recursos-section').style.display = 'block';
+            cargarRecursosAdmin();
+            document.getElementById('gestion-recursos-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- Gestión de Tutores (usa /api/admin/tutores y /tutores/{idTutor}/estado, /tutores/{idTutor}) ---
+        async function cargarTutoresAdmin() {
+            const tbody = document.getElementById('tabla-tutores-admin');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Cargando...</td></tr>';
+
+            try {
+                const resp = await fetch('http://localhost:8080/api/admin/tutores', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!resp.ok) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Error al cargar tutores.</td></tr>';
+                    return;
+                }
+
+                const tutores = await resp.json();
+                if (tutores.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No hay tutores registrados.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                tutores.forEach(t => {
+                    const estado = (t.estado || '').toLowerCase();
+                    const claseEstado = estado === 'aprobado' ? 'aprobado' :
+                                        estado === 'pendiente' ? 'pendiente' :
+                                        estado === 'rechazado' ? 'rechazado' :
+                                        estado === 'bloqueado' ? 'bloqueado' : '';
+
+                    const fila = `
+                        <tr>
+                            <td>${t.nombre || ''} ${t.apellido || ''}</td>
+                            <td>${t.correo || ''}</td>
+                            <td><span class="status-badge ${claseEstado}">${t.estado || 'N/A'}</span></td>
+                            <td>
+                                <button class="btn-action btn-approve" onclick="cambiarEstadoTutorAdmin(${t.idTutor}, 'APROBADO')">Aprobar</button>
+                                <button class="btn-action btn-reject" onclick="cambiarEstadoTutorAdmin(${t.idTutor}, 'BLOQUEADO')">Bloquear</button>
+                                <button class="btn-action" style="background:#555;" onclick="eliminarTutorAdmin(${t.idTutor})">Eliminar</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += fila;
+                });
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Error de conexión.</td></tr>';
+            }
+        }
+
+        async function cambiarEstadoTutorAdmin(idTutor, nuevoEstado) {
+            if (!confirm(`¿Cambiar estado del tutor a ${nuevoEstado}?`)) return;
+            try {
+                const resp = await fetch(`http://localhost:8080/api/admin/tutores/${idTutor}/estado`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ estado: nuevoEstado })
+                });
+                if (resp.ok) {
+                    cargarTutoresAdmin();
+                } else {
+                    alert('No se pudo actualizar el estado.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error de red al actualizar estado.');
+            }
+        }
+
+        async function eliminarTutorAdmin(idTutor) {
+            if (!confirm('¿Eliminar definitivamente esta cuenta de tutor?')) return;
+            try {
+                const resp = await fetch(`http://localhost:8080/api/admin/tutores/${idTutor}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (resp.ok) {
+                    cargarTutoresAdmin();
+                } else {
+                    alert('No se pudo eliminar el tutor.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error de red al eliminar tutor.');
+            }
+        }
+
+        // --- Gestión de Recursos (usa /api/admin/recursos) ---
+        async function cargarRecursosAdmin() {
+            const tbody = document.getElementById('tabla-recursos-admin');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Cargando...</td></tr>';
+
+            try {
+                const resp = await fetch('http://localhost:8080/api/admin/recursos', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!resp.ok) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:red;">Error al cargar recursos.</td></tr>';
+                    return;
+                }
+
+                const recursos = await resp.json();
+                if (recursos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay recursos registrados.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                recursos.forEach(r => {
+                    const fila = `
+                        <tr>
+                            <td>${r.titulo}</td>
+                            <td>${r.materiaNombre}</td>
+                            <td>${r.usuarioNombre}</td>
+                            <td>${r.ratingPromedio != null ? r.ratingPromedio : '0.0'}</td>
+                            <td>
+                                <button class="btn-action btn-approve" onclick="editarRecursoAdmin(${r.id})">Editar</button>
+                                <button class="btn-action btn-reject" onclick="eliminarRecursoAdmin(${r.id})">Eliminar</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += fila;
+                });
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:red;">Error de conexión.</td></tr>';
+            }
+        }
+
+        async function editarRecursoAdmin(id) {
+            // Edición sencilla usando prompts para no cambiar tu maquetación actual
+            try {
+                const resp = await fetch(`http://localhost:8080/api/admin/recursos/${id}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!resp.ok) {
+                    alert('No se pudo cargar el recurso.');
+                    return;
+                }
+                const recurso = await resp.json();
+
+                const nuevoTitulo = prompt('Título del recurso:', recurso.titulo);
+                if (nuevoTitulo === null) return;
+                const nuevaDescripcion = prompt('Descripción:', recurso.descripcion || '');
+                if (nuevaDescripcion === null) return;
+                const nuevaUrl = prompt('URL:', recurso.url);
+                if (nuevaUrl === null) return;
+
+                // Por simplicidad mantenemos tipoRecurso y materiaId iguales a los actuales.
+                const body = {
+                    titulo: nuevoTitulo,
+                    descripcion: nuevaDescripcion,
+                    url: nuevaUrl,
+                    tipoRecurso: recurso.tipoRecurso,
+                    materiaId: null
+                };
+
+                const respUpdate = await fetch(`http://localhost:8080/api/admin/recursos/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (respUpdate.ok) {
+                    cargarRecursosAdmin();
+                } else {
+                    alert('No se pudo actualizar el recurso.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error de red al editar recurso.');
+            }
+        }
+
+        async function eliminarRecursoAdmin(id) {
+            if (!confirm('¿Eliminar este recurso de forma permanente?')) return;
+            try {
+                const resp = await fetch(`http://localhost:8080/api/admin/recursos/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (resp.ok) {
+                    cargarRecursosAdmin();
+                } else {
+                    alert('No se pudo eliminar el recurso.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error de red al eliminar recurso.');
+            }
+        }
 
         // --- NUEVA FUNCIÓN PARA CARGAR ESTADÍSTICAS ---
         async function cargarEstadisticas() {
@@ -410,5 +787,43 @@
             cargarEstadisticas(); // --- AÑADIDO: Cargar estadísticas al iniciar
         });
     </script>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>Sinergia</h4>
+                <p>Plataforma LMS que conecta estudiantes, tutores y recursos en un solo lugar.</p>
+                <p>Aprende de forma más inteligente, organizada y colaborativa.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Enlaces rápidos</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="#">Marketplace de tutores</a></li>
+                    <li><a href="#">Flashcards y quizzes</a></li>
+                    <li><a href="#">Planificador</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Contacto</h4>
+                <p>soporte@sinergia.com</p>
+                <p>+57 (000) 000 0000</p>
+                <p>Bogotá, Colombia</p>
+            </div>
+            <div class="footer-column">
+                <h4>Síguenos</h4>
+                <div class="footer-social">
+                    <a href="#">Instagram</a>
+                    <a href="#">LinkedIn</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2025 Sinergia. Todos los derechos reservados.</span>
+            <span>Términos y condiciones · Política de privacidad</span>
+        </div>
+    </footer>
+
 </body>
 </html>
