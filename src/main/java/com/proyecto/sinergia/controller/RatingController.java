@@ -19,8 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/ratings")
@@ -116,7 +116,8 @@ public class RatingController {
             // 4a. Actualizar calificación existente
             rating = existingRatingOpt.get();
             rating.setPuntuacion(request.getPuntuacion());
-            // Nota: No actualizamos el comentario, solo la puntuación por simplicidad
+            // Actualizar también el comentario (puede ser null o vacío)
+            rating.setComentario(request.getComentario());
             mensaje = "Calificación de tutor actualizada con éxito.";
         } else {
             // 4b. Crear nueva calificación
@@ -124,7 +125,8 @@ public class RatingController {
             rating.setEstudiante(estudiante);
             rating.setTutor(tutor);
             rating.setPuntuacion(request.getPuntuacion());
-            // Nota: Podrías añadir request.getComentario() si el DTO lo tuviera
+            rating.setComentario(request.getComentario());
+            rating.setFechaCreacion(LocalDateTime.now());
             mensaje = "Tutor calificado con éxito.";
         }
 

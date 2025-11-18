@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil del Tutor - Sinergia</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
+        :root {
+            --primary-color: #f26200;
+            --white-color: #ffffff;
+            --dark-text: #333;
+            --light-bg: #f4f4f4;
+            --grey-border: #ddd;
+            --secondary-color: #007bff;
+        }
+        body { font-family: Calibri, "Segoe UI", Arial, sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: var(--dark-text); }
+        h1, h2, h3, h4 { font-family: 'DM Serif Display', serif; }
+
+        /* Navbar (copiada de marketplace) */
+        nav.navbar {
+            background-color: var(--white-color);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; }
+        .navbar .logo img { height: 70px; width: auto; margin-right: 0.5rem; }
+        .navbar .nav-links { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.5rem; align-items: center; }
+        .navbar .nav-links a { text-decoration: none; color: var(--dark-text); font-weight: 500; transition: color 0.3s ease; }
+        .navbar .nav-links a:hover, .navbar .nav-links a.active { color: var(--primary-color); }
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; background-color: var(--white-color); min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); z-index: 1001; border-radius: 5px; margin-top: 0.5rem; }
+        .dropdown-content a { color: var(--dark-text); padding: 12px 16px; text-decoration: none; display: block; }
+        .dropdown-content a:hover { background-color: var(--light-bg); color: var(--primary-color); }
+        .dropdown.open .dropdown-content { display: block; }
+        .dropdown .dropbtn { cursor: pointer; text-decoration: none; color: var(--dark-text); font-weight: 500; background: none; border: none; font-family: inherit; font-size: inherit; }
+        .dropdown .dropbtn:hover { color: var(--primary-color); }
+        .user-section { display: flex; align-items: center; gap: 1rem; }
+        .button-logout { padding: 0.5rem 1rem; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; font-size: 0.9rem; }
+        .button-logout:hover { background: var(--primary-color); color: white; }
+
+        /* Layout principal */
+        .profile-container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 2rem; }
+        @media (max-width: 900px) { .profile-container { grid-template-columns: 1fr; } }
+
+        .profile-card, .comments-card { background-color: var(--white-color); padding: 1.8rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
+        .profile-header { display: flex; gap: 1.5rem; align-items: center; margin-bottom: 1rem; }
+        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background-color: var(--primary-color); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; }
+        .profile-name { margin: 0; font-size: 1.6rem; }
+        .profile-materia { color: #666; margin-top: 0.2rem; }
+
+        .profile-rating { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+        .profile-rating-number { font-weight: bold; color: var(--primary-color); }
+        .profile-stars { color: #ffd700; }
+
+        .profile-price { margin-top: 1rem; font-size: 1.3rem; font-weight: bold; }
+        .profile-contact { margin-top: 0.5rem; font-size: 0.95rem; color: #555; }
+
+        .profile-stats { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
+        .profile-stat-item {
+            flex: 1 1 120px;
+            background-color: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        .profile-stat-label { color: #777; display:block; margin-bottom: 0.15rem; }
+        .profile-stat-value { font-weight: 700; font-size: 1rem; }
+
+        .profile-actions { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .btn-contact { background-color: var(--primary-color); color: #fff; padding: 0.6rem 1.1rem; border-radius: 999px; text-decoration: none; font-weight: bold; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .btn-contact:hover { background-color: #d65100; }
+
+        .comments-card h3 { margin-top: 0; margin-bottom: 1rem; color: var(--primary-color); }
+        .comment-item { border-radius: 8px; border: 1px solid #eee; padding: 0.75rem 1rem; margin-bottom: 0.75rem; background-color: #fafafa; }
+        .comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; flex-wrap: wrap; gap: 0.5rem; }
+        .comment-name { font-weight: 600; }
+        .comment-rating { color: #ffd700; font-size: 0.9rem; }
+        .comment-date { font-size: 0.8rem; color: #999; }
+        .comment-text { font-size: 0.9rem; color: #555; }
+        .comment-empty { color: #777; font-size: 0.9rem; }
+
+        /* Footer global */
+        footer { background-color: #1e1e1e; color: var(--white-color); padding: 3.5rem 8% 2rem; margin-top: 3rem; }
+        .footer-content { display: flex; flex-wrap: wrap; gap: 2.5rem; justify-content: space-between; margin-bottom: 2rem; }
+        .footer-column { flex: 1 1 220px; min-width: 200px; }
+        .footer-column h4 { font-family: 'DM Serif Display', serif; margin-top: 0; margin-bottom: 1rem; font-size: 1.1rem; }
+        .footer-column p { margin: 0.25rem 0; font-size: 0.95rem; }
+        .footer-links { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: 0.4rem; }
+        .footer-links a { color: var(--white-color); text-decoration: none; font-size: 0.95rem; opacity: 0.85; }
+        .footer-links a:hover { opacity: 1; text-decoration: underline; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 1.5rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; font-size: 0.9rem; }
+        .footer-social { display: flex; gap: 1rem; }
+        .footer-social a { color: var(--white-color); text-decoration: none; font-size: 0.95rem; opacity: 0.85; }
+        .footer-social a:hover { opacity: 1; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="#" class="logo" onclick="goToDashboardSegunRol()">
+        <img src="/images/1.png" alt="Sinergia Logo">
+    </a>
+
+    <ul class="nav-links">
+        <li><a href="#" onclick="goToDashboardSegunRol()">Inicio</a></li>
+        <li><a href="recursos.html">Recursos Educativos</a></li>
+        <li><a href="marketplace.html">Marketplace de Tutores</a></li>
+        <li class="dropdown">
+            <a href="#" class="dropbtn">Repaso Activo &#9662;</a>
+            <div class="dropdown-content">
+                <a href="flashcards.html">Flashcards</a>
+                <a href="quizzes.html">Quizzes</a>
+                <a href="planificador.html">Planificador</a>
+            </div>
+        </li>
+    </ul>
+
+    <div class="user-section">
+        <span id="user-name" style="font-weight: 500;"></span>
+        <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
+    </div>
+</nav>
+
+<div class="profile-container">
+    <section class="profile-card" id="profile-section">
+        <div class="profile-header">
+            <div class="profile-avatar" id="profile-avatar">TU</div>
+            <div>
+                <h2 class="profile-name" id="profile-name">Tutor</h2>
+                <div class="profile-materia" id="profile-materia">Materia</div>
+                <div class="profile-rating">
+                    <span class="profile-rating-number" id="profile-rating-number">0.0</span>
+                    <span class="profile-stars" id="profile-stars">★★★★★</span>
+                </div>
+            </div>
+        </div>
+        <div class="profile-stats">
+            <div class="profile-stat-item">
+                <span class="profile-stat-label">Rating promedio</span>
+                <span class="profile-stat-value" id="stat-rating">0.0</span>
+            </div>
+            <div class="profile-stat-item">
+                <span class="profile-stat-label">Comentarios</span>
+                <span class="profile-stat-value" id="stat-comentarios">0</span>
+            </div>
+            <div class="profile-stat-item">
+                <span class="profile-stat-label">Precio por hora</span>
+                <span class="profile-stat-value" id="stat-precio">$0</span>
+            </div>
+        </div>
+        <p id="profile-descripcion">Descripción del tutor.</p>
+        <div class="profile-price" id="profile-precio">$0 / hora</div>
+        <div class="profile-contact" id="profile-contacto"></div>
+        <div class="profile-actions">
+            <a href="#" target="_blank" id="profile-contact-link" class="btn-contact">📱 Contactar por WhatsApp</a>
+        </div>
+    </section>
+
+    <section class="comments-card">
+        <h3>Opiniones de estudiantes</h3>
+        <div id="comments-container">
+            <p class="comment-empty">Cargando comentarios...</p>
+        </div>
+    </section>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-column">
+            <h4>Sinergia</h4>
+            <p>Plataforma LMS que conecta estudiantes, tutores y recursos en un solo lugar.</p>
+            <p>Aprende de forma más inteligente, organizada y colaborativa.</p>
+        </div>
+        <div class="footer-column">
+            <h4>Enlaces rápidos</h4>
+            <ul class="footer-links">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="#">Marketplace de tutores</a></li>
+                <li><a href="#">Flashcards y quizzes</a></li>
+                <li><a href="#">Planificador</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h4>Contacto</h4>
+            <p>soporte@sinergia.com</p>
+            <p>+57 (000) 000 0000</p>
+            <p>Bogotá, Colombia</p>
+        </div>
+        <div class="footer-column">
+            <h4>Síguenos</h4>
+            <div class="footer-social">
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">YouTube</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>&copy; 2025 Sinergia. Todos los derechos reservados.</span>
+        <span>Términos y condiciones · Política de privacidad</span>
+    </div>
+</footer>
+
+<script>
+    const token = localStorage.getItem('jwtToken');
+    if (!token) window.location.href = 'login.html';
+
+    function parseJwt(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            return JSON.parse(jsonPayload);
+        } catch (e) { return null; }
+    }
+
+    function goToDashboardSegunRol() {
+        const token = localStorage.getItem('jwtToken');
+        if (!token) { window.location.href = 'login.html'; return; }
+        const payload = parseJwt(token);
+        const role = payload && payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+
+        if (role === 'ADMIN') {
+            window.location.href = 'dashboard-admin.html';
+        } else if (role === 'TUTOR') {
+            window.location.href = 'dashboard-tutor.html';
+        } else {
+            window.location.href = 'dashboard-estudiante.html';
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('jwtToken');
+        window.location.href = 'index.html';
+    }
+
+    function generarEstrellas(rating) {
+        const maxEstrellas = 5;
+        let html = '';
+        const ratingRedondeado = Math.round(rating);
+        for (let i = 1; i <= maxEstrellas; i++) {
+            html += i <= ratingRedondeado ? '★' : '☆';
+        }
+        return html;
+    }
+
+    function limpiarTelefono(telefono) {
+        return telefono ? telefono.replace(/\D/g, '') : '';
+    }
+
+    function formatearFecha(fechaIso) {
+        if (!fechaIso) return '';
+        const d = new Date(fechaIso);
+        return d.toLocaleDateString('es-CO', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit'
+        });
+    }
+
+    async function cargarPerfil() {
+        const params = new URLSearchParams(window.location.search);
+        const tutorId = params.get('tutorId');
+        if (!tutorId) {
+            document.getElementById('comments-container').innerHTML = '<p class="comment-empty">No se especificó un tutor.</p>';
+            return;
+        }
+
+        const payload = parseJwt(token);
+        if (payload) {
+            document.getElementById('user-name').textContent = `Hola, ${payload.sub ? payload.sub.split('@')[0] : 'Usuario'}`;
+        }
+
+        try {
+            const resp = await fetch(`http://localhost:8080/api/tutores/${tutorId}/perfil`, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!resp.ok) {
+                document.getElementById('comments-container').innerHTML = '<p class="comment-empty">No se pudo cargar el perfil del tutor.</p>';
+                return;
+            }
+            const data = await resp.json();
+
+            // Perfil
+            const iniciales = data.nombreCompleto.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+            document.getElementById('profile-avatar').textContent = iniciales;
+            document.getElementById('profile-name').textContent = data.nombreCompleto;
+            document.getElementById('profile-materia').textContent = data.materia || 'General';
+            document.getElementById('profile-descripcion').textContent = data.descripcion || 'Sin descripción disponible.';
+            document.getElementById('profile-precio').textContent = `$${new Intl.NumberFormat('es-CO',{style:'decimal',minimumFractionDigits:0}).format(data.precioPorClase || 0)} / hora`;
+            document.getElementById('profile-contacto').textContent = data.contacto ? `Contacto: ${data.contacto}` : '';
+
+            const rating = data.ratingPromedio || 0;
+            document.getElementById('profile-rating-number').textContent = rating.toFixed(1);
+            document.getElementById('profile-stars').textContent = generarEstrellas(rating);
+            document.getElementById('stat-rating').textContent = rating.toFixed(1);
+            document.getElementById('stat-precio').textContent = `$${new Intl.NumberFormat('es-CO',{style:'decimal',minimumFractionDigits:0}).format(data.precioPorClase || 0)}`;
+
+            const contactLink = document.getElementById('profile-contact-link');
+            if (data.contacto) {
+                contactLink.href = `https://wa.me/${limpiarTelefono(data.contacto)}`;
+            } else {
+                contactLink.style.display = 'none';
+            }
+
+            // Comentarios
+            const commentsContainer = document.getElementById('comments-container');
+            commentsContainer.innerHTML = '';
+            if (!data.comentarios || data.comentarios.length === 0) {
+                commentsContainer.innerHTML = '<p class="comment-empty">Aún no hay comentarios para este tutor.</p>';
+            } else {
+                document.getElementById('stat-comentarios').textContent = data.totalComentarios || data.comentarios.length;
+                data.comentarios.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'comment-item';
+                    div.innerHTML = `
+                        <div class="comment-header">
+                            <span class="comment-name">${c.estudianteNombre}</span>
+                            <span class="comment-rating">${generarEstrellas(c.puntuacion)}</span>
+                            <span class="comment-date">${formatearFecha(c.fecha)}</span>
+                        </div>
+                        <div class="comment-text">${c.comentario}</div>
+                    `;
+                    commentsContainer.appendChild(div);
+                });
+            }
+        } catch (e) {
+            console.error(e);
+            document.getElementById('comments-container').innerHTML = '<p class="comment-empty">Error de conexión al cargar el perfil.</p>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropdown = document.querySelector('.navbar .dropdown');
+        if (dropdown) {
+            const button = dropdown.querySelector('.dropbtn');
+            const content = dropdown.querySelector('.dropdown-content');
+            if (button && content) {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropdown.classList.toggle('open');
+                });
+                content.addEventListener('click', function (e) { e.stopPropagation(); });
+                document.addEventListener('click', function () { dropdown.classList.remove('open'); });
+            }
+        }
+        cargarPerfil();
+    });
+</script>
+
+</body>
+</html>

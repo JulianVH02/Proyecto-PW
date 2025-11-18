@@ -1,14 +1,18 @@
 package com.proyecto.sinergia.controller;
 
+import com.proyecto.sinergia.dto.TutorProfileResponse;
 import com.proyecto.sinergia.dto.TutorResponseDto;
 import com.proyecto.sinergia.model.Tutor;
 import com.proyecto.sinergia.model.enums.EstadoTutor;
 import com.proyecto.sinergia.repository.TutorRepository;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,5 +34,25 @@ public class TutorController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
+    }
+
+    // Perfil detallado de un tutor: incluye comentarios
+    @GetMapping("/{id}/perfil")
+    @Transactional
+    public ResponseEntity<TutorProfileResponse> getPerfilTutor(@PathVariable Long id) {
+        Optional<Tutor> tutorOpt = tutorRepository.findById(id);
+        if (tutorOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Tutor tutor = tutorOpt.get();
+
+        // Inicializar relaciones LAZY necesarias para el DTO
+        Hibernate.initialize(tutor.getUsuario());
+        Hibernate.initialize(tutor.getMateria());
+        Hibernate.initialize(tutor.getRatings());
+
+        TutorProfileResponse dto = new TutorProfileResponse(tutor);
+        return ResponseEntity.ok(dto);
     }
 }

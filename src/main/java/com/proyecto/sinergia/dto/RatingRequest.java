@@ -12,4 +12,7 @@ public class RatingRequest {
     @Min(value = 1, message = "La puntuación mínima es 1.")
     @Max(value = 5, message = "La puntuación máxima es 5.")
     private Integer puntuacion;
+
+    // Campo opcional para comentarios (usado en ratings de tutores)
+    private String comentario;
 }

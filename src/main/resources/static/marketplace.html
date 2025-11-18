@@ -164,6 +164,22 @@
             transform: translateY(-1px);
         }
 
+        .btn-profile {
+            background-color: #ffffff;
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            border: 1px solid var(--primary-color);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-profile:hover {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+
         .pagination-container { margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
         .pagination-container button {
             padding: 0.4rem 0.8rem;
@@ -342,15 +358,19 @@
     <div id="rating-modal" class="rating-modal-overlay" style="display:none;">
         <div class="rating-modal-content">
             <h3>Calificar Tutor</h3>
-            <p>Selecciona tu puntuación (1 a 5):</p>
+            <p>Selecciona tu puntuación (1 a 5) y deja un comentario opcional:</p>
             
             <form id="rating-form">
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 12px;">
                     <label><input type="radio" name="puntuacion" value="1"> 1</label>
                     <label><input type="radio" name="puntuacion" value="2"> 2</label>
                     <label><input type="radio" name="puntuacion" value="3"> 3</label>
                     <label><input type="radio" name="puntuacion" value="4"> 4</label>
                     <label><input type="radio" name="puntuacion" value="5"> 5</label>
+                </div>
+                <div style="margin-bottom: 12px; text-align:left;">
+                    <label for="rating-comment" style="font-size:0.9rem; font-weight:600;">Comentario (opcional):</label>
+                    <textarea id="rating-comment" style="width:100%; padding:0.5rem; border:1px solid var(--grey-border); border-radius:5px; font-family:inherit; font-size:0.9rem; min-height:60px; resize:vertical;"></textarea>
                 </div>
                 <button type="button" onclick="enviarRating()" class="button-submit">Enviar Calificación</button>
                 <button type="button" onclick="document.getElementById('rating-modal').style.display='none'" class="button-clear">Cancelar</button>
@@ -450,6 +470,7 @@
         async function enviarRating() {
             const puntuacionInput = document.querySelector('input[name="puntuacion"]:checked');
             const mensajeEl = document.getElementById('rating-message');
+            const comentario = document.getElementById('rating-comment').value;
 
             if (!puntuacionInput || !tutorIdActual) {
                 mensajeEl.style.color = 'red';
@@ -467,7 +488,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + token
                     },
-                    body: JSON.stringify({ puntuacion: ratingValue })
+                    body: JSON.stringify({ puntuacion: ratingValue, comentario: comentario })
                 });
 
                 if (response.ok) {
@@ -530,9 +551,12 @@
                             <p class="tutor-desc">${t.descripcion || 'Sin descripción disponible.'}</p>
                         </div>
                         <div class="tutor-footer">
-                            <a href="https://wa.me/${limpiarTelefono(t.contacto)}" target="_blank" class="btn-contact">
-                                📱 Contactar
-                            </a>
+                            <div style="display:flex; gap:0.5rem; align-items:center;">
+                                <a href="https://wa.me/${limpiarTelefono(t.contacto)}" target="_blank" class="btn-contact">
+                                    📱 Contactar
+                                </a>
+                                <button type="button" class="btn-profile" onclick="verPerfilTutor(${t.idTutor})">Ver perfil</button>
+                            </div>
                             <span style="font-size: 0.8rem; color: #888;">Verificado ✅</span>
                             ${adminBtnHtml}
                         </div>
@@ -632,6 +656,11 @@
         function limpiarTelefono(telefono) {
             // Elimina todo lo que no sea número para el enlace de WhatsApp
             return telefono ? telefono.replace(/\D/g, '') : '';
+        }
+
+        function verPerfilTutor(idTutor) {
+            if (!idTutor) return;
+            window.location.href = `tutor-perfil.html?tutorId=${idTutor}`;
         }
 
         async function eliminarTutorDesdeMarketplace(idTutor) {

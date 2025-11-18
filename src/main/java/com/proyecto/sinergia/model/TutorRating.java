@@ -2,6 +2,7 @@ package com.proyecto.sinergia.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -29,4 +30,8 @@ public class TutorRating {
     // Campo opcional para comentarios
     @Column(columnDefinition = "TEXT")
     private String comentario;
+
+    // Fecha de creación de la calificación
+    @Column(name = "fecha_creacion")
+    private LocalDateTime fechaCreacion;
 }
