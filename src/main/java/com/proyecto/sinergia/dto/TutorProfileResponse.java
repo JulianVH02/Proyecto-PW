@@ -47,7 +47,8 @@ public class TutorProfileResponse {
                             r.getEstudiante().getNombre() + " " + r.getEstudiante().getApellido(),
                             r.getPuntuacion(),
                             r.getComentario(),
-                            r.getFechaCreacion()
+                            r.getFechaCreacion(),
+                            r.getEstudiante().getFotoPerfil()
                     ))
                     .collect(Collectors.toList());
         } else {

@@ -14,6 +14,7 @@
             --grey-border: #ddd;
             --secondary-color: #007bff;
         }
+
         body { font-family: Calibri, "Segoe UI", Arial, sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: var(--dark-text); }
         h1, h2, h3, h4 { font-family: 'DM Serif Display', serif; }
 
@@ -82,6 +83,22 @@
         .comments-card h3 { margin-top: 0; margin-bottom: 1rem; color: var(--primary-color); }
         .comment-item { border-radius: 8px; border: 1px solid #eee; padding: 0.75rem 1rem; margin-bottom: 0.75rem; background-color: #fafafa; }
         .comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; flex-wrap: wrap; gap: 0.5rem; }
+        .comment-user { display: flex; align-items: center; gap: 0.5rem; }
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
         .comment-name { font-weight: 600; }
         .comment-rating { color: #ffd700; font-size: 0.9rem; }
         .comment-date { font-size: 0.8rem; color: #999; }
@@ -268,6 +285,14 @@
         });
     }
 
+    function generarIniciales(nombreCompleto) {
+        if (!nombreCompleto) return '';
+        const partes = nombreCompleto.trim().split(' ');
+        let ini = partes[0].charAt(0).toUpperCase();
+        if (partes.length > 1) ini += partes[1].charAt(0).toUpperCase();
+        return ini;
+    }
+
     async function cargarPerfil() {
         const params = new URLSearchParams(window.location.search);
         const tutorId = params.get('tutorId');
@@ -323,9 +348,15 @@
                 data.comentarios.forEach(c => {
                     const div = document.createElement('div');
                     div.className = 'comment-item';
+                    const iniciales = generarIniciales(c.estudianteNombre);
                     div.innerHTML = `
                         <div class="comment-header">
-                            <span class="comment-name">${c.estudianteNombre}</span>
+                            <div class="comment-user">
+                                <div class="comment-avatar" style="${c.fotoPerfilEstudiante ? `background-image:url('${c.fotoPerfilEstudiante}')` : ''}">
+                                    ${c.fotoPerfilEstudiante ? '' : iniciales}
+                                </div>
+                                <span class="comment-name">${c.estudianteNombre}</span>
+                            </div>
                             <span class="comment-rating">${generarEstrellas(c.puntuacion)}</span>
                             <span class="comment-date">${formatearFecha(c.fecha)}</span>
                         </div>

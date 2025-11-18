@@ -3,6 +3,8 @@ package com.proyecto.sinergia.controller;
 import com.proyecto.sinergia.dto.LoginRequest;
 import com.proyecto.sinergia.dto.LoginResponse;
 import com.proyecto.sinergia.dto.RegistroRequest;
+import com.proyecto.sinergia.dto.UsuarioPerfilDto;
+import com.proyecto.sinergia.dto.ActualizarPerfilRequest;
 import com.proyecto.sinergia.model.Usuario;
 import com.proyecto.sinergia.security.JwtService;
 import com.proyecto.sinergia.service.UsuarioService;
@@ -19,6 +21,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -69,14 +78,68 @@ public class UsuarioController {
     }
     
     @GetMapping("/mi-perfil")
-    public ResponseEntity<Usuario> getMiPerfil(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<UsuarioPerfilDto> getMiPerfil(@AuthenticationPrincipal UserDetails userDetails) {
         // userDetails.getUsername() nos da el correo extraído del Token
         Usuario usuario = usuarioService.buscarPorCorreo(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        
-        // Por seguridad, no devolvemos la contraseña en el JSON
-        usuario.setContraseña(null); 
-        
-        return ResponseEntity.ok(usuario);
+
+        return ResponseEntity.ok(new UsuarioPerfilDto(usuario));
+    }
+
+    @PutMapping("/mi-perfil")
+    public ResponseEntity<UsuarioPerfilDto> actualizarMiPerfil(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody ActualizarPerfilRequest request) {
+
+        Usuario usuario = usuarioService.buscarPorCorreo(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Solo actualizar la foto si viene explícitamente en el request
+        if (request.fotoPerfil() != null) {
+            usuario.setFotoPerfil(request.fotoPerfil());
+        }
+
+        usuario.setDescripcionPerfil(request.descripcionPerfil());
+
+        Usuario guardado = usuarioService.actualizar(usuario);
+
+        return ResponseEntity.ok(new UsuarioPerfilDto(guardado));
+    }
+
+    @PostMapping("/mi-perfil/foto")
+    public ResponseEntity<UsuarioPerfilDto> actualizarFotoPerfil(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("imagen") MultipartFile imagen) throws IOException {
+
+        if (imagen == null || imagen.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Usuario usuario = usuarioService.buscarPorCorreo(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Carpeta dentro de resources/static para servir las imágenes como /uploads/perfiles/...
+        Path uploadDir = Paths.get("src/main/resources/static/uploads/perfiles");
+        if (!Files.exists(uploadDir)) {
+            Files.createDirectories(uploadDir);
+        }
+
+        String extension = "";
+        String original = imagen.getOriginalFilename();
+        if (original != null && original.contains(".")) {
+            extension = original.substring(original.lastIndexOf('.'));
+        }
+        String fileName = "perfil_" + usuario.getId() + "_" + UUID.randomUUID() + extension;
+        Path destino = uploadDir.resolve(fileName);
+
+        Files.copy(imagen.getInputStream(), destino);
+
+        // Ruta accesible desde el navegador
+        String urlPublica = "/uploads/perfiles/" + fileName;
+        usuario.setFotoPerfil(urlPublica);
+
+        Usuario guardado = usuarioService.actualizar(usuario);
+
+        return ResponseEntity.ok(new UsuarioPerfilDto(guardado));
     }
 }

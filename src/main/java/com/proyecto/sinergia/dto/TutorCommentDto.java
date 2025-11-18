@@ -7,14 +7,16 @@ public class TutorCommentDto {
     private Integer puntuacion;
     private String comentario;
     private LocalDateTime fecha;
+    private String fotoPerfilEstudiante;
 
     public TutorCommentDto() {}
 
-    public TutorCommentDto(String estudianteNombre, Integer puntuacion, String comentario, LocalDateTime fecha) {
+    public TutorCommentDto(String estudianteNombre, Integer puntuacion, String comentario, LocalDateTime fecha, String fotoPerfilEstudiante) {
         this.estudianteNombre = estudianteNombre;
         this.puntuacion = puntuacion;
         this.comentario = comentario;
         this.fecha = fecha;
+        this.fotoPerfilEstudiante = fotoPerfilEstudiante;
     }
 
     public String getEstudianteNombre() {
@@ -47,5 +49,13 @@ public class TutorCommentDto {
 
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
+    }
+
+    public String getFotoPerfilEstudiante() {
+        return fotoPerfilEstudiante;
+    }
+
+    public void setFotoPerfilEstudiante(String fotoPerfilEstudiante) {
+        this.fotoPerfilEstudiante = fotoPerfilEstudiante;
     }
 }

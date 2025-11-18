@@ -70,4 +70,9 @@ public class UsuarioService {
     public java.util.Optional<Usuario> buscarPorCorreo(String correo) {
         return usuarioRepository.findByCorreo(correo);
     }
+
+    @Transactional
+    public Usuario actualizar(Usuario usuario) {
+        return usuarioRepository.save(usuario);
+    }
 }

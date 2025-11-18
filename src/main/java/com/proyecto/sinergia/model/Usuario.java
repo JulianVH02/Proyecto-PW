@@ -43,6 +43,12 @@ public class Usuario {
     @Column(columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean activo;
 
+    @Column(name = "foto_perfil", length = 255)
+    private String fotoPerfil;
+
+    @Column(name = "descripcion_perfil", columnDefinition = "TEXT")
+    private String descripcionPerfil;
+
     // --- Relaciones ---
     
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
