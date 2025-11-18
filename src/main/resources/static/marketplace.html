@@ -7,13 +7,14 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
         :root {
-            --primary-color: #ff6200;
+            --primary-color: #f26200;
             --white-color: #ffffff;
             --dark-text: #333;
             --light-bg: #f4f4f4;
             --grey-border: #ddd;
             --secondary-color: #007bff;
         }
+        
         body {
             font-family: Calibri, "Segoe UI", Arial, sans-serif;
             margin: 0;
@@ -82,7 +83,7 @@
             background-color: var(--light-bg); 
             color: var(--primary-color); 
         }
-        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown.open .dropdown-content { display: block; }
         .dropdown .dropbtn { cursor: pointer; text-decoration: none; color: var(--dark-text); font-weight: 500; background: none; border: none; font-family: inherit; font-size: inherit; }
         .dropdown .dropbtn:hover { color: var(--primary-color); }
         
@@ -102,8 +103,22 @@
         .section-card h3 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 0.5rem; font-size: 1.2rem; }
         .filter-group { margin-bottom: 1rem; }
         .filter-group label { display: block; margin-bottom: 0.3rem; font-weight: 600; font-size: 0.9rem; }
-        .filter-group select, .filter-group input { width: 100%; padding: 0.6rem; border: 1px solid var(--grey-border); border-radius: 5px; font-family: inherit; }
-        .btn-clear { background: none; border: none; color: #666; text-decoration: underline; cursor: pointer; font-size: 0.85rem; margin-top: 0.5rem; }
+        .filter-group select, .filter-group input { width: 100%; padding: 0.6rem; border: 1px solid var(--grey-border); border-radius: 6px; font-family: inherit; }
+        .btn-clear {
+            margin-top: 0.5rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid var(--primary-color);
+            background: #fff;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .btn-clear:hover {
+            background: var(--primary-color);
+            color: #fff;
+        }
 
         /* --- Grid de Tutores --- */
         .marketplace-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
@@ -131,10 +146,44 @@
         .rate-link { font-size: 0.85rem; color: var(--secondary-color); text-decoration: underline; cursor: pointer; margin-left: auto; }
 
         .tutor-footer { padding: 1rem 1.5rem; background-color: #f9f9f9; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
-        .btn-contact { background-color: #25D366; color: white; padding: 0.6rem 1rem; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; transition: background 0.3s; }
-        .btn-contact:hover { background-color: #128C7E; }
-        .admin-delete-btn { background-color: #d9534f; color: #fff; border: none; padding: 0.4rem 0.7rem; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
-        .admin-delete-btn:hover { opacity: 0.85; }
+        .btn-contact {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.6rem 1.1rem;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+        .btn-contact:hover {
+            background-color: #d65100;
+            transform: translateY(-1px);
+        }
+
+        .pagination-container { margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+        .pagination-container button {
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            border: 1px solid var(--grey-border);
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--dark-text);
+            min-width: 36px;
+        }
+        .pagination-container button.active {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+        .pagination-container button:disabled {
+            opacity: 0.55;
+            cursor: default;
+        }
 
         /* Modal Estilos */
         .rating-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; }
@@ -286,6 +335,7 @@
             <div id="tutores-grid">
                 <p>Cargando tutores...</p>
             </div>
+            <div id="tutores-pagination" class="pagination-container"></div>
         </main>
     </div>
 
@@ -315,6 +365,11 @@
         let todasLasMaterias = [];
         let tutorIdActual = null;
         let currentRole = 'ESTUDIANTE';
+
+        // Paginación de tutores
+        let tutoresFiltrados = [];
+        let paginaActualTutores = 1;
+        const TAM_PAGINA_TUTORES = 6;
 
         if (!token) window.location.href = 'login.html';
 
@@ -346,13 +401,14 @@
         async function fetchTutores() {
             const grid = document.getElementById('tutores-grid');
             try {
-                // Endpoint actualizado: MarketplaceController
                 const response = await fetch('http://localhost:8080/api/marketplace/tutores', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 if (response.ok) {
                     todosLosTutores = await response.json();
-                    renderizarTutores(todosLosTutores);
+                    tutoresFiltrados = todosLosTutores.slice();
+                    paginaActualTutores = 1;
+                    renderPaginaTutores();
                 } else { 
                     grid.innerHTML = '<p style="color: red;">Error al cargar tutores. Intenta más tarde.</p>'; 
                 }
@@ -437,9 +493,7 @@
 
         function renderizarTutores(listaTutores) {
             const grid = document.getElementById('tutores-grid');
-            const contador = document.getElementById('contador-tutores');
             grid.innerHTML = '';
-            contador.textContent = listaTutores.length;
 
             if (listaTutores.length === 0) {
                 grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #666;">No se encontraron tutores con estos filtros.</div>';
@@ -488,22 +542,87 @@
             });
         }
 
+        function renderPaginaTutores() {
+            const contador = document.getElementById('contador-tutores');
+            const paginacion = document.getElementById('tutores-pagination');
+
+            const total = tutoresFiltrados.length;
+            contador.textContent = total;
+
+            if (total === 0) {
+                renderizarTutores([]);
+                if (paginacion) paginacion.innerHTML = '';
+                return;
+            }
+
+            const totalPaginas = Math.ceil(total / TAM_PAGINA_TUTORES);
+            if (paginaActualTutores > totalPaginas) {
+                paginaActualTutores = totalPaginas;
+            }
+
+            const inicio = (paginaActualTutores - 1) * TAM_PAGINA_TUTORES;
+            const fin = inicio + TAM_PAGINA_TUTORES;
+            const pagina = tutoresFiltrados.slice(inicio, fin);
+
+            renderizarTutores(pagina);
+
+            if (!paginacion) return;
+            paginacion.innerHTML = '';
+            if (totalPaginas <= 1) return;
+
+            const btnPrev = document.createElement('button');
+            btnPrev.textContent = 'Anterior';
+            btnPrev.disabled = paginaActualTutores === 1;
+            btnPrev.onclick = () => {
+                if (paginaActualTutores > 1) {
+                    paginaActualTutores--;
+                    renderPaginaTutores();
+                }
+            };
+            paginacion.appendChild(btnPrev);
+
+            for (let i = 1; i <= totalPaginas; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                if (i === paginaActualTutores) btn.classList.add('active');
+                btn.onclick = () => {
+                    paginaActualTutores = i;
+                    renderPaginaTutores();
+                };
+                paginacion.appendChild(btn);
+            }
+
+            const btnNext = document.createElement('button');
+            btnNext.textContent = 'Siguiente';
+            btnNext.disabled = paginaActualTutores === totalPaginas;
+            btnNext.onclick = () => {
+                if (paginaActualTutores < totalPaginas) {
+                    paginaActualTutores++;
+                    renderPaginaTutores();
+                }
+            };
+            paginacion.appendChild(btnNext);
+        }
+
         function aplicarFiltros() {
             const materiaSel = document.getElementById('filtro-materia').value;
             const precioMax = document.getElementById('filtro-precio').value;
 
-            const filtrados = todosLosTutores.filter(t => {
+            tutoresFiltrados = todosLosTutores.filter(t => {
                 const cumpleMateria = (materiaSel === 'TODAS') || (t.materia === materiaSel);
                 const cumplePrecio = !precioMax || (t.precioPorClase <= parseFloat(precioMax));
                 return cumpleMateria && cumplePrecio;
             });
-            renderizarTutores(filtrados);
+            paginaActualTutores = 1;
+            renderPaginaTutores();
         }
 
         function limpiarFiltros() {
             document.getElementById('filtro-materia').value = 'TODAS';
             document.getElementById('filtro-precio').value = '';
-            renderizarTutores(todosLosTutores);
+            tutoresFiltrados = todosLosTutores.slice();
+            paginaActualTutores = 1;
+            renderPaginaTutores();
         }
 
         function formatoMoneda(valor) {
@@ -563,6 +682,33 @@
             window.location.href = 'index.html';
         }
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdown = document.querySelector('.navbar .dropdown');
+            if (!dropdown) return;
+
+            const button = dropdown.querySelector('.dropbtn');
+            const content = dropdown.querySelector('.dropdown-content');
+
+            if (!button || !content) return;
+
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropdown.classList.toggle('open');
+            });
+
+            content.addEventListener('click', function (e) {
+                e.stopPropagation();
+            });
+
+            document.addEventListener('click', function () {
+                dropdown.classList.remove('open');
+            });
+        });
+    </script>
+
 </body>
 
 <footer>

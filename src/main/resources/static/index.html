@@ -128,7 +128,7 @@
             color: var(--primary-color);
         }
         
-        .dropdown:hover .dropdown-content {
+        .dropdown.open .dropdown-content {
             display: block;
         }
         
@@ -573,6 +573,33 @@
             <span>Términos y condiciones · Política de privacidad</span>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdown = document.querySelector('.navbar .dropdown');
+            if (!dropdown) return;
+
+            const button = dropdown.querySelector('.dropbtn');
+            const content = dropdown.querySelector('.dropdown-content');
+
+            if (!button || !content) return;
+
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropdown.classList.toggle('open');
+            });
+
+            content.addEventListener('click', function (e) {
+                // Permite hacer click en los links sin cerrar por el bubbling inmediato
+                e.stopPropagation();
+            });
+
+            document.addEventListener('click', function () {
+                dropdown.classList.remove('open');
+            });
+        });
+    </script>
 
 </body>
 </html>

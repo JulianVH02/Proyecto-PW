@@ -83,7 +83,8 @@ public class SecurityConfig {
                     .requestMatchers("/api/quizzes/**").authenticated() 
                     .requestMatchers("/api/flashcards/**").authenticated()
                     .requestMatchers("/api/tareas/**").authenticated()
-                    .requestMatchers("/api/recursos/**").authenticated()
+                    // Hacer /api/recursos/** completamente público (todos los métodos)
+                    .requestMatchers("/api/recursos/**").permitAll()
                     .requestMatchers("/api/marketplace/**").authenticated()
                     .requestMatchers("/api/ratings/**").authenticated()
                     

@@ -69,7 +69,7 @@
             background-color: var(--light-bg); 
             color: var(--primary-color); 
         }
-        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown.open .dropdown-content { display: block; }
         .dropdown .dropbtn { cursor: pointer; text-decoration: none; color: var(--dark-text); font-weight: 500; background: none; border: none; font-family: inherit; font-size: inherit; }
         .dropdown .dropbtn:hover { color: var(--primary-color); }
 
@@ -230,19 +230,19 @@
 
     <nav class="navbar">
         <a href="#" class="logo" onclick="goToDashboardSegunRol()">
-             <img src="/images/1.png" alt="Sinergia Logo">
+            <img src="/images/1.png" alt="Sinergia Logo">
         </a>
         
         <ul class="nav-links">
             <li><a href="#" onclick="goToDashboardSegunRol()">Inicio</a></li>
-            <li><a href="recursos.html">Recursos</a></li>
-            <li><a href="marketplace.html">Marketplace</a></li>
+            <li><a href="recursos.html">Recursos Educativos</a></li>
+            <li><a href="marketplace.html">Marketplace de Tutores</a></li>
             <li class="dropdown">
-                <a href="#" class="dropbtn">Repaso &#9662;</a>
+                <a href="#" class="dropbtn">Repaso Activo &#9662;</a>
                 <div class="dropdown-content">
-                    <a href="planificador.html">📅 Planificador</a>
-                    <a href="flashcards.html" class="active">🧠 Flashcards</a>
-                    <a href="quizzes.html">📝 Quizzes</a>
+                    <a href="flashcards.html" class="active">Flashcards</a>
+                    <a href="quizzes.html">Quizzes</a>
+                    <a href="planificador.html">Planificador</a>
                 </div>
             </li>
         </ul>
@@ -526,5 +526,32 @@
             <span>Términos y condiciones · Política de privacidad</span>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdown = document.querySelector('.navbar .dropdown');
+            if (!dropdown) return;
+
+            const button = dropdown.querySelector('.dropbtn');
+            const content = dropdown.querySelector('.dropdown-content');
+
+            if (!button || !content) return;
+
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropdown.classList.toggle('open');
+            });
+
+            content.addEventListener('click', function (e) {
+                e.stopPropagation();
+            });
+
+            document.addEventListener('click', function () {
+                dropdown.classList.remove('open');
+            });
+        });
+    </script>
+
 </body>
 </html>

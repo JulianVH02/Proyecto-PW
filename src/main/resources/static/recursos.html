@@ -82,7 +82,7 @@
             background-color: var(--light-bg); 
             color: var(--primary-color); 
         }
-        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown.open .dropdown-content { display: block; }
         .dropdown .dropbtn { cursor: pointer; text-decoration: none; color: var(--dark-text); font-weight: 500; background: none; border: none; font-family: inherit; font-size: inherit; }
         .dropdown .dropbtn:hover { color: var(--primary-color); }
         /* Sección de Usuario */
@@ -104,9 +104,32 @@
         /* Grid Recursos */
         .library-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
         #recursos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .pagination-container { margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
+        .pagination-container button {
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            border: 1px solid var(--grey-border);
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--dark-text);
+            min-width: 36px;
+        }
+        .pagination-container button.active {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+        .pagination-container button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
         .recurso-card { background-color: #fff; border: 1px solid var(--grey-border); border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
         .recurso-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         .recurso-card-content { padding: 1.5rem; flex-grow: 1; }
+        .recurso-preview { border-top: 1px solid var(--grey-border); background-color: #fafafa; }
+        .recurso-preview iframe { width: 100%; height: 200px; border: none; display: block; }
+        .recurso-preview-placeholder { padding: 1rem; font-size: 0.85rem; color: #777; text-align: center; }
         .recurso-card-tag { display: inline-block; background-color: var(--primary-color); color: white; padding: 3px 8px; font-size: 0.7rem; font-weight: bold; border-radius: 4px; margin-bottom: 0.5rem; text-transform: uppercase; }
         .recurso-info-mini { font-size: 0.8rem; color: #999; margin-top: 1rem; display: flex; justify-content: space-between; }
         .recurso-card-link { background-color: var(--primary-color); color: white; text-decoration: none; padding: 0.8rem; text-align: center; font-weight: bold; transition: background-color 0.3s ease; }
@@ -167,6 +190,61 @@
         }
         .button-submit { width: 100%; padding: 0.8rem; background-color: var(--primary-color); color: var(--white-color); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .button-clear { background: none; border: 1px solid var(--grey-border); color: var(--dark-text); padding: 0.8rem; border-radius: 5px; width: 100%; cursor: pointer;}
+
+        /* --- Modal de edición de recursos (ADMIN) --- */
+        .edit-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2100;
+        }
+        .edit-modal-content {
+            background: var(--white-color);
+            padding: 24px 28px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 95%;
+            max-width: 480px;
+        }
+        .edit-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .edit-modal-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        .edit-modal-close {
+            border: none;
+            background: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .edit-modal-form .filter-group label {
+            font-size: 0.85rem;
+        }
+        .edit-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        .edit-modal-actions .btn-secondary {
+            background: #f1f1f1;
+            color: #333;
+        }
+        .edit-modal-actions .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+        }
 
         /* --- Footer --- */
         footer {
@@ -270,10 +348,10 @@
             <li class="dropdown">
                 <a href="#" class="dropbtn">Repaso Activo &#9662;</a>
                 <div class="dropdown-content">
-                    <a href="#">Flashcards</a>
-                    <a href="#">Quizzes</a>
-                    <a href="#">Planificador</a>
-                </div>
+    <a href="flashcards.html">Flashcards</a>
+    <a href="quizzes.html">Quizzes</a>
+    <a href="planificador.html">Planificador</a>
+</div>
             </li>
         </ul>
 
@@ -358,6 +436,7 @@
             <div id="recursos-grid">
                 <p>Cargando biblioteca...</p>
             </div>
+            <div id="recursos-pagination" class="pagination-container"></div>
         </main>
     </div>
 
@@ -381,12 +460,79 @@
         </div>
     </div>
 
+    <!-- Modal de edición de recursos (solo ADMIN) -->
+    <div id="edit-modal" class="edit-modal-overlay">
+        <div class="edit-modal-content">
+            <div class="edit-modal-header">
+                <h3>Editar Recurso</h3>
+                <button class="edit-modal-close" onclick="cerrarEditModal()">✕</button>
+            </div>
+            <form id="edit-recurso-form" class="edit-modal-form">
+                <div class="filter-group">
+                    <label for="edit-titulo">Título</label>
+                    <input type="text" id="edit-titulo" required>
+                </div>
+                <div class="filter-group">
+                    <label for="edit-url">Enlace (URL)</label>
+                    <input type="url" id="edit-url" required>
+                </div>
+                <div class="filter-group">
+                    <label for="edit-materia">Materia</label>
+                    <select id="edit-materia" required>
+                        <option value="" disabled selected>Selecciona materia</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="edit-tipo">Tipo</label>
+                    <select id="edit-tipo" required>
+                        <option value="Video">Video</option>
+                        <option value="Artículo">Artículo</option>
+                        <option value="Guía/PDF">Guía/PDF</option>
+                        <option value="Simulador">Simulador</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="edit-descripcion">Descripción</label>
+                    <input type="text" id="edit-descripcion" placeholder="Breve descripción...">
+                </div>
+                <div class="edit-modal-actions">
+                    <button type="button" class="button-clear btn-secondary" onclick="cerrarEditModal()">Cancelar</button>
+                    <button type="submit" class="button-submit btn-primary">Guardar cambios</button>
+                </div>
+                <p id="edit-mensaje" style="margin-top:0.5rem;"></p>
+            </form>
+        </div>
+    </div>
+
     <script>
+
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(
+                    window.atob(base64).split('').map(function (c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join('')
+                );
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                return null;
+            }
+        }
+
         const token = localStorage.getItem('jwtToken');
         let todosLosRecursos = []; 
         let todasLasMaterias = [];
         let recursoIdActual = null; // Variable para almacenar el ID del recurso a calificar
         let currentRole = 'ESTUDIANTE';
+        let recursoIdEditando = null; // ID del recurso que se está editando
+
+        // Paginación de recursos
+        let recursosFiltrados = [];
+        let paginaActualRecursos = 1;
+        const TAM_PAGINA_RECURSOS = 9;
 
         if (!token) window.location.href = 'login.html';
 
@@ -407,13 +553,20 @@
         async function fetchMaterias() {
             const selectForm = document.getElementById('materia');
             const selectFiltro = document.getElementById('filtro-materia');
+            const selectEdit = document.getElementById('edit-materia');
+
             try {
                 const response = await fetch('http://localhost:8080/api/public/materias');
                 if (response.ok) {
                     todasLasMaterias = await response.json();
                     selectForm.innerHTML = '<option value="" disabled selected>Selecciona materia</option>';
-                    todasLasMaterias.forEach(m => selectForm.innerHTML += `<option value="${m.id}">${m.nombre}</option>`);
-                    todasLasMaterias.forEach(m => selectFiltro.innerHTML += `<option value="${m.nombre}">${m.nombre}</option>`);
+                    selectEdit.innerHTML = '<option value="" disabled selected>Selecciona materia</option>';
+                    todasLasMaterias.forEach(m => {
+                        selectForm.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
+                        selectEdit.innerHTML += `<option value="${m.id}">${m.nombre}</option>`;
+                        selectFiltro.innerHTML += `<option value="${m.nombre}">${m.nombre}</option>`;
+                    });
+
                 }
             } catch (e) { console.error("Error materias", e); }
         }
@@ -426,7 +579,9 @@
                 });
                 if (response.ok) {
                     todosLosRecursos = await response.json();
-                    renderizarRecursos(todosLosRecursos);
+                    recursosFiltrados = todosLosRecursos.slice();
+                    paginaActualRecursos = 1;
+                    renderPaginaRecursos();
                 } else { grid.innerHTML = '<p style="color: red;">Error al cargar.</p>'; }
             } catch (e) { console.error("Error recursos", e); }
         }
@@ -503,13 +658,51 @@
                 mensajeEl.textContent = "Error de conexión al servidor.";
             }
         }
+
+
+                function getTagColor(tipo) {
+            switch (tipo) {
+                case 'Video':      return '#FF0000';
+                case 'Guía/PDF':   return '#007BFF';
+                case 'Artículo':   return '#28a745';
+                case 'Simulador':  return '#17a2b8';
+                default:           return 'var(--primary-color)';
+            }
+        }
+
+        function construirUrlEmbed(urlOriginal) {
+            try {
+                const u = new URL(urlOriginal);
+                const host = u.hostname.toLowerCase();
+
+                // https://www.youtube.com/watch?v=VIDEO_ID
+                if (host.includes('youtube.com')) {
+                    const videoId = u.searchParams.get('v');
+                    if (videoId) {
+                        return `https://www.youtube.com/embed/${videoId}`;
+                    }
+                }
+
+                // https://youtu.be/VIDEO_ID
+                if (host.includes('youtu.be')) {
+                    const path = u.pathname.replace('/', '');
+                    if (path) {
+                        return `https://www.youtube.com/embed/${path}`;
+                    }
+                }
+
+                // Otros sitios: de momento no intentamos embed
+                return null;
+            } catch (e) {
+                return null;
+            }
+        }
+
         // -----------------------------
 
         function renderizarRecursos(listaRecursos) {
             const grid = document.getElementById('recursos-grid');
-            const contador = document.getElementById('contador-recursos');
             grid.innerHTML = '';
-            contador.textContent = listaRecursos.length;
 
             if (listaRecursos.length === 0) {
                 grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #666;">No se encontraron recursos.</div>';
@@ -526,6 +719,13 @@
                             <button class="btn-delete" onclick="eliminarRecursoDesdeRecursos(${r.id})">Eliminar</button>
                        </div>`
                     : '';
+
+                let previewHtml = '<div class="recurso-preview-placeholder">Vista previa no disponible para este recurso. Usa el botón "Ver Recurso".</div>';
+                const embedUrl = construirUrlEmbed(r.url);
+                if (embedUrl) {
+                    previewHtml = `<iframe src="${embedUrl}" loading="lazy" allowfullscreen></iframe>`;
+                }
+
                 const card = `
                     <div class="recurso-card">
                         <div class="recurso-card-content">
@@ -545,6 +745,9 @@
                             </div>
                             ${adminBtns}
                         </div>
+                        <div class="recurso-preview">
+                            ${previewHtml}
+                        </div>
                         <a href="${r.url}" target="_blank" class="recurso-card-link">Ver Recurso ↗</a>
                     </div>
                 `;
@@ -552,41 +755,85 @@
             });
         }
 
+        function renderPaginaRecursos() {
+            const contador = document.getElementById('contador-recursos');
+            const paginacion = document.getElementById('recursos-pagination');
+
+            const total = recursosFiltrados.length;
+            contador.textContent = total;
+
+            if (total === 0) {
+                renderizarRecursos([]);
+                if (paginacion) paginacion.innerHTML = '';
+                return;
+            }
+
+            const totalPaginas = Math.ceil(total / TAM_PAGINA_RECURSOS);
+            if (paginaActualRecursos > totalPaginas) {
+                paginaActualRecursos = totalPaginas;
+            }
+
+            const inicio = (paginaActualRecursos - 1) * TAM_PAGINA_RECURSOS;
+            const fin = inicio + TAM_PAGINA_RECURSOS;
+            const pagina = recursosFiltrados.slice(inicio, fin);
+
+            renderizarRecursos(pagina);
+
+            if (!paginacion) return;
+            paginacion.innerHTML = '';
+            if (totalPaginas <= 1) return;
+
+            const btnPrev = document.createElement('button');
+            btnPrev.textContent = 'Anterior';
+            btnPrev.disabled = paginaActualRecursos === 1;
+            btnPrev.onclick = () => {
+                if (paginaActualRecursos > 1) {
+                    paginaActualRecursos--;
+                    renderPaginaRecursos();
+                }
+            };
+            paginacion.appendChild(btnPrev);
+
+            for (let i = 1; i <= totalPaginas; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                if (i === paginaActualRecursos) btn.classList.add('active');
+                btn.onclick = () => {
+                    paginaActualRecursos = i;
+                    renderPaginaRecursos();
+                };
+                paginacion.appendChild(btn);
+            }
+
+            const btnNext = document.createElement('button');
+            btnNext.textContent = 'Siguiente';
+            btnNext.disabled = paginaActualRecursos === totalPaginas;
+            btnNext.onclick = () => {
+                if (paginaActualRecursos < totalPaginas) {
+                    paginaActualRecursos++;
+                    renderPaginaRecursos();
+                }
+            };
+            paginacion.appendChild(btnNext);
+        }
+
         function aplicarFiltros() {
             const materiaSel = document.getElementById('filtro-materia').value;
             const tipoSel = document.getElementById('filtro-tipo').value;
-            const filtrados = todosLosRecursos.filter(r => {
+            recursosFiltrados = todosLosRecursos.filter(r => {
                 return ((materiaSel === 'TODAS') || (r.materiaNombre === materiaSel)) &&
-                       ((tipoSel === 'TODOS') || (r.tipoRecurso === tipoSel));
+                    ((tipoSel === 'TODOS') || (r.tipoRecurso === tipoSel));
             });
-            renderizarRecursos(filtrados);
+            paginaActualRecursos = 1;
+            renderPaginaRecursos();
         }
 
         function limpiarFiltros() {
             document.getElementById('filtro-materia').value = 'TODAS';
             document.getElementById('filtro-tipo').value = 'TODOS';
-            renderizarRecursos(todosLosRecursos);
-        }
-
-        function getTagColor(tipo) {
-            switch(tipo) {
-                case 'Video': return '#FF0000'; 
-                case 'Guía/PDF': return '#007BFF'; 
-                case 'Artículo': return '#28a745'; 
-                case 'Simulador': return '#17a2b8'; 
-                default: return 'var(--primary-color)';
-            }
-        }
-
-        function parseJwt(token) {
-            try {
-                const base64Url = token.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                return JSON.parse(jsonPayload);
-            } catch (e) { return null; }
+            recursosFiltrados = todosLosRecursos.slice();
+            paginaActualRecursos = 1;
+            renderPaginaRecursos();
         }
 
         function goToDashboardSegunRol() {
@@ -654,38 +901,27 @@
                 }
                 const recurso = await resp.json();
 
-                const nuevoTitulo = prompt('Título del recurso:', recurso.titulo);
-                if (nuevoTitulo === null) return;
-                const nuevaDescripcion = prompt('Descripción:', recurso.descripcion || '');
-                if (nuevaDescripcion === null) return;
-                const nuevaUrl = prompt('URL:', recurso.url);
-                if (nuevaUrl === null) return;
+                recursoIdEditando = id;
 
-                const body = {
-                    titulo: nuevoTitulo,
-                    descripcion: nuevaDescripcion,
-                    url: nuevaUrl,
-                    tipoRecurso: recurso.tipoRecurso,
-                    materiaId: null
-                };
+                document.getElementById('edit-titulo').value = recurso.titulo || '';
+                document.getElementById('edit-url').value = recurso.url || '';
+                document.getElementById('edit-descripcion').value = recurso.descripcion || '';
+                document.getElementById('edit-tipo').value = recurso.tipoRecurso || 'Video';
 
-                const respUpdate = await fetch(`http://localhost:8080/api/admin/recursos/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(body)
-                });
-
-                if (respUpdate.ok) {
-                    fetchRecursos();
+                // Buscar materia por nombre para seleccionar el id correcto
+                const materiaEncontrada = todasLasMaterias.find(m => m.nombre === recurso.materiaNombre);
+                const editMateriaSelect = document.getElementById('edit-materia');
+                if (materiaEncontrada) {
+                    editMateriaSelect.value = materiaEncontrada.id;
                 } else {
-                    alert('No se pudo actualizar el recurso.');
+                    editMateriaSelect.value = '';
                 }
+
+                document.getElementById('edit-mensaje').textContent = '';
+                document.getElementById('edit-modal').style.display = 'flex';
             } catch (e) {
                 console.error(e);
-                alert('Error de red al editar recurso.');
+                alert('Error de red al cargar recurso.');
             }
         }
 
@@ -707,6 +943,52 @@
                 alert('Error de red al eliminar recurso.');
             }
         }
+
+        function cerrarEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+            recursoIdEditando = null;
+        }
+
+        document.getElementById('edit-recurso-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            if (currentRole !== 'ADMIN' || !recursoIdEditando) return;
+
+            const mensajeEl = document.getElementById('edit-mensaje');
+            mensajeEl.textContent = '';
+
+            const body = {
+                titulo: document.getElementById('edit-titulo').value,
+                url: document.getElementById('edit-url').value,
+                descripcion: document.getElementById('edit-descripcion').value,
+                tipoRecurso: document.getElementById('edit-tipo').value,
+                materiaId: document.getElementById('edit-materia').value
+            };
+
+            try {
+                const respUpdate = await fetch(`http://localhost:8080/api/admin/recursos/${recursoIdEditando}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (respUpdate.ok) {
+                    mensajeEl.style.color = 'green';
+                    mensajeEl.textContent = 'Recurso actualizado correctamente.';
+                    await fetchRecursos();
+                    setTimeout(cerrarEditModal, 700);
+                } else {
+                    mensajeEl.style.color = 'red';
+                    mensajeEl.textContent = 'No se pudo actualizar el recurso.';
+                }
+            } catch (e) {
+                console.error(e);
+                mensajeEl.style.color = 'red';
+                mensajeEl.textContent = 'Error de red al actualizar recurso.';
+            }
+        });
     </script>
 
     <footer>
@@ -745,5 +1027,32 @@
             <span>Términos y condiciones · Política de privacidad</span>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdown = document.querySelector('.navbar .dropdown');
+            if (!dropdown) return;
+
+            const button = dropdown.querySelector('.dropbtn');
+            const content = dropdown.querySelector('.dropdown-content');
+
+            if (!button || !content) return;
+
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropdown.classList.toggle('open');
+            });
+
+            content.addEventListener('click', function (e) {
+                e.stopPropagation();
+            });
+
+            document.addEventListener('click', function () {
+                dropdown.classList.remove('open');
+            });
+        });
+    </script>
+
 </body>
 </html>

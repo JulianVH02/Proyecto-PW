@@ -12,7 +12,7 @@
         /* --- Navbar --- */
         nav.navbar { background-color: var(--white-color); padding: 1rem 2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .navbar .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); text-decoration: none; display: flex; align-items: center; }
-        .navbar .logo img { height: 40px; width: auto; margin-right: 0.5rem; }
+        .navbar .logo img { height: 70px; width: auto; margin-right: 0.5rem; }
         .navbar .nav-links { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.5rem; align-items: center; }
         .navbar .nav-links a { text-decoration: none; color: var(--dark-text); font-weight: 500; transition: color 0.3s ease; }
         .navbar .nav-links a:hover, .navbar .nav-links a.active { color: var(--primary-color); }
@@ -124,6 +124,56 @@
         .footer-social a:hover {
             opacity: 1;
         }
+
+                /* --- Estilos para el Dropdown --- */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--white-color);
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 1001;
+            border-radius: 5px;
+            margin-top: 0.5rem;
+        }
+        
+        .dropdown-content a {
+            color: var(--dark-text);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: var(--light-bg);
+            color: var(--primary-color);
+        }
+        
+        .dropdown.open .dropdown-content {
+            display: block;
+        }
+        
+        .dropdown .dropbtn {
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: inherit;
+        }
+        
+        .dropdown .dropbtn:hover {
+            color: var(--primary-color);
+        }
+
     </style>
 </head>
 <body>
@@ -139,16 +189,20 @@
                 <img src="/images/1.png" alt="Sinergia Logo">
             </a>
             <ul class="nav-links">
-                <!-- CORRECCIÓN 2: Inicio apunta al propio dashboard -->
-                <li><a href="dashboard-tutor.html" class="active">Inicio (Tutor)</a></li> 
+                <li><a href="dashboard-tutor.html" class="active">Inicio</a></li>
                 <li><a href="recursos.html">Recursos Educativos</a></li>
-                <li><a href="marketplace.html">Marketplace</a></li>
-                <li><a href="planificador.html">Planificador</a></li>
-                <!-- Otras secciones -->
+                <li><a href="marketplace.html">Marketplace de Tutores</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Repaso Activo &#9662;</a>
+                    <div class="dropdown-content">
+                        <a href="flashcards.html">Flashcards</a>
+                        <a href="quizzes.html">Quizzes</a>
+                        <a href="planificador.html">Planificador</a>
+                    </div>
+                </li>
             </ul>
             <div class="user-section">
                 <span id="user-name" style="margin-right: 1rem; font-weight: 500;"></span>
-                <!-- CORRECCIÓN 1: El botón usa la función logout -->
                 <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
             </div>
         </nav>
@@ -320,6 +374,32 @@
             }
 
         })(); 
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropdown = document.querySelector('.navbar .dropdown');
+        if (!dropdown) return;
+
+        const button = dropdown.querySelector('.dropbtn');
+        const content = dropdown.querySelector('.dropdown-content');
+
+        if (!button || !content) return;
+
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropdown.classList.toggle('open');
+        });
+
+        content.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        document.addEventListener('click', function () {
+            dropdown.classList.remove('open');
+        });
+    });
     </script>
 
     <footer>

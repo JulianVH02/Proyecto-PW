@@ -50,6 +50,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
              return true;
         }
 
+        // 3. Excluir peticiones GET a /api/recursos (biblioteca pública)
+        if (method.equals("GET") && path.startsWith("/api/recursos")) {
+            return true;
+        }
+
         // Si no es ninguna de las rutas públicas de arriba, el filtro se ejecuta.
         return false; 
     }
@@ -66,8 +71,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String userEmail = null;
 
         String tokenFromHeader = null;
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            tokenFromHeader = authHeader.substring(7);
+        if (authHeader != null) {
+            String lowerAuth = authHeader.toLowerCase();
+            if (lowerAuth.startsWith("bearer ")) {
+                tokenFromHeader = authHeader.substring(7);
+            }
         }
 
         String tokenFromCookie = null;
