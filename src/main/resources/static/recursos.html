@@ -644,7 +644,25 @@
             }
             cargarPerfilUsuarioNavbar();
             cargarDatosIniciales();
+            ocultarRepasoActivoSiAdmin();
         });
+
+        function ocultarRepasoActivoSiAdmin() {
+            try {
+                const jwt = localStorage.getItem('jwtToken');
+                if (!jwt) return;
+                const payload = parseJwt(jwt);
+                const role = payload && payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+                if (role !== 'ADMIN') return;
+
+                const repasoItem = document.querySelector('.navbar .nav-links .dropdown');
+                if (repasoItem) {
+                    repasoItem.style.display = 'none';
+                }
+            } catch (e) {
+                console.error('Error ocultando Repaso Activo para admin', e);
+            }
+        }
 
         async function cargarPerfilUsuarioNavbar() {
             try {
