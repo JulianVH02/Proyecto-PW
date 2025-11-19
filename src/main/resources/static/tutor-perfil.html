@@ -53,13 +53,19 @@
         .profile-card, .comments-card { background-color: var(--white-color); padding: 1.8rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
         .profile-header { display: flex; gap: 1.5rem; align-items: center; margin-bottom: 1rem; }
-        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background-color: var(--primary-color); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; }
+        .profile-avatar {
+            width: 80px; height: 80px; border-radius: 50%; background-color: var(--primary-color);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; font-weight: bold; overflow: hidden;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+        }
         .profile-name { margin: 0; font-size: 1.6rem; }
         .profile-materia { color: #666; margin-top: 0.2rem; }
 
-        .profile-rating { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+        .profile-rating { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
         .profile-rating-number { font-weight: bold; color: var(--primary-color); }
         .profile-stars { color: #ffd700; }
+        .profile-rating-count { font-size: 0.85rem; color: #777; }
 
         .profile-price { margin-top: 1rem; font-size: 1.3rem; font-weight: bold; }
         .profile-contact { margin-top: 0.5rem; font-size: 0.95rem; color: #555; }
@@ -157,6 +163,7 @@
                 <div class="profile-materia" id="profile-materia">Materia</div>
                 <div class="profile-rating">
                     <span class="profile-rating-number" id="profile-rating-number">0.0</span>
+                    <span class="profile-rating-count" id="profile-rating-count">(0 calificaciones)</span>
                     <span class="profile-stars" id="profile-stars">★★★★★</span>
                 </div>
             </div>
@@ -165,6 +172,7 @@
             <div class="profile-stat-item">
                 <span class="profile-stat-label">Rating promedio</span>
                 <span class="profile-stat-value" id="stat-rating">0.0</span>
+                <small id="stat-rating-count" style="display:block; font-size:0.75rem; color:#555;">0 calificaciones</small>
             </div>
             <div class="profile-stat-item">
                 <span class="profile-stat-label">Comentarios</span>
@@ -317,8 +325,15 @@
             const data = await resp.json();
 
             // Perfil
+            const avatarEl = document.getElementById('profile-avatar');
             const iniciales = data.nombreCompleto.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-            document.getElementById('profile-avatar').textContent = iniciales;
+            avatarEl.textContent = iniciales;
+            if (data.fotoPerfil) {
+                avatarEl.style.backgroundImage = `url('${data.fotoPerfil}')`;
+                avatarEl.textContent = '';
+            } else {
+                avatarEl.style.backgroundImage = '';
+            }
             document.getElementById('profile-name').textContent = data.nombreCompleto;
             document.getElementById('profile-materia').textContent = data.materia || 'General';
             document.getElementById('profile-descripcion').textContent = data.descripcion || 'Sin descripción disponible.';
@@ -326,9 +341,13 @@
             document.getElementById('profile-contacto').textContent = data.contacto ? `Contacto: ${data.contacto}` : '';
 
             const rating = data.ratingPromedio || 0;
+            const totalRatings = data.totalRatings || 0;
+            const labelCalificaciones = totalRatings === 1 ? 'calificación' : 'calificaciones';
             document.getElementById('profile-rating-number').textContent = rating.toFixed(1);
             document.getElementById('profile-stars').textContent = generarEstrellas(rating);
+            document.getElementById('profile-rating-count').textContent = `(${totalRatings} ${labelCalificaciones})`;
             document.getElementById('stat-rating').textContent = rating.toFixed(1);
+            document.getElementById('stat-rating-count').textContent = `${totalRatings} ${labelCalificaciones}`;
             document.getElementById('stat-precio').textContent = `$${new Intl.NumberFormat('es-CO',{style:'decimal',minimumFractionDigits:0}).format(data.precioPorClase || 0)}`;
 
             const contactLink = document.getElementById('profile-contact-link');

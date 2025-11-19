@@ -1,11 +1,14 @@
 package com.proyecto.sinergia.controller;
 
+import com.proyecto.sinergia.dto.TutorCommentDto;
 import com.proyecto.sinergia.dto.TutorUpdateDto;
 import com.proyecto.sinergia.model.Tutor;
+import com.proyecto.sinergia.model.TutorRating;
 import com.proyecto.sinergia.model.Usuario;
 import com.proyecto.sinergia.model.enums.EstadoTutor;
 import com.proyecto.sinergia.repository.TutorRepository;
 import com.proyecto.sinergia.repository.UsuarioRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +18,15 @@ import org.hibernate.Hibernate; // Necesaria para la inicialización forzada
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+/**
+ * Controlador para la gestión de tutores.
+ */
 @RestController
 @RequestMapping("/api/tutor")
 public class TutorManagementController {
@@ -35,6 +46,11 @@ public class TutorManagementController {
         public String descripcion;
         public String contacto;
         public BigDecimal precioPorClase;
+        public String fotoPerfil;
+        public Double ratingPromedio;
+        public Integer totalRatings;
+        public Integer totalComentarios;
+        public List<TutorCommentDto> comentariosRecientes;
         
         public TutorStatus(Tutor t, Usuario u, boolean complete) {
             this.approved = t.getEstado() == EstadoTutor.APROBADO;
@@ -50,6 +66,45 @@ public class TutorManagementController {
             this.descripcion = t.getDescripcion();
             this.contacto = t.getContacto();
             this.precioPorClase = t.getPrecioPorClase();
+            this.fotoPerfil = u.getFotoPerfil();
+
+            List<TutorRating> ratings = t.getRatings();
+            if (ratings != null && !ratings.isEmpty()) {
+                this.totalRatings = ratings.size();
+                double total = ratings.stream()
+                        .mapToInt(TutorRating::getPuntuacion)
+                        .sum();
+                this.ratingPromedio = Math.round((total / this.totalRatings) * 10.0) / 10.0;
+
+                this.totalComentarios = (int) ratings.stream()
+                        .filter(r -> r.getComentario() != null && !r.getComentario().isBlank())
+                        .count();
+
+                this.comentariosRecientes = ratings.stream()
+                        .filter(r -> r.getComentario() != null && !r.getComentario().isBlank())
+                        .sorted(Comparator.comparing(TutorRating::getFechaCreacion, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                        .limit(3)
+                        .map(r -> new TutorCommentDto(
+                                buildNombreEstudiante(r.getEstudiante()),
+                                r.getPuntuacion(),
+                                r.getComentario(),
+                                r.getFechaCreacion(),
+                                r.getEstudiante() != null ? r.getEstudiante().getFotoPerfil() : null
+                        ))
+                        .collect(Collectors.toList());
+            } else {
+                this.totalRatings = 0;
+                this.ratingPromedio = 0.0;
+                this.totalComentarios = 0;
+                this.comentariosRecientes = Collections.emptyList();
+            }
+        }
+
+        private String buildNombreEstudiante(Usuario estudiante) {
+            if (estudiante == null) return "Estudiante";
+            String nombre = Optional.ofNullable(estudiante.getNombre()).orElse("");
+            String apellido = Optional.ofNullable(estudiante.getApellido()).orElse("");
+            return (nombre + " " + apellido).trim();
         }
     }
 

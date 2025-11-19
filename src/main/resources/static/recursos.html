@@ -87,10 +87,39 @@
         .dropdown .dropbtn:hover { color: var(--primary-color); }
         /* Sección de Usuario */
         .user-section { display: flex; align-items: center; gap: 1rem; }
+        .user-info-mini { display: flex; align-items: center; gap: 0.6rem; }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+        .user-name-mini { font-weight: 500; font-size: 0.95rem; }
         .button-logout {
             padding: 0.5rem 1rem; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; font-size: 0.9rem;
         }
         .button-logout:hover { background: var(--primary-color); color: white; }
+        .button-edit-profile {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--secondary-color);
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        .button-edit-profile:hover { background: #0056b3; }
 
         /* --- Layout Principal --- */
         .dashboard-container { max-width: 1300px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
@@ -356,7 +385,11 @@
         </ul>
 
         <div class="user-section">
-            <span id="user-name" style="font-weight: 500;"></span>
+            <div class="user-info-mini">
+                <div class="user-avatar" id="user-avatar"></div>
+                <span id="user-name" class="user-name-mini"></span>
+            </div>
+            <button type="button" class="button-edit-profile" onclick="irAPerfil()">Editar perfil</button>
             <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
         </div>
     </nav>
@@ -539,11 +572,76 @@
         document.addEventListener('DOMContentLoaded', () => {
             const payload = parseJwt(token);
             if (payload) {
-                document.getElementById('user-name').textContent = `Hola, ${payload.sub ? payload.sub.split('@')[0] : 'Usuario'}`;
+                const nombreBase = payload.sub ? payload.sub.split('@')[0] : 'Usuario';
+                const nombreCapitalizado = nombreBase.charAt(0).toUpperCase() + nombreBase.slice(1);
+                const userNameSpan = document.getElementById('user-name');
+                if (userNameSpan) {
+                    userNameSpan.textContent = nombreCapitalizado;
+                }
                 currentRole = payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
             }
+            cargarPerfilUsuarioNavbar();
             cargarDatosIniciales();
         });
+
+        async function cargarPerfilUsuarioNavbar() {
+            try {
+                const jwt = localStorage.getItem('jwtToken');
+                if (!jwt) return;
+
+                const resp = await fetch('http://localhost:8080/api/auth/mi-perfil', {
+                    headers: { 'Authorization': 'Bearer ' + jwt }
+                });
+
+                if (!resp.ok) return;
+
+                const data = await resp.json();
+                const avatar = document.getElementById('user-avatar');
+                const nameSpan = document.getElementById('user-name');
+
+                if (data && data.nombre) {
+                    const nombreCompleto = data.apellido ? `${data.nombre} ${data.apellido}` : data.nombre;
+                    if (nameSpan && !nameSpan.textContent) {
+                        nameSpan.textContent = nombreCompleto;
+                    }
+                }
+
+                if (avatar) {
+                    if (data && data.fotoPerfil) {
+                        avatar.style.backgroundImage = `url('${data.fotoPerfil}')`;
+                        avatar.textContent = '';
+                    } else {
+                        const baseNombre = (data && data.nombre) ? data.nombre : (nameSpan ? nameSpan.textContent : '');
+                        if (baseNombre) {
+                            const partes = baseNombre.split(' ');
+                            let iniciales = partes[0].charAt(0).toUpperCase();
+                            if (partes.length > 1) {
+                                iniciales += partes[1].charAt(0).toUpperCase();
+                            }
+                            avatar.textContent = iniciales;
+                            avatar.style.backgroundImage = '';
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Error cargando perfil de usuario en navbar', e);
+            }
+        }
+
+        function irAPerfil() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) { window.location.href = 'login.html'; return; }
+            const payload = parseJwt(token);
+            const role = payload && payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+
+            if (role === 'ADMIN') {
+                window.location.href = 'dashboard-admin.html';
+            } else if (role === 'TUTOR') {
+                window.location.href = 'dashboard-tutor.html';
+            } else {
+                window.location.href = 'dashboard-estudiante.html';
+            }
+        }
 
         async function cargarDatosIniciales() {
             await fetchMaterias(); 
@@ -1051,6 +1149,8 @@
             document.addEventListener('click', function () {
                 dropdown.classList.remove('open');
             });
+
+            cargarPerfilUsuarioNavbar();
         });
     </script>
 

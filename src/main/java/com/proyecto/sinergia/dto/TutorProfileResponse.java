@@ -18,6 +18,8 @@ public class TutorProfileResponse {
     private String contacto;
     private BigDecimal precioPorClase;
     private Double ratingPromedio;
+    private Integer totalRatings;
+    private String fotoPerfil;
 
     private List<TutorCommentDto> comentarios;
     private Integer totalComentarios;
@@ -31,6 +33,10 @@ public class TutorProfileResponse {
         this.descripcion = tutor.getDescripcion();
         this.contacto = tutor.getContacto();
         this.precioPorClase = tutor.getPrecioPorClase();
+        this.totalRatings = tutor.getRatings() != null ? tutor.getRatings().size() : 0;
+        this.fotoPerfil = Optional.ofNullable(tutor.getUsuario())
+                .map(u -> u.getFotoPerfil())
+                .orElse(null);
 
         List<TutorRating> ratings = tutor.getRatings();
         if (ratings != null && !ratings.isEmpty()) {
@@ -84,6 +90,14 @@ public class TutorProfileResponse {
 
     public Double getRatingPromedio() {
         return ratingPromedio;
+    }
+
+    public Integer getTotalRatings() {
+        return totalRatings;
+    }
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
     }
 
     public List<TutorCommentDto> getComentarios() {

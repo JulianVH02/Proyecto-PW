@@ -16,19 +16,65 @@
         .navbar .nav-links { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.5rem; align-items: center; }
         .navbar .nav-links a { text-decoration: none; color: var(--dark-text); font-weight: 500; transition: color 0.3s ease; }
         .navbar .nav-links a:hover, .navbar .nav-links a.active { color: var(--primary-color); }
+        .dropdown { position: relative; }
+        .dropdown .dropbtn { cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; color: var(--dark-text); text-decoration: none; font-weight: 500; }
+        .dropdown .dropbtn:hover { color: var(--primary-color); }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 110%;
+            left: 0;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            min-width: 180px;
+            padding: 0.5rem 0;
+            z-index: 10;
+        }
+        .dropdown-content a { display: block; padding: 0.6rem 1rem; color: var(--dark-text); text-decoration: none; font-weight: 500; }
+        .dropdown-content a:hover { background: #f5f5f5; color: var(--primary-color); }
+        .dropdown.open .dropdown-content { display: block; }
+
+        /* User Section */
         .user-section { display: flex; align-items: center; gap: 1rem; }
+        .user-info-mini { display: flex; align-items: center; gap: 0.6rem; }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+        .user-name-mini { font-weight: 500; font-size: 0.95rem; }
         .button-logout { 
             padding: 0.5rem 1rem; border: 1px solid var(--primary-color); background: transparent; 
             color: var(--primary-color); border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none;
-            /* Importante: Añadir la clase para que el JS lo capture */
-            display: inline-block;
+            display: inline-block; font-size: 0.9rem;
         }
         .button-logout:hover { background: var(--primary-color); color: white; }
+        .button-edit-profile {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--secondary-color);
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        .button-edit-profile:hover { background: #0056b3; }
         
         /* --- Layout Principal --- */
-        .dashboard-container { max-width: 1300px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
-        @media (min-width: 1024px) { .dashboard-container { grid-template-columns: 300px 1fr; align-items: start; } }
-        /* --- Componentes --- */
+        .dashboard-container { max-width: 1300px; margin: 2rem auto; padding: 0 1rem; display: block; }
         .section-card { background-color: var(--white-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
         h1, h2, h3, h4 { font-family: 'DM Serif Display', serif; }
         .section-card h3 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 0.5rem; font-size: 1.2rem; }
@@ -36,144 +82,83 @@
         #status-message { text-align: center; padding: 3rem; background-color: var(--white-color); border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 5rem; }
         .tutor-info-box { background-color: #e6f7ff; border: 1px solid #b3e0ff; color: #0056b3; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.95rem; }
         .tutor-info-box strong { font-weight: 700; color: var(--secondary-color); }
-        
-        /* Ajuste de Grid: Ahora solo dos columnas */
-        .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
-        .metric-card { background-color: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; border-left: 5px solid var(--primary-color); }
+        .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 2.5rem; }
+        .metric-card {
+            background-color: #fff;
+            padding: 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .metric-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #999; }
         .metric-value { font-size: 2rem; font-weight: bold; color: var(--dark-text); }
-        .metric-label { font-size: 0.9rem; color: #666; margin-top: 0.5rem; }
+        .metric-sub { font-size: 0.85rem; color: #777; }
 
-        /* --- Footer --- */
+        .hero-card {
+            background: linear-gradient(120deg, #ff915a, #ff6200);
+            color: #fff;
+            padding: 2rem;
+            border-radius: 18px;
+            box-shadow: 0 20px 45px rgba(242, 98, 0, 0.35);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .hero-header { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+        .hero-avatar {
+            width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem; font-weight: bold; text-transform: uppercase;
+            border: 2px solid rgba(255,255,255,0.3);
+            background-size: cover; background-position: center; overflow: hidden;
+        }
+        .hero-name { margin: 0; font-size: 2rem; }
+        .hero-materia { margin: 0.1rem 0; opacity: 0.85; font-size: 1rem; }
+        .hero-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .hero-tag { background: rgba(255,255,255,0.15); padding: 0.35rem 0.9rem; border-radius: 999px; font-size: 0.85rem; }
+        .hero-description { margin: 0; font-size: 1rem; line-height: 1.5; }
+        .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .hero-actions .btn-primary { background: #fff; color: var(--primary-color); border: none; padding: 0.65rem 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .hero-actions .btn-secondary { border: 1px solid rgba(255,255,255,0.6); background: transparent; color: #fff; padding: 0.65rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: bold; }
+
+        .feedback-card { margin-top: 2.5rem; }
+        .feedback-card .feedback-list { display: flex; flex-direction: column; gap: 1rem; }
+        .feedback-item { display: flex; gap: 1rem; align-items: flex-start; padding: 1rem; border: 1px solid #eee; border-radius: 10px; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+        .feedback-avatar {
+            width: 48px; height: 48px; border-radius: 50%; background-color: var(--primary-color); color: #fff;
+            display: flex; align-items: center; justify-content: center; font-weight: 600;
+            background-size: cover; background-position: center; overflow: hidden;
+        }
+        .feedback-content { flex: 1; }
+        .feedback-header { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; }
+        .feedback-name { font-weight: 600; margin: 0; }
+        .feedback-date { font-size: 0.85rem; color: #999; }
+        .feedback-stars { color: #ffd700; font-size: 0.95rem; }
+        .feedback-text { margin-top: 0.35rem; color: #555; line-height: 1.4; }
+        .feedback-empty { color: #777; font-style: italic; }
+
         footer {
             background-color: #1e1e1e;
             color: var(--white-color);
             padding: 3.5rem 8% 2rem;
             margin-top: 3rem;
         }
-
-        .footer-content {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2.5rem;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-        }
-
-        .footer-column {
-            flex: 1 1 220px;
-            min-width: 200px;
-        }
-
-        .footer-column h4 {
-            font-family: 'DM Serif Display', serif;
-            margin-top: 0;
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-        }
-
-        .footer-column p {
-            margin: 0.25rem 0;
-            font-size: 0.95rem;
-        }
-
-        .footer-links {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.4rem;
-        }
-
-        .footer-links a {
-            color: var(--white-color);
-            text-decoration: none;
-            font-size: 0.95rem;
-            opacity: 0.85;
-        }
-
-        .footer-links a:hover {
-            opacity: 1;
-            text-decoration: underline;
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.12);
-            padding-top: 1.5rem;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .footer-social {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .footer-social a {
-            color: var(--white-color);
-            text-decoration: none;
-            font-size: 0.95rem;
-            opacity: 0.85;
-        }
-
-        .footer-social a:hover {
-            opacity: 1;
-        }
-
-                /* --- Estilos para el Dropdown --- */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: var(--white-color);
-            min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            z-index: 1001;
-            border-radius: 5px;
-            margin-top: 0.5rem;
-        }
-        
-        .dropdown-content a {
-            color: var(--dark-text);
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-        
-        .dropdown-content a:hover {
-            background-color: var(--light-bg);
-            color: var(--primary-color);
-        }
-        
-        .dropdown.open .dropdown-content {
-            display: block;
-        }
-        
-        .dropdown .dropbtn {
-            cursor: pointer;
-            text-decoration: none;
-            color: var(--dark-text);
-            font-weight: 500;
-            transition: color 0.3s ease;
-            background: none;
-            border: none;
-            font-family: inherit;
-            font-size: inherit;
-        }
-        
-        .dropdown .dropbtn:hover {
-            color: var(--primary-color);
-        }
-
+        .footer-content { display: flex; flex-wrap: wrap; gap: 2.5rem; justify-content: space-between; margin-bottom: 2rem; }
+        .footer-column { flex: 1 1 220px; min-width: 200px; }
+        .footer-column h4 { font-family: 'DM Serif Display', serif; margin-top: 0; margin-bottom: 1rem; font-size: 1.1rem; }
+        .footer-column p { margin: 0.25rem 0; font-size: 0.95rem; }
+        .footer-links { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: 0.4rem; }
+        .footer-links a { color: var(--white-color); text-decoration: none; font-size: 0.95rem; opacity: 0.85; }
+        .footer-links a:hover { opacity: 1; text-decoration: underline; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 1.5rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; font-size: 0.9rem; }
+        .footer-social { display: flex; gap: 1rem; }
+        .footer-social a { color: var(--white-color); text-decoration: none; font-size: 0.95rem; opacity: 0.85; }
+        .footer-social a:hover { opacity: 1; }
     </style>
 </head>
 <body>
@@ -181,7 +166,7 @@
     <div id="status-message">
         <p>Verificando tu estado como tutor...</p>
     </div>
-    
+
     <div id="main-dashboard" class="main-content">
 
         <nav class="navbar">
@@ -202,61 +187,97 @@
                 </li>
             </ul>
             <div class="user-section">
-                <span id="user-name" style="margin-right: 1rem; font-weight: 500;"></span>
+                <div class="user-info-mini">
+                    <div class="user-avatar" id="user-avatar"></div>
+                    <span id="user-name" class="user-name-mini"></span>
+                </div>
                 <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
             </div>
         </nav>
 
         <div class="dashboard-container">
             
-            <!-- Sidebar -->
-            <aside>
-                <div class="section-card tutor-info-box">
-                    <strong>¡Bienvenido, Tutor!</strong>
-                    <p id="tutor-name-info" style="margin: 0.5rem 0 0;"></p>
-                    <p id="tutor-materia-info" style="margin: 0; font-size: 0.85rem; color: #0056b3;"></p>
-                </div>
-                
-                <div class="section-card">
-                    <h3>🛠️ Gestión de Perfil</h3>
-                    <p><a href="tutor-profile-setup.html" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Actualizar Precio y Contacto</a></p>
-                    <p><a href="#" style="color: var(--secondary-color); text-decoration: none; font-weight: 600;">Ver/Modificar Horarios</a></p>
-                </div>
-
-                <div class="section-card">
-                    <h3>📊 Sesiones y Pagos</h3>
-                    <p>Calendario de Sesiones (Próximamente)</p>
-                    <p>Historial de Pagos (Próximamente)</p>
-                </div>
-            </aside>
-
             <!-- Main Content (Métricas) -->
             <main>
-                <div class="marketplace-header">
-                    <h2>Panel de Control</h2>
-                    <p style="color: #666;">Tu resumen de actividad y desempeño como tutor en Sinergia.</p>
-                </div>
+                <section class="hero-card">
+                    <div class="hero-header">
+                        <div class="hero-avatar" id="hero-avatar">TU</div>
+                        <div>
+                            <p style="margin:0; opacity:0.85;">Hola de nuevo 👋</p>
+                            <h2 class="hero-name" id="hero-name">Tutor</h2>
+                            <p class="hero-materia" id="hero-materia">Materia</p>
+                            <div class="hero-tags">
+                                <span class="hero-tag" id="hero-rating-tag">0.0 ★</span>
+                                <span class="hero-tag" id="hero-status-tag">Perfil en revisión</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="hero-description" id="hero-description">Describe brevemente tu experiencia para que los estudiantes te conozcan.</p>
+                    <div class="hero-actions">
+                        <button type="button" class="btn-primary" onclick="abrirModalPerfilTutor()">Editar perfil</button>
+                    </div>
+                </section>
 
-                <!-- CORRECCIÓN 3: Solo Clases Impartidas y Tasa de Respuesta -->
                 <div class="metric-grid">
                     <div class="metric-card">
-                        <div class="metric-value">12</div>
-                        <div class="metric-label">Clases impartidas (Mes)</div>
+                        <span class="metric-title">Rating promedio</span>
+                        <span class="metric-value" id="metric-rating">0.0</span>
+                        <span class="metric-sub" id="metric-rating-count">0 calificaciones</span>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-value">85%</div>
-                        <div class="metric-label">Tasa de respuesta</div>
+                        <span class="metric-title">Precio por hora</span>
+                        <span class="metric-value" id="metric-price">$0</span>
+                        <span class="metric-sub">Configurado desde tu perfil</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Contacto principal</span>
+                        <span class="metric-value" id="metric-contact">Sin contacto</span>
+                        <span class="metric-sub">Visible para los estudiantes</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Comentarios</span>
+                        <span class="metric-value" id="metric-comments">0</span>
+                        <span class="metric-sub">Últimas opiniones recibidas</span>
                     </div>
                 </div>
 
-                <div class="section-card" style="margin-top: 2rem;">
-                    <h3>📝 Tu Descripción Actual</h3>
-                    <p id="current-description" style="color: #444; font-style: italic;"></p>
-                    <h3>💵 Precio por Hora</h3>
-                    <p id="current-price" style="font-size: 1.5rem; font-weight: bold; color: var(--primary-color);"></p>
+                <div class="section-card feedback-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;">
+                        <h3 style="margin:0;">⭐ Opiniones recientes</h3>
+                    </div>
+                    <div class="feedback-list" id="feedback-list">
+                        <p class="feedback-empty">Aún no tienes comentarios.</p>
+                    </div>
                 </div>
 
             </main>
+        </div>
+    </div>
+
+    <!-- Modal Perfil Tutor -->
+    <div class="modal-overlay" id="modal-perfil-tutor" style="position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 2000;">
+        <div class="modal-card" style="background: #fff; border-radius: 12px; padding: 1.75rem; max-width: 460px; width: 100%; box-shadow: 0 12px 32px rgba(0,0,0,0.15);">
+            <h3 style="margin-top:0; margin-bottom:0.75rem;">Actualizar perfil de tutor</h3>
+            <div class="modal-field" style="margin-bottom:0.85rem;">
+                <label for="perfil-foto-tutor" style="display:block; font-size:0.9rem; margin-bottom:0.25rem;">Foto de perfil</label>
+                <input type="file" id="perfil-foto-tutor" accept="image/*" style="width:100%; padding:0.4rem 0.5rem; border-radius:5px; border:1px solid #ccc; font-family:inherit; font-size:0.9rem; box-sizing:border-box;">
+            </div>
+            <div class="modal-field" style="margin-bottom:0.85rem;">
+                <label for="perfil-descripcion-tutor" style="display:block; font-size:0.9rem; margin-bottom:0.25rem;">Descripción</label>
+                <textarea id="perfil-descripcion-tutor" rows="4" placeholder="Cuéntales a los estudiantes sobre tu experiencia..." style="width:100%; padding:0.4rem 0.5rem; border-radius:5px; border:1px solid #ccc; font-family:inherit; font-size:0.9rem; box-sizing:border-box;"></textarea>
+            </div>
+            <div class="modal-field" style="margin-bottom:0.85rem;">
+                <label for="perfil-contacto-tutor" style="display:block; font-size:0.9rem; margin-bottom:0.25rem;">Contacto principal</label>
+                <input type="text" id="perfil-contacto-tutor" placeholder="Ej. +57 3000000000" style="width:100%; padding:0.4rem 0.5rem; border-radius:5px; border:1px solid #ccc; font-family:inherit; font-size:0.9rem; box-sizing:border-box;">
+            </div>
+            <div class="modal-field" style="margin-bottom:0.85rem;">
+                <label for="perfil-precio-tutor" style="display:block; font-size:0.9rem; margin-bottom:0.25rem;">Precio por clase (COP)</label>
+                <input type="number" id="perfil-precio-tutor" min="0" step="1000" placeholder="Ej. 70000" style="width:100%; padding:0.4rem 0.5rem; border-radius:5px; border:1px solid #ccc; font-family:inherit; font-size:0.9rem; box-sizing:border-box;">
+            </div>
+            <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1rem;">
+                <button type="button" onclick="cerrarModalPerfilTutor()" style="padding:0.45rem 0.9rem; border-radius:5px; border:1px solid #ccc; background:#f5f5f5; cursor:pointer; font-size:0.85rem;">Cancelar</button>
+                <button type="button" onclick="guardarPerfilTutor()" style="padding:0.45rem 0.9rem; border-radius:5px; border:none; background: #ff6200; color:#fff; cursor:pointer; font-size:0.85rem; font-weight:bold;">Guardar cambios</button>
+            </div>
         </div>
     </div>
 
@@ -290,13 +311,13 @@
                     if (response.ok) {
                         const data = await response.json();
                         
-                        // Si el perfil NO está completo, redirige inmediatamente
-                        if (!data.profileComplete) {
+                        // Si profileComplete es explícitamente false, redirige a la configuración
+                        if (data.profileComplete === false) {
                             window.location.href = 'http://localhost:8080/tutor-profile-setup.html'; 
                             return;
                         }
                         
-                        // Perfil completo: renderiza el dashboard
+                        // Perfil completo (o sin flag): renderiza el dashboard
                         renderDashboard(data);
                         
                     } else if (response.status === 403) {
@@ -328,27 +349,69 @@
                 if (userNameEl) {
                     const payload = parseJwt(token);
                     if (payload) {
-                        // Usamos data.nombre si está disponible, si no, el del token
-                        userNameEl.textContent = `Hola, ${data.nombre ? data.nombre.split(' ')[0] : payload.sub.split('@')[0]}`;
+                        const baseNombre = data.nombre ? data.nombre.split(' ')[0] : (payload.sub ? payload.sub.split('@')[0] : 'Tutor');
+                        const nombreCapitalizado = baseNombre.charAt(0).toUpperCase() + baseNombre.slice(1);
+                        userNameEl.textContent = nombreCapitalizado;
                     }
                 }
 
-                if (document.getElementById('tutor-name-info')) {
-                    document.getElementById('tutor-name-info').textContent = data.nombre || 'N/A';
+                const heroNameEl = document.getElementById('hero-name');
+                if (heroNameEl) heroNameEl.textContent = data.nombre || 'Tutor';
+                const heroMateriaEl = document.getElementById('hero-materia');
+                if (heroMateriaEl) heroMateriaEl.textContent = data.materia || 'General';
+                const heroDescEl = document.getElementById('hero-description');
+                if (heroDescEl) heroDescEl.textContent = data.descripcion || 'Actualiza tu descripción para atraer más estudiantes.';
+
+                const heroAvatar = document.getElementById('hero-avatar');
+                if (heroAvatar) {
+                    if (data.fotoPerfil) {
+                        heroAvatar.style.backgroundImage = `url('${data.fotoPerfil}')`;
+                        heroAvatar.textContent = '';
+                    } else {
+                        const baseNombre = (data && data.nombre) ? data.nombre : (heroNameEl ? heroNameEl.textContent : 'Tutor');
+                        if (baseNombre) {
+                            const partes = baseNombre.split(' ');
+                            let iniciales = partes[0].charAt(0).toUpperCase();
+                            if (partes.length > 1) {
+                                iniciales += partes[1].charAt(0).toUpperCase();
+                            }
+                            heroAvatar.textContent = iniciales;
+                            heroAvatar.style.backgroundImage = '';
+                        }
+                    }
                 }
-                if (document.getElementById('tutor-materia-info')) {
-                    document.getElementById('tutor-materia-info').textContent = `Materia: ${data.materia || 'No Asignada'}`;
+
+                const rating = typeof data.ratingPromedio === 'number' ? data.ratingPromedio : 0;
+                const totalRatings = data.totalRatings || 0;
+                const ratingLabel = totalRatings === 1 ? 'calificación' : 'calificaciones';
+
+                const heroRatingTag = document.getElementById('hero-rating-tag');
+                if (heroRatingTag) heroRatingTag.textContent = `${rating.toFixed(1)} ★`;
+                const heroStatusTag = document.getElementById('hero-status-tag');
+                if (heroStatusTag) {
+                    heroStatusTag.textContent = data.profileComplete ? 'Perfil completo ✅' : 'Completa tu perfil';
                 }
-                if (document.getElementById('current-description')) {
-                    document.getElementById('current-description').textContent = data.descripcion || 'Sin descripción';
+
+                const metricRatingEl = document.getElementById('metric-rating');
+                if (metricRatingEl) metricRatingEl.textContent = rating.toFixed(1);
+                const metricRatingCountEl = document.getElementById('metric-rating-count');
+                if (metricRatingCountEl) metricRatingCountEl.textContent = `${totalRatings} ${ratingLabel}`;
+
+                const metricPriceEl = document.getElementById('metric-price');
+                if (metricPriceEl) {
+                    metricPriceEl.textContent = (data.precioPorClase && data.precioPorClase > 0)
+                        ? `$${formatoMoneda(data.precioPorClase)}`
+                        : '$0';
                 }
-                
-                if (document.getElementById('current-price')) {
-                    const precio = data.precioPorClase;
-                    document.getElementById('current-price').textContent = (precio && precio > 0) 
-                        ? `$${formatoMoneda(precio)}` 
-                        : '¡Añade un precio!'; 
-                }
+
+                const contactText = data.contacto || 'Sin contacto';
+                const metricContactEl = document.getElementById('metric-contact');
+                if (metricContactEl) metricContactEl.textContent = contactText;
+
+                const metricCommentsEl = document.getElementById('metric-comments');
+                if (metricCommentsEl) metricCommentsEl.textContent = data.totalComentarios || 0;
+
+                renderFeedback(data.comentariosRecientes || []);
             }
             
             // --- Utilidades ---
@@ -373,70 +436,313 @@
                 }
             }
 
+            function generarIniciales(nombre) {
+                if (!nombre) return 'TU';
+                const partes = nombre.trim().split(' ');
+                let iniciales = partes[0].charAt(0).toUpperCase();
+                if (partes.length > 1) iniciales += partes[1].charAt(0).toUpperCase();
+                return iniciales;
+            }
+
+            function formatearFecha(fechaIso) {
+                if (!fechaIso) return '';
+                const fecha = new Date(fechaIso);
+                return fecha.toLocaleDateString('es-CO', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+            }
+
+            function generarEstrellas(rating) {
+                const max = 5;
+                const filled = Math.round(rating || 0);
+                let resultado = '';
+                for (let i = 1; i <= max; i++) {
+                    resultado += i <= filled ? '★' : '☆';
+                }
+                return resultado;
+            }
+
+            function renderFeedback(comentarios) {
+                const list = document.getElementById('feedback-list');
+                if (!list) return;
+
+                if (!comentarios.length) {
+                    list.innerHTML = '<p class="feedback-empty">Aún no tienes comentarios.</p>';
+                    return;
+                }
+
+                list.innerHTML = '';
+                comentarios.forEach(c => {
+                    const item = document.createElement('div');
+                    item.className = 'feedback-item';
+
+                    const avatar = document.createElement('div');
+                    avatar.className = 'feedback-avatar';
+                    if (c.fotoPerfilEstudiante) {
+                        avatar.style.backgroundImage = `url('${c.fotoPerfilEstudiante}')`;
+                        avatar.textContent = '';
+                    } else {
+                        avatar.style.backgroundImage = '';
+                        avatar.textContent = generarIniciales(c.estudianteNombre || 'Estudiante');
+                    }
+
+                    const content = document.createElement('div');
+                    content.className = 'feedback-content';
+
+                    const header = document.createElement('div');
+                    header.className = 'feedback-header';
+                    const name = document.createElement('p');
+                    name.className = 'feedback-name';
+                    name.textContent = c.estudianteNombre || 'Estudiante';
+                    const date = document.createElement('span');
+                    date.className = 'feedback-date';
+                    date.textContent = formatearFecha(c.fecha);
+                    header.appendChild(name);
+                    header.appendChild(date);
+
+                    const stars = document.createElement('span');
+                    stars.className = 'feedback-stars';
+                    stars.textContent = generarEstrellas(c.puntuacion);
+
+                    const text = document.createElement('p');
+                    text.className = 'feedback-text';
+                    text.textContent = c.comentario;
+
+                    content.appendChild(header);
+                    content.appendChild(stars);
+                    content.appendChild(text);
+
+                    item.appendChild(avatar);
+                    item.appendChild(content);
+
+                    list.appendChild(item);
+                });
+            }
+
         })(); 
     </script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const dropdown = document.querySelector('.navbar .dropdown');
-        if (!dropdown) return;
+        async function cargarPerfilUsuarioNavbar() {
+            try {
+                const jwt = localStorage.getItem('jwtToken');
+                if (!jwt) return;
 
-        const button = dropdown.querySelector('.dropbtn');
-        const content = dropdown.querySelector('.dropdown-content');
+                const resp = await fetch('http://localhost:8080/api/auth/mi-perfil', {
+                    headers: { 'Authorization': 'Bearer ' + jwt }
+                });
 
-        if (!button || !content) return;
+                if (!resp.ok) return;
 
-        button.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            dropdown.classList.toggle('open');
-        });
+                const data = await resp.json();
+                const avatar = document.getElementById('user-avatar');
+                const nameSpan = document.getElementById('user-name');
 
-        content.addEventListener('click', function (e) {
-            e.stopPropagation();
-        });
+                if (data && data.nombre) {
+                    const nombreCompleto = data.apellido ? `${data.nombre} ${data.apellido}` : data.nombre;
+                    if (nameSpan && !nameSpan.textContent) {
+                        nameSpan.textContent = nombreCompleto;
+                    }
+                }
 
-        document.addEventListener('click', function () {
-            dropdown.classList.remove('open');
-        });
-    });
+                if (avatar) {
+                    if (data && data.fotoPerfil) {
+                        avatar.style.backgroundImage = `url('${data.fotoPerfil}')`;
+                        avatar.textContent = '';
+                    } else {
+                        const baseNombre = (data && data.nombre) ? data.nombre : (nameSpan ? nameSpan.textContent : '');
+                        if (baseNombre) {
+                            const partes = baseNombre.split(' ');
+                            let iniciales = partes[0].charAt(0).toUpperCase();
+                            if (partes.length > 1) {
+                                iniciales += partes[1].charAt(0).toUpperCase();
+                            }
+                            avatar.textContent = iniciales;
+                            avatar.style.backgroundImage = '';
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Error cargando perfil de usuario en navbar', e);
+            }
+        }
+
+        function irAPerfil() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) { window.location.href = 'login.html'; return; }
+            const payload = (function parseJwtLocal(t){
+                try {
+                    const base64Url = t.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+                    return JSON.parse(jsonPayload);
+                } catch(e){ return null; }
+            })(token);
+
+            const role = payload && payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+            if (role === 'ADMIN') {
+                window.location.href = 'dashboard-admin.html';
+            } else if (role === 'TUTOR') {
+                window.location.href = 'dashboard-tutor.html';
+            } else {
+                window.location.href = 'dashboard-estudiante.html';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', cargarPerfilUsuarioNavbar);
     </script>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-column">
-                <h4>Sinergia</h4>
-                <p>Plataforma LMS que conecta estudiantes, tutores y recursos en un solo lugar.</p>
-                <p>Aprende de forma más inteligente, organizada y colaborativa.</p>
-            </div>
-            <div class="footer-column">
-                <h4>Enlaces rápidos</h4>
-                <ul class="footer-links">
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="#">Marketplace de tutores</a></li>
-                    <li><a href="#">Flashcards y quizzes</a></li>
-                    <li><a href="#">Planificador</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h4>Contacto</h4>
-                <p>soporte@sinergia.com</p>
-                <p>+57 (000) 000 0000</p>
-                <p>Bogotá, Colombia</p>
-            </div>
-            <div class="footer-column">
-                <h4>Síguenos</h4>
-                <div class="footer-social">
-                    <a href="#">Instagram</a>
-                    <a href="#">LinkedIn</a>
-                    <a href="#">YouTube</a>
-                </div>
+    <script>
+    const tokenPerfilTutor = localStorage.getItem('jwtToken');
+
+    async function cargarPerfilTutor() {
+        try {
+            if (!tokenPerfilTutor) return;
+
+            const tutorResp = await fetch('http://localhost:8080/api/tutor/profile', {
+                headers: { 'Authorization': 'Bearer ' + tokenPerfilTutor }
+            });
+            if (!tutorResp.ok) return;
+            const tutorData = await tutorResp.json();
+
+            const descInput = document.getElementById('perfil-descripcion-tutor');
+            const contactoInput = document.getElementById('perfil-contacto-tutor');
+            const precioInput = document.getElementById('perfil-precio-tutor');
+
+            if (descInput) descInput.value = tutorData.descripcion || '';
+            if (contactoInput) contactoInput.value = tutorData.contacto || '';
+            if (precioInput) precioInput.value = tutorData.precioPorClase || '';
+        } catch (e) {
+            console.error('Error cargando perfil de tutor', e);
+        }
+    }
+
+    function abrirModalPerfilTutor() {
+        const modal = document.getElementById('modal-perfil-tutor');
+        if (modal) {
+            modal.style.display = 'flex';
+            cargarPerfilTutor();
+        }
+    }
+
+    function cerrarModalPerfilTutor() {
+        const modal = document.getElementById('modal-perfil-tutor');
+        if (modal) modal.style.display = 'none';
+    }
+
+    async function guardarPerfilTutor() {
+        try {
+            if (!tokenPerfilTutor) { window.location.href = 'login.html'; return; }
+            const fileInput = document.getElementById('perfil-foto-tutor');
+            const descripcion = document.getElementById('perfil-descripcion-tutor').value.trim();
+            const contacto = document.getElementById('perfil-contacto-tutor').value.trim();
+            const precio = document.getElementById('perfil-precio-tutor').value.trim();
+
+            if (fileInput && fileInput.files && fileInput.files[0]) {
+                const formData = new FormData();
+                formData.append('imagen', fileInput.files[0]);
+
+                const respFoto = await fetch('http://localhost:8080/api/auth/mi-perfil/foto', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + tokenPerfilTutor },
+                    body: formData
+                });
+                if (!respFoto.ok) {
+                    alert('No se pudo subir la foto de perfil.');
+                    return;
+                }
+            }
+
+            const resp = await fetch('http://localhost:8080/api/tutor/profile/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + tokenPerfilTutor
+                },
+                body: JSON.stringify({
+                    descripcion: descripcion || null,
+                    contacto: contacto || null,
+                    precioPorClase: precio || null
+                })
+            });
+
+            if (resp.ok) {
+                cerrarModalPerfilTutor();
+                cargarPerfilUsuarioNavbar();
+                window.location.reload();
+            } else {
+                alert('No se pudo guardar el perfil.');
+            }
+        } catch (e) {
+            console.error('Error guardando perfil de tutor', e);
+            alert('Error de conexión al guardar el perfil.');
+        }
+    }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dropdown = document.querySelector('.navbar .dropdown');
+    if (!dropdown) return;
+
+    const button = dropdown.querySelector('.dropbtn');
+    const content = dropdown.querySelector('.dropdown-content');
+
+    if (!button || !content) return;
+
+    button.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropdown.classList.toggle('open');
+    });
+
+    content.addEventListener('click', function (e) {
+        e.stopPropagation();
+    });
+
+    document.addEventListener('click', function () {
+        dropdown.classList.remove('open');
+    });
+});
+</script>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-column">
+            <h4>Sinergia</h4>
+            <p>Plataforma LMS que conecta estudiantes, tutores y recursos en un solo lugar.</p>
+            <p>Aprende de forma más inteligente, organizada y colaborativa.</p>
+        </div>
+        <div class="footer-column">
+            <h4>Enlaces rápidos</h4>
+            <ul class="footer-links">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="#">Marketplace de tutores</a></li>
+                <li><a href="#">Flashcards y quizzes</a></li>
+                <li><a href="#">Planificador</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h4>Contacto</h4>
+            <p>soporte@sinergia.com</p>
+            <p>+57 (000) 000 0000</p>
+            <p>Bogotá, Colombia</p>
+        </div>
+        <div class="footer-column">
+            <h4>Síguenos</h4>
+            <div class="footer-social">
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">YouTube</a>
             </div>
         </div>
-        <div class="footer-bottom">
-            <span>&copy; 2025 Sinergia. Todos los derechos reservados.</span>
-            <span>Términos y condiciones · Política de privacidad</span>
-        </div>
-    </footer>
+    </div>
+    <div class="footer-bottom">
+        <span>&copy; 2025 Sinergia. Todos los derechos reservados.</span>
+        <span>Términos y condiciones · Política de privacidad</span>
+    </div>
+</footer>
 </body>
 </html>

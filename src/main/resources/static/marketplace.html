@@ -89,10 +89,40 @@
         
         /* Sección de Usuario */
         .user-section { display: flex; align-items: center; gap: 1rem; }
+        .user-info-mini { display: flex; align-items: center; gap: 0.6rem; }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+        .user-name-mini { font-weight: 500; font-size: 0.95rem; }
+
         .button-logout {
             padding: 0.5rem 1rem; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; font-size: 0.9rem;
         }
         .button-logout:hover { background: var(--primary-color); color: white; }
+        .button-edit-profile {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--secondary-color);
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        .button-edit-profile:hover { background: #0056b3; }
 
         /* --- Layout Principal --- */
         .dashboard-container { max-width: 1300px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
@@ -128,7 +158,29 @@
         .tutor-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         
         .tutor-header { background-color: var(--primary-color); color: white; padding: 1.5rem; text-align: center; position: relative; }
-        .tutor-avatar-placeholder { width: 80px; height: 80px; background-color: white; color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 0.5rem; border: 3px solid rgba(255,255,255,0.3); }
+        .tutor-avatar-placeholder,
+        .tutor-avatar-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+        .tutor-avatar-placeholder {
+            background-color: white;
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .tutor-avatar-photo {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
         .tutor-name { font-size: 1.2rem; font-weight: 700; margin: 0; }
         .tutor-materia { font-size: 0.9rem; opacity: 0.9; margin-top: 0.2rem; }
         
@@ -144,6 +196,7 @@
         .star.filled { color: #ffd700; }
         .star.empty { color: #ddd; }
         .rate-link { font-size: 0.85rem; color: var(--secondary-color); text-decoration: underline; cursor: pointer; margin-left: auto; }
+        .rating-count { font-size: 0.85rem; color: #777; }
 
         .tutor-footer { padding: 1rem 1.5rem; background-color: #f9f9f9; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
         .btn-contact {
@@ -313,7 +366,11 @@
         </ul>
 
         <div class="user-section">
-            <span id="user-name" style="font-weight: 500;"></span>
+            <div class="user-info-mini">
+                <div class="user-avatar" id="user-avatar"></div>
+                <span id="user-name" class="user-name-mini"></span>
+            </div>
+            <button type="button" class="button-edit-profile" onclick="irAPerfil()">Editar perfil</button>
             <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
         </div>
     </nav>
@@ -396,11 +453,76 @@
         document.addEventListener('DOMContentLoaded', () => {
             const payload = parseJwt(token);
             if (payload) {
-                document.getElementById('user-name').textContent = `Hola, ${payload.sub ? payload.sub.split('@')[0] : 'Usuario'}`;
+                const nombreBase = payload.sub ? payload.sub.split('@')[0] : 'Usuario';
+                const nombreCapitalizado = nombreBase.charAt(0).toUpperCase() + nombreBase.slice(1);
+                const userNameSpan = document.getElementById('user-name');
+                if (userNameSpan) {
+                    userNameSpan.textContent = nombreCapitalizado;
+                }
                 currentRole = payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
             }
+            cargarPerfilUsuarioNavbar();
             cargarDatosIniciales();
         });
+
+        async function cargarPerfilUsuarioNavbar() {
+            try {
+                const jwt = localStorage.getItem('jwtToken');
+                if (!jwt) return;
+
+                const resp = await fetch('http://localhost:8080/api/auth/mi-perfil', {
+                    headers: { 'Authorization': 'Bearer ' + jwt }
+                });
+
+                if (!resp.ok) return;
+
+                const data = await resp.json();
+                const avatar = document.getElementById('user-avatar');
+                const nameSpan = document.getElementById('user-name');
+
+                if (data && data.nombre) {
+                    const nombreCompleto = data.apellido ? `${data.nombre} ${data.apellido}` : data.nombre;
+                    if (nameSpan && !nameSpan.textContent) {
+                        nameSpan.textContent = nombreCompleto;
+                    }
+                }
+
+                if (avatar) {
+                    if (data && data.fotoPerfil) {
+                        avatar.style.backgroundImage = `url('${data.fotoPerfil}')`;
+                        avatar.textContent = '';
+                    } else {
+                        const baseNombre = (data && data.nombre) ? data.nombre : (nameSpan ? nameSpan.textContent : '');
+                        if (baseNombre) {
+                            const partes = baseNombre.split(' ');
+                            let iniciales = partes[0].charAt(0).toUpperCase();
+                            if (partes.length > 1) {
+                                iniciales += partes[1].charAt(0).toUpperCase();
+                            }
+                            avatar.textContent = iniciales;
+                            avatar.style.backgroundImage = '';
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Error cargando perfil de usuario en navbar', e);
+            }
+        }
+
+        function irAPerfil() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) { window.location.href = 'login.html'; return; }
+            const payload = parseJwt(token);
+            const role = payload && payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+
+            if (role === 'ADMIN') {
+                window.location.href = 'dashboard-admin.html';
+            } else if (role === 'TUTOR') {
+                window.location.href = 'dashboard-tutor.html';
+            } else {
+                window.location.href = 'dashboard-estudiante.html';
+            }
+        }
 
         async function cargarDatosIniciales() {
             await fetchMaterias(); 
@@ -524,8 +646,15 @@
             const esAdmin = currentRole === 'ADMIN';
 
             listaTutores.forEach(t => {
-                const iniciales = t.nombreCompleto.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const iniciales = t.nombreCompleto
+                    ? t.nombreCompleto.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+                    : 'TU';
                 const estrellasHtml = generarEstrellas(t.ratingPromedio);
+                const totalRatings = t.totalRatings || 0;
+
+                const avatarHtml = t.fotoPerfil
+                    ? `<div class="tutor-avatar-photo" style="background-image: url('${t.fotoPerfil}');"></div>`
+                    : `<div class="tutor-avatar-placeholder">${iniciales}</div>`;
 
                 const adminBtnHtml = esAdmin
                     ? `<button class="admin-delete-btn" onclick="eliminarTutorDesdeMarketplace(${t.idTutor})">Eliminar</button>`
@@ -534,13 +663,14 @@
                 const card = `
                     <div class="tutor-card">
                         <div class="tutor-header">
-                            <div class="tutor-avatar-placeholder">${iniciales}</div>
+                            ${avatarHtml}
                             <h3 class="tutor-name">${t.nombreCompleto}</h3>
                             <div class="tutor-materia">${t.materia}</div>
                         </div>
                         <div class="tutor-body">
                             <div class="tutor-rating">
                                 <span class="rating-number">${t.ratingPromedio ? t.ratingPromedio.toFixed(1) : '0.0'}</span>
+                                <span class="rating-count">(${totalRatings})</span>
                                 <span class="stars">${estrellasHtml}</span>
                                 <a href="#" class="rate-link" onclick="abrirModalRating(event, ${t.idTutor})">Calificar</a>
                             </div>

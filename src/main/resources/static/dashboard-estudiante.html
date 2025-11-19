@@ -127,27 +127,64 @@
         .button-edit-profile:hover { background: #0056b3; }
 
         /* --- Layout --- */
-        .main-container {
+        .dashboard-shell {
             max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            margin: 2rem auto 3rem;
+            padding: 0 1.25rem;
+        }
+        .content-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr; /* Columna ancha para Tareas/Actividad, estrecha para Accesos */
+            grid-template-columns: 2fr 1fr;
             gap: 2rem;
+            margin-top: 2rem;
         }
-        @media (max-width: 768px) { .main-container { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) {
+            .content-grid { grid-template-columns: 1fr; }
+        }
+        .card-block { margin-bottom: 2rem; }
 
-        /* --- Welcome Header --- */
-        .welcome-banner {
-            background-color: var(--white-color);
+        .hero-card {
+            background: linear-gradient(120deg, #ff915a, #ff6200);
+            color: #fff;
             padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-radius: 18px;
+            box-shadow: 0 20px 45px rgba(242,98,0,0.35);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
             margin-bottom: 2rem;
-            grid-column: 1 / -1;
         }
-        .welcome-banner h1 { margin: 0 0 0.5rem 0; color: var(--primary-color); }
-        .welcome-banner p { margin: 0; color: #666; }
+        .hero-header { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+        .hero-avatar {
+            width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem; font-weight: bold; text-transform: uppercase;
+            border: 2px solid rgba(255,255,255,0.3);
+            background-size: cover; background-position: center; overflow: hidden;
+        }
+        .hero-greeting { margin: 0; opacity: 0.85; }
+        .hero-name { margin: 0; font-size: 2rem; }
+        .hero-description { margin: 0; font-size: 1rem; line-height: 1.5; }
+        .hero-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .hero-tag { background: rgba(255,255,255,0.15); padding: 0.35rem 0.9rem; border-radius: 999px; font-size: 0.85rem; }
+        .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .hero-actions .btn-primary { background: #fff; color: var(--primary-color); border: none; padding: 0.65rem 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .hero-actions .btn-secondary { border: 1px solid rgba(255,255,255,0.6); background: transparent; color: #fff; padding: 0.65rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: bold; }
+
+        .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 2.5rem; }
+        .metric-card {
+            background-color: #fff;
+            padding: 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .metric-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: #999; }
+        .metric-value { font-size: 2rem; font-weight: bold; color: var(--dark-text); }
+        .metric-sub { font-size: 0.85rem; color: #777; }
 
         /* --- Cards & Sections --- */
         .section-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; color: #444; display: flex; justify-content: space-between; align-items: center; }
@@ -363,55 +400,90 @@
                 <div class="user-avatar" id="user-avatar">ES</div>
                 <span id="user-name" class="user-name-mini"></span>
             </div>
-            <button type="button" class="button-edit-profile" onclick="abrirModalPerfil()">Editar perfil</button>
             <a href="#" onclick="logout()" class="button-logout">Cerrar Sesión</a>
         </div>
     </nav>
 
-    <div class="main-container">
-        
-        <div class="welcome-banner">
-            <h1 id="welcome-msg">Hola, Estudiante</h1>
-            <p>Bienvenido a tu espacio de aprendizaje. Aquí tienes un resumen de tu día.</p>
-        </div>
-
-        <section>
-            <div class="section-title">
-                <span>📅 Tu Próxima Agenda</span>
-                <a href="planificador.html" class="section-link">Ver calendario completo →</a>
+    <div class="dashboard-shell">
+        <section class="hero-card">
+            <div class="hero-header">
+                <div class="hero-avatar" id="hero-avatar-figure">ES</div>
+                <div>
+                    <p class="hero-greeting" id="hero-greeting">Hola de nuevo 👋</p>
+                    <h2 class="hero-name" id="hero-name">Estudiante</h2>
+                    <p class="hero-description" id="hero-description">Organiza tu semana, mantén tus tareas al día y sigue aprendiendo.</p>
+                    <div class="hero-tags">
+                        <span class="hero-tag" id="hero-tag-progress">Planificador activo</span>
+                        <span class="hero-tag" id="hero-tag-status">Perfil listo</span>
+                    </div>
+                </div>
             </div>
-            
-            <div class="card" id="tasks-container">
-                <p class="task-empty">Cargando tareas...</p>
+            <div class="hero-actions">
+                <button type="button" class="btn-primary" onclick="abrirModalPerfil()">Actualizar perfil</button>
+                <a href="planificador.html" class="btn-secondary">Abrir planificador</a>
             </div>
         </section>
 
-        <aside>
-            <div class="section-title">
-                <span>🚀 Repaso Rápido</span>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <span class="metric-title">Pendientes esta semana</span>
+                <span class="metric-value" id="metric-weekly-value">0</span>
+                <span class="metric-sub" id="metric-weekly-sub">Semana actual</span>
             </div>
-
-            <div class="study-grid">
-                <a href="flashcards.html" class="study-card">
-                    <span class="study-icon">🧠</span>
-                    <span class="study-title">Flashcards</span>
-                    <span class="study-meta">Repasar conceptos</span>
-                </a>
-                
-                <a href="quizzes.html" class="study-card">
-                    <span class="study-icon">📝</span>
-                    <span class="study-title">Quizzes</span>
-                    <span class="study-meta">Pon a prueba tu saber</span>
-                </a>
+            <div class="metric-card">
+                <span class="metric-title">Pendientes este mes</span>
+                <span class="metric-value" id="metric-monthly-value">0</span>
+                <span class="metric-sub" id="metric-monthly-sub">Mes en curso</span>
             </div>
-
-            <div class="card" style="margin-top: 1.5rem; background-color: #e6f7ff; border: 1px solid #b3e0ff;">
-                <h4 style="margin-top:0; color: #0056b3;">¿Necesitas ayuda hoy?</h4>
-                <p style="font-size: 0.9rem; color: #555;">Hay nuevos tutores disponibles en Matemáticas y Física.</p>
-                <a href="marketplace.html" style="display:block; text-align:center; margin-top:10px; background:#0056b3; color:white; padding:8px; border-radius:5px; text-decoration:none; font-weight:bold;">Buscar Tutor</a>
+            <div class="metric-card">
+                <span class="metric-title">Flashcards creadas</span>
+                <span class="metric-value" id="metric-flashcards-value">0</span>
+                <span class="metric-sub" id="metric-flashcards-sub">Colecciones personales</span>
             </div>
-        </aside>
+            <div class="metric-card">
+                <span class="metric-title">Quizzes creados</span>
+                <span class="metric-value" id="metric-quizzes-value">0</span>
+                <span class="metric-sub" id="metric-quizzes-sub">Retos personalizados</span>
+            </div>
+        </div>
 
+        <div class="content-grid">
+            <section class="card-block">
+                <div class="section-title">
+                    <span>📅 Tu Próxima Agenda</span>
+                    <a href="planificador.html" class="section-link">Ver calendario completo →</a>
+                </div>
+                <div class="card" id="tasks-container">
+                    <p class="task-empty">Cargando tareas...</p>
+                </div>
+            </section>
+
+            <aside class="card-block">
+                <div class="section-title">
+                    <span>🚀 Repaso Rápido</span>
+                </div>
+
+                <div class="study-grid">
+                    <a href="flashcards.html" class="study-card">
+                        <span class="study-icon">🧠</span>
+                        <span class="study-title">Flashcards</span>
+                        <span class="study-meta">Repasar conceptos</span>
+                    </a>
+                    
+                    <a href="quizzes.html" class="study-card">
+                        <span class="study-icon">📝</span>
+                        <span class="study-title">Quizzes</span>
+                        <span class="study-meta">Pon a prueba tu saber</span>
+                    </a>
+                </div>
+
+                <div class="card" style="margin-top: 1.5rem; background-color: #e6f7ff; border: 1px solid #b3e0ff;">
+                    <h4 style="margin-top:0; color: #0056b3;">¿Necesitas ayuda hoy?</h4>
+                    <p style="font-size: 0.9rem; color: #555;">Hay nuevos tutores disponibles en Matemáticas y Física.</p>
+                    <a href="marketplace.html" style="display:block; text-align:center; margin-top:10px; background:#0056b3; color:white; padding:8px; border-radius:5px; text-decoration:none; font-weight:bold;">Buscar Tutor</a>
+                </div>
+            </aside>
+        </div>
     </div>
 
     <!-- Modal Perfil Usuario -->
@@ -440,15 +512,19 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const payload = parseJwt(token);
+            let nombreCapitalizado = 'Estudiante';
             if (payload) {
                 const nombre = payload.sub ? payload.sub.split('@')[0] : 'Estudiante';
-                const nombreCapitalizado = nombre.charAt(0).toUpperCase() + nombre.slice(1);
-                document.getElementById('user-name').textContent = nombreCapitalizado;
-                document.getElementById('welcome-msg').textContent = `Hola, ${nombreCapitalizado}`;
-                actualizarAvatarIniciales(nombreCapitalizado);
+                nombreCapitalizado = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+                const userNameEl = document.getElementById('user-name');
+                if (userNameEl) userNameEl.textContent = nombreCapitalizado;
             }
+            actualizarHeroBase(nombreCapitalizado);
+            actualizarAvatarIniciales(nombreCapitalizado);
             cargarTareasPreview();
             cargarPerfilUsuario();
+            cargarMetricasFlashcards();
+            cargarMetricasQuizzes();
         });
 
         // --- Lógica para mostrar las tareas más cercanas ---
@@ -461,6 +537,7 @@
                 
                 if (response.ok) {
                     const tareas = await response.json();
+                    actualizarMetricasTareas(tareas);
                     
                     // 1. Filtrar tareas futuras o de hoy
                     const ahora = new Date();
@@ -527,6 +604,78 @@
             }
         }
 
+        function actualizarMetricasTareas(tareas) {
+            const now = new Date();
+            const semanaInicio = getStartOfWeek(now);
+            const semanaFin = getEndOfWeek(now);
+            const mesInicio = new Date(now.getFullYear(), now.getMonth(), 1);
+            const mesFin = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+            const semanal = tareas.filter(t => {
+                const fecha = new Date(t.start);
+                return fecha >= semanaInicio && fecha <= semanaFin;
+            }).length;
+
+            const mensual = tareas.filter(t => {
+                const fecha = new Date(t.start);
+                return fecha >= mesInicio && fecha <= mesFin;
+            }).length;
+
+            const metricWeekEl = document.getElementById('metric-weekly-value');
+            if (metricWeekEl) metricWeekEl.textContent = semanal;
+            const metricWeekSub = document.getElementById('metric-weekly-sub');
+            if (metricWeekSub) metricWeekSub.textContent = `${formatearFechaCorta(semanaInicio)} - ${formatearFechaCorta(semanaFin)}`;
+
+            const metricMonthEl = document.getElementById('metric-monthly-value');
+            if (metricMonthEl) metricMonthEl.textContent = mensual;
+            const metricMonthSub = document.getElementById('metric-monthly-sub');
+            if (metricMonthSub) metricMonthSub.textContent = mesInicio.toLocaleString('es-CO', { month: 'long' });
+        }
+
+        function formatearFechaCorta(fecha) {
+            return fecha.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' });
+        }
+
+        function getStartOfWeek(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // lunes
+            return new Date(d.setDate(diff));
+        }
+
+        function getEndOfWeek(date) {
+            const start = getStartOfWeek(date);
+            return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6, 23, 59, 59, 999);
+        }
+
+        async function cargarMetricasFlashcards() {
+            try {
+                const resp = await fetch('http://localhost:8080/api/flashcards', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!resp.ok) return;
+                const cards = await resp.json();
+                const metricEl = document.getElementById('metric-flashcards-value');
+                if (metricEl) metricEl.textContent = cards.length;
+            } catch (e) {
+                console.error('Error cargando flashcards', e);
+            }
+        }
+
+        async function cargarMetricasQuizzes() {
+            try {
+                const resp = await fetch('http://localhost:8080/api/quizzes', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!resp.ok) return;
+                const quizzes = await resp.json();
+                const metricEl = document.getElementById('metric-quizzes-value');
+                if (metricEl) metricEl.textContent = quizzes.length;
+            } catch (e) {
+                console.error('Error cargando quizzes', e);
+            }
+        }
+
         // --- Utilidades ---
         function isToday(date) {
             const today = new Date();
@@ -581,12 +730,18 @@
                 const data = await resp.json();
                 const descInput = document.getElementById('perfil-descripcion');
                 if (descInput) descInput.value = data.descripcionPerfil || '';
+                actualizarHeroDescripcion(data.descripcionPerfil || '');
 
                 if (data.fotoPerfil) {
                     const avatar = document.getElementById('user-avatar');
                     if (avatar) {
                         avatar.style.backgroundImage = `url('${data.fotoPerfil}')`;
                         avatar.textContent = '';
+                    }
+                    const heroAvatar = document.getElementById('hero-avatar-figure');
+                    if (heroAvatar) {
+                        heroAvatar.style.backgroundImage = `url('${data.fotoPerfil}')`;
+                        heroAvatar.textContent = '';
                     }
                 }
             } catch (e) {
@@ -595,15 +750,45 @@
         }
 
         function actualizarAvatarIniciales(nombreCompleto) {
-            const avatar = document.getElementById('user-avatar');
-            if (!avatar) return;
             const partes = nombreCompleto.split(' ');
             let iniciales = partes[0].charAt(0).toUpperCase();
             if (partes.length > 1) {
                 iniciales += partes[1].charAt(0).toUpperCase();
             }
-            avatar.textContent = iniciales;
-            avatar.style.backgroundImage = '';
+
+            const avatar = document.getElementById('user-avatar');
+            if (avatar) {
+                avatar.textContent = iniciales;
+                avatar.style.backgroundImage = '';
+            }
+
+            const heroAvatar = document.getElementById('hero-avatar-figure');
+            if (heroAvatar) {
+                heroAvatar.textContent = iniciales;
+                heroAvatar.style.backgroundImage = '';
+            }
+        }
+
+        function actualizarHeroBase(nombre) {
+            const greetingEl = document.getElementById('hero-greeting');
+            if (greetingEl) greetingEl.textContent = `Hola, ${nombre}`;
+            const heroNameEl = document.getElementById('hero-name');
+            if (heroNameEl) heroNameEl.textContent = nombre;
+        }
+
+        function actualizarHeroDescripcion(descripcion) {
+            const heroDescEl = document.getElementById('hero-description');
+            const statusTag = document.getElementById('hero-tag-status');
+            if (heroDescEl) {
+                heroDescEl.textContent = descripcion && descripcion.trim()
+                    ? descripcion
+                    : 'Organiza tu semana, mantén tus tareas al día y sigue aprendiendo.';
+            }
+            if (statusTag) {
+                statusTag.textContent = descripcion && descripcion.trim()
+                    ? 'Perfil completo ✅'
+                    : 'Completa tu perfil';
+            }
         }
 
         function abrirModalPerfil() {

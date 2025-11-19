@@ -14,6 +14,8 @@ public class TutorResponseDto{
     private String descripcion;
     private String contacto;
     private BigDecimal precioPorClase;
+    private String fotoPerfil;
+    private Integer totalRatings;
     
     // --- NUEVO CAMPO DE RATING ---
     private Double ratingPromedio; 
@@ -27,7 +29,11 @@ public class TutorResponseDto{
         this.descripcion = tutor.getDescripcion();
         this.contacto = tutor.getContacto();
         this.precioPorClase = tutor.getPrecioPorClase();
-        
+        this.fotoPerfil = Optional.ofNullable(tutor.getUsuario())
+                .map(u -> u.getFotoPerfil())
+                .orElse(null);
+        this.totalRatings = tutor.getRatings() != null ? tutor.getRatings().size() : 0;
+
         // CALCULAMOS EL RATING PROMEDIO AQUÍ
         if (tutor.getRatings() != null && !tutor.getRatings().isEmpty()) {
             double totalPuntuacion = tutor.getRatings().stream()
