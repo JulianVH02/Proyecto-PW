@@ -50,7 +50,14 @@
         .profile-container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 2rem; }
         @media (max-width: 900px) { .profile-container { grid-template-columns: 1fr; } }
 
-        .profile-card, .comments-card { background-color: var(--white-color); padding: 1.8rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .profile-card {
+            background: linear-gradient(120deg, #ff915a, #ff6200);
+            color: #fff;
+            padding: 1.8rem;
+            border-radius: 18px;
+            box-shadow: 0 20px 45px rgba(242,98,0,0.2);
+        }
+        .comments-card { background-color: var(--white-color); padding: 1.8rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
         .profile-header { display: flex; gap: 1.5rem; align-items: center; margin-bottom: 1rem; }
         .profile-avatar {
@@ -59,27 +66,28 @@
             font-size: 2rem; font-weight: bold; overflow: hidden;
             background-size: cover; background-position: center; background-repeat: no-repeat;
         }
-        .profile-name { margin: 0; font-size: 1.6rem; }
-        .profile-materia { color: #666; margin-top: 0.2rem; }
+        .profile-name { margin: 0; font-size: 1.8rem; color: #fff; }
+        .profile-materia { color: rgba(255,255,255,0.8); margin-top: 0.2rem; }
 
         .profile-rating { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
         .profile-rating-number { font-weight: bold; color: var(--primary-color); }
         .profile-stars { color: #ffd700; }
         .profile-rating-count { font-size: 0.85rem; color: #777; }
 
-        .profile-price { margin-top: 1rem; font-size: 1.3rem; font-weight: bold; }
-        .profile-contact { margin-top: 0.5rem; font-size: 0.95rem; color: #555; }
+        .profile-price { margin-top: 1rem; font-size: 1.4rem; font-weight: bold; }
+        .profile-contact { margin-top: 0.5rem; font-size: 1rem; color: rgba(255,255,255,0.9); }
 
         .profile-stats { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
         .profile-stat-item {
             flex: 1 1 120px;
-            background-color: #fafafa;
-            border-radius: 8px;
-            border: 1px solid #eee;
+            background-color: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
             padding: 0.6rem 0.8rem;
             font-size: 0.8rem;
+            color: #fff;
         }
-        .profile-stat-label { color: #777; display:block; margin-bottom: 0.15rem; }
+        .profile-stat-label { color: rgba(255,255,255,0.8); display:block; margin-bottom: 0.15rem; }
         .profile-stat-value { font-weight: 700; font-size: 1rem; }
 
         .profile-actions { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
@@ -183,7 +191,7 @@
                 <span class="profile-stat-value" id="stat-precio">$0</span>
             </div>
         </div>
-        <p id="profile-descripcion">Descripción del tutor.</p>
+        <p id="profile-descripcion" style="color: rgba(255,255,255,0.95);">Descripción del tutor.</p>
         <div class="profile-price" id="profile-precio">$0 / hora</div>
         <div class="profile-contact" id="profile-contacto"></div>
         <div class="profile-actions">
