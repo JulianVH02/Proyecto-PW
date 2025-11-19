@@ -93,6 +93,17 @@
         .profile-actions { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
         .btn-contact { background-color: var(--primary-color); color: #fff; padding: 0.6rem 1.1rem; border-radius: 999px; text-decoration: none; font-weight: bold; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.4rem; }
         .btn-contact:hover { background-color: #d65100; }
+        .btn-rate {
+            background-color: #fff;
+            color: var(--primary-color);
+            border: 1px solid rgba(255,255,255,0.6);
+            padding: 0.6rem 1.1rem;
+            border-radius: 999px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .btn-rate:hover { background-color: rgba(255,255,255,0.15); }
 
         .comments-card h3 { margin-top: 0; margin-bottom: 1rem; color: var(--primary-color); }
         .comment-item { border-radius: 8px; border: 1px solid #eee; padding: 0.75rem 1rem; margin-bottom: 0.75rem; background-color: #fafafa; }
@@ -133,6 +144,47 @@
         .footer-social { display: flex; gap: 1rem; }
         .footer-social a { color: var(--white-color); text-decoration: none; font-size: 0.95rem; opacity: 0.85; }
         .footer-social a:hover { opacity: 1; }
+
+        /* Modal Calificación */
+        .rating-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .rating-modal-content {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 360px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .rating-modal-content h3 { margin-top: 0; margin-bottom: 0.5rem; color: var(--primary-color); }
+        .rating-options label { margin: 0 5px; font-weight: 600; cursor: pointer; }
+        .rating-modal-content textarea {
+            width: 100%;
+            padding: 0.6rem;
+            border-radius: 6px;
+            border: 1px solid var(--grey-border);
+            resize: vertical;
+            font-family: inherit;
+        }
+        .rating-modal-actions { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+        .rating-modal-actions button {
+            padding: 0.6rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-submit-rating { background: var(--primary-color); color: #fff; }
+        .btn-cancel-rating { background: #f3f3f3; color: #555; }
+        #rating-message { font-size: 0.9rem; margin-top: 0.5rem; }
     </style>
 </head>
 <body>
@@ -196,6 +248,7 @@
         <div class="profile-contact" id="profile-contacto"></div>
         <div class="profile-actions">
             <a href="#" target="_blank" id="profile-contact-link" class="btn-contact">📱 Contactar por WhatsApp</a>
+            <button type="button" class="btn-rate" onclick="abrirModalRating()">Calificar tutor</button>
         </div>
     </section>
 
@@ -205,6 +258,28 @@
             <p class="comment-empty">Cargando comentarios...</p>
         </div>
     </section>
+</div>
+
+<div id="rating-modal" class="rating-modal-overlay">
+    <div class="rating-modal-content">
+        <h3>Calificar tutor</h3>
+        <p>Selecciona un puntaje y deja un comentario opcional.</p>
+        <form id="rating-form">
+            <div class="rating-options" style="margin-bottom: 0.75rem;">
+                <label><input type="radio" name="puntuacion" value="1"> 1</label>
+                <label><input type="radio" name="puntuacion" value="2"> 2</label>
+                <label><input type="radio" name="puntuacion" value="3"> 3</label>
+                <label><input type="radio" name="puntuacion" value="4"> 4</label>
+                <label><input type="radio" name="puntuacion" value="5"> 5</label>
+            </div>
+            <textarea id="rating-comment" rows="3" placeholder="Comentario (opcional)"></textarea>
+        </form>
+        <div class="rating-modal-actions">
+            <button type="button" class="btn-submit-rating" onclick="enviarRating()">Enviar calificación</button>
+            <button type="button" class="btn-cancel-rating" onclick="cerrarModalRating()">Cancelar</button>
+        </div>
+        <p id="rating-message"></p>
+    </div>
 </div>
 
 <footer>
@@ -246,6 +321,7 @@
 
 <script>
     const token = localStorage.getItem('jwtToken');
+    let tutorIdActual = null;
     if (!token) window.location.href = 'login.html';
 
     function parseJwt(token) {
@@ -316,6 +392,7 @@
             document.getElementById('comments-container').innerHTML = '<p class="comment-empty">No se especificó un tutor.</p>';
             return;
         }
+        tutorIdActual = tutorId;
 
         const payload = parseJwt(token);
         if (payload) {
@@ -415,6 +492,70 @@
         }
         cargarPerfil();
     });
+    function abrirModalRating() {
+        const modal = document.getElementById('rating-modal');
+        const form = document.getElementById('rating-form');
+        const message = document.getElementById('rating-message');
+        if (form) form.reset();
+        if (message) message.textContent = '';
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function cerrarModalRating() {
+        const modal = document.getElementById('rating-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    async function enviarRating() {
+        if (!tutorIdActual) {
+            const message = document.getElementById('rating-message');
+            message.style.color = 'red';
+            message.textContent = 'No se pudo identificar al tutor. Recarga la página.';
+            return;
+        }
+        const puntuacionInput = document.querySelector('input[name="puntuacion"]:checked');
+        const comentario = document.getElementById('rating-comment').value.trim();
+        const message = document.getElementById('rating-message');
+
+        if (!puntuacionInput) {
+            message.style.color = 'red';
+            message.textContent = 'Selecciona un puntaje.';
+            return;
+        }
+
+        try {
+            const resp = await fetch(`http://localhost:8080/api/ratings/tutor/${tutorIdActual}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ puntuacion: parseInt(puntuacionInput.value), comentario: comentario || null })
+            });
+
+            if (resp.ok) {
+                message.style.color = 'green';
+                message.textContent = '¡Gracias! Tu calificación fue guardada.';
+                setTimeout(() => {
+                    cerrarModalRating();
+                    cargarPerfil();
+                }, 800);
+            } else {
+                const text = await resp.text();
+                message.style.color = 'red';
+                message.textContent = text || 'No se pudo guardar la calificación.';
+            }
+        } catch (e) {
+            console.error(e);
+            message.style.color = 'red';
+            message.textContent = 'Error de conexión.';
+        }
+    }
+
+    // Exponer funciones al ámbito global para manejadores inline
+    window.abrirModalRating = abrirModalRating;
+    window.cerrarModalRating = cerrarModalRating;
+    window.enviarRating = enviarRating;
 </script>
 
 </body>
