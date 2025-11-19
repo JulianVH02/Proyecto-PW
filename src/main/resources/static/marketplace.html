@@ -384,19 +384,24 @@
                     <label for="filtro-materia">Materia:</label>
                     <select id="filtro-materia" onchange="aplicarFiltros()">
                         <option value="TODAS">Todas las materias</option>
-                        </select>
+                    </select>
                 </div>
                 <div class="filter-group">
                     <label for="filtro-precio">Precio Máximo:</label>
                     <input type="number" id="filtro-precio" placeholder="Ej. 50000" oninput="aplicarFiltros()">
                 </div>
+                <div class="filter-group">
+                    <label for="filtro-rating">Rating mínimo:</label>
+                    <select id="filtro-rating" onchange="aplicarFiltros()">
+                        <option value="0">Todos</option>
+                        <option value="4.5">4.5 ★ o más</option>
+                        <option value="4">4.0 ★ o más</option>
+                        <option value="3.5">3.5 ★ o más</option>
+                        <option value="3">3.0 ★ o más</option>
+                        <option value="2.5">2.5 ★ o más</option>
+                    </select>
+                </div>
                 <button class="btn-clear" onclick="limpiarFiltros()">Limpiar filtros</button>
-            </div>
-
-            <div class="section-card" style="background-color: #e6f7ff; border: 1px solid #b3e0ff;">
-                <h3 style="color: #0056b3; font-size: 1rem; border-bottom: none;">¿Eres bueno en algo?</h3>
-                <p style="font-size: 0.9rem; margin-bottom: 1rem;">Comparte tu conocimiento y gana dinero extra convirtiéndote en tutor.</p>
-                <a href="tutor-registro.html" style="display: block; text-align: center; background: #0056b3; color: white; padding: 0.5rem; border-radius: 5px; text-decoration: none; font-weight: bold;">Aplicar como Tutor</a>
             </div>
         </aside>
 
@@ -761,11 +766,13 @@
         function aplicarFiltros() {
             const materiaSel = document.getElementById('filtro-materia').value;
             const precioMax = document.getElementById('filtro-precio').value;
+            const ratingMin = parseFloat(document.getElementById('filtro-rating').value || '0');
 
             tutoresFiltrados = todosLosTutores.filter(t => {
                 const cumpleMateria = (materiaSel === 'TODAS') || (t.materia === materiaSel);
                 const cumplePrecio = !precioMax || (t.precioPorClase <= parseFloat(precioMax));
-                return cumpleMateria && cumplePrecio;
+                const cumpleRating = (t.ratingPromedio || 0) >= ratingMin;
+                return cumpleMateria && cumplePrecio && cumpleRating;
             });
             paginaActualTutores = 1;
             renderPaginaTutores();
@@ -774,6 +781,8 @@
         function limpiarFiltros() {
             document.getElementById('filtro-materia').value = 'TODAS';
             document.getElementById('filtro-precio').value = '';
+            const ratingSelect = document.getElementById('filtro-rating');
+            if (ratingSelect) ratingSelect.value = '0';
             tutoresFiltrados = todosLosTutores.slice();
             paginaActualTutores = 1;
             renderPaginaTutores();
