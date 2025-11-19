@@ -405,11 +405,6 @@
                 <p>Acceso personal al calendario y tareas (modo usuario).</p>
                 <a href="#" class="btn-card" onclick="irPlanificadorAdmin(); return false;">Ver Calendario</a>
             </div>
-             <div class="tool-card">
-                <h3>Repaso Activo</h3>
-                <p>Crear o moderar Flashcards y Quizzes de la comunidad.</p>
-                <a href="#" class="btn-card" onclick="irRepasoAdmin(); return false;">Ir a Repaso</a>
-            </div>
         </div>
 
         <!-- Gestión interna de Tutores (sección oculta hasta que se pulse Administrar) -->
@@ -462,11 +457,6 @@
         // --- Navegación rápida desde las tarjetas ---
         function irPlanificadorAdmin() {
             window.location.href = 'planificador.html';
-        }
-
-        function irRepasoAdmin() {
-            // Puedes ajustar esto si quieres ir primero a flashcards u otra página
-            window.location.href = 'flashcards.html';
         }
 
         function mostrarGestionTutores() {
