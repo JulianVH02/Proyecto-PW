@@ -44,6 +44,14 @@
             display: flex; align-items: center;
         }
         .navbar .logo img { height: 70px; width: auto; margin-right: 0.5rem; }
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
         .navbar .nav-links {
             list-style: none;
             margin: 0;
@@ -408,6 +416,31 @@
         .footer-social a:hover {
             opacity: 1;
         }
+
+        @media (max-width: 1200px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .nav-links,
+            .navbar .user-section {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 0.5rem;
+                display: none;
+                align-items: flex-start;
+            }
+
+            .navbar.open .nav-links,
+            .navbar.open .user-section {
+                display: flex;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -416,6 +449,7 @@
         <a href="#" class="logo" onclick="goToDashboardSegunRol()">
              <img src="/images/1.png" alt="Sinergia Logo">
         </a>
+        <button class="navbar-toggle" aria-label="Abrir menú" onclick="toggleNavbar()">&#9776;</button>
         
         <ul class="nav-links">
             <li><a href="#" onclick="goToDashboardSegunRol()">Inicio</a></li>
@@ -509,7 +543,7 @@
 
     <script>
         const token = localStorage.getItem('jwtToken');
-        let todosLosTutores = []; 
+        let todosLosTutores = [];
         let todasLasMaterias = [];
         let tutorIdActual = null;
         let currentRole = 'ESTUDIANTE';
@@ -531,6 +565,11 @@
                     userNameSpan.textContent = nombreCapitalizado;
                 }
                 currentRole = payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+
+                if (currentRole === 'ADMIN') {
+                    const editBtn = document.querySelector('.button-edit-profile');
+                    if (editBtn) editBtn.style.display = 'none';
+                }
             }
             cargarPerfilUsuarioNavbar();
             cargarDatosIniciales();
@@ -616,6 +655,13 @@
         async function cargarDatosIniciales() {
             await fetchMaterias(); 
             await fetchTutores(); 
+        }
+
+        function toggleNavbar() {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                navbar.classList.toggle('open');
+            }
         }
 
         async function fetchMaterias() {

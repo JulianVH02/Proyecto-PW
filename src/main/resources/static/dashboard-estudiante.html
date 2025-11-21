@@ -63,7 +63,6 @@
             color: var(--primary-color);
         }
 
-        /* Dropdown */
         .dropdown { position: relative; display: inline-block; }
         .dropdown-content { 
             display: none; 
@@ -88,6 +87,15 @@
         .dropdown.open .dropdown-content { display: block; }
         .dropdown .dropbtn { cursor: pointer; text-decoration: none; color: var(--dark-text); font-weight: 500; background: none; border: none; font-family: inherit; font-size: inherit; }
         .dropdown .dropbtn:hover { color: var(--primary-color); }
+
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
 
         /* User Section */
         .user-section { display: flex; align-items: center; gap: 1rem; }
@@ -372,6 +380,32 @@
             font-weight: bold;
         }
         .btn-primary:hover { background: #d65100; }
+
+        /* Navbar responsive */
+        @media (max-width: 1200px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .nav-links,
+            .navbar .user-section {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 0.5rem;
+                display: none;
+                align-items: flex-start;
+            }
+
+            .navbar.open .nav-links,
+            .navbar.open .user-section {
+                display: flex;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -380,6 +414,7 @@
         <a href="#" class="logo" onclick="goToDashboardSegunRol()">
              <img src="/images/1.png" alt="Sinergia Logo">
         </a>
+        <button class="navbar-toggle" aria-label="Abrir menú" onclick="toggleNavbar()">&#9776;</button>
         
         <ul class="nav-links">
             <li><a href="#" class="active" onclick="goToDashboardSegunRol()">Inicio</a></li>
@@ -698,6 +733,13 @@
                 const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
                 return JSON.parse(jsonPayload);
             } catch (e) { return null; }
+        }
+
+        function toggleNavbar() {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                navbar.classList.toggle('open');
+            }
         }
 
         function goToDashboardSegunRol() {

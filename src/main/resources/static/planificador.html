@@ -30,6 +30,18 @@
             display: flex; align-items: center;
         }
         .navbar .logo img { height: 70px; width: auto; margin-right: 0.5rem; }
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-left: 1rem;
+            color: #000;
+            width: auto;
+            padding: 0;
+        }
+
         .navbar .nav-links {
             list-style: none;
             margin: 0;
@@ -37,6 +49,7 @@
             display: flex;
             gap: 1.5rem;
             align-items: center;
+            justify-content: flex-end;
         }
         .navbar .nav-links a {
             text-decoration: none;
@@ -227,6 +240,31 @@
             }
         }
 
+        @media (max-width: 1200px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .nav-links,
+            .navbar .user-section {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 0.5rem;
+                display: none;
+                align-items: flex-start;
+            }
+
+            .navbar.open .nav-links,
+            .navbar.open .user-section {
+                display: flex;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+        }
+
         /* --- Footer --- */
         footer {
             background-color: #1e1e1e;
@@ -318,6 +356,7 @@
         <a href="#" class="logo" onclick="goToDashboardSegunRol()">
             <img src="/images/1.png" alt="Sinergia Logo">
         </a>
+        <button class="navbar-toggle" aria-label="Abrir menú" onclick="toggleNavbar()">&#9776;</button>
         
         <ul class="nav-links">
             <li><a href="#" onclick="goToDashboardSegunRol()">Inicio</a></li>
@@ -380,7 +419,7 @@
         const token = localStorage.getItem('jwtToken');
         if (!token) window.location.href = 'login.html';
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const jwt = localStorage.getItem('jwtToken');
             if (jwt) {
                 const payload = parseJwt(jwt);
@@ -391,86 +430,92 @@
                     if (userNameSpan) {
                         userNameSpan.textContent = nombreCapitalizado;
                     }
+
+                    const role = payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+                    if (role === 'ADMIN') {
+                        const editBtn = document.querySelector('.button-edit-profile');
+                        if (editBtn) editBtn.style.display = 'none';
+                    }
                 }
             }
+
             cargarPerfilUsuarioNavbar();
             ocultarRepasoActivoSiAdmin();
 
-            var calendarEl = document.getElementById('calendar');
-            
-            var calendar = new FullCalendar.Calendar(calendarEl, {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                locale: 'es', // Idioma español
+                locale: 'es',
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                events: function(info, successCallback, failureCallback) {
-                    // Cargar eventos desde nuestro Backend
+                events: function (info, successCallback, failureCallback) {
                     fetch('http://localhost:8080/api/tareas', {
                         headers: { 'Authorization': 'Bearer ' + token }
                     })
-                    .then(response => response.json())
-                    .then(data => successCallback(data))
-                    .catch(error => failureCallback(error));
+                        .then(response => response.json())
+                        .then(data => successCallback(data))
+                        .catch(error => failureCallback(error));
                 },
-                eventClick: function(info) {
-                    // Al hacer clic en un evento, preguntar si borrar
-                    if(confirm("¿Eliminar tarea: " + info.event.title + "?")) {
-                        eliminarTarea(info.event.id);
+                eventClick: function (info) {
+                    if (confirm("¿Eliminar tarea: " + info.event.title + "?")) {
+                        eliminarTarea(info.event.id, calendar);
                     }
                 }
             });
-            
+
             calendar.render();
 
-            // --- Lógica para Guardar Tarea ---
-            document.getElementById('form-tarea').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const btn = e.target.querySelector('button');
-                btn.disabled = true; 
-                
-                const nuevaTarea = {
-                    titulo: document.getElementById('titulo').value,
-                    descripcion: document.getElementById('descripcion').value,
-                    fechaInicio: document.getElementById('fechaInicio').value,
-                    fechaFin: document.getElementById('fechaFin').value || null,
-                    color: document.getElementById('color').value
-                };
+            const form = document.getElementById('form-tarea');
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = e.target.querySelector('button');
+                    if (btn) btn.disabled = true;
 
-                try {
-                    const resp = await fetch('http://localhost:8080/api/tareas', {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token 
-                        },
-                        body: JSON.stringify(nuevaTarea)
-                    });
+                    const nuevaTarea = {
+                        titulo: document.getElementById('titulo').value,
+                        descripcion: document.getElementById('descripcion').value,
+                        fechaInicio: document.getElementById('fechaInicio').value,
+                        fechaFin: document.getElementById('fechaFin').value || null,
+                        color: document.getElementById('color').value
+                    };
 
-                    if(resp.ok) {
-                        document.getElementById('form-tarea').reset();
-                        calendar.refetchEvents(); // Recargar calendario sin F5
-                        alert("Tarea guardada con éxito");
-                    } else {
-                        alert("Error al guardar");
+                    try {
+                        const resp = await fetch('http://localhost:8080/api/tareas', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + token
+                            },
+                            body: JSON.stringify(nuevaTarea)
+                        });
+
+                        if (resp.ok) {
+                            form.reset();
+                            calendar.refetchEvents();
+                            alert('Tarea guardada con éxito');
+                        } else {
+                            alert('Error al guardar');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    } finally {
+                        if (btn) btn.disabled = false;
                     }
-                } catch(err) {
-                    console.error(err);
-                } finally {
-                    btn.disabled = false;
-                }
-            });
-
-            async function eliminarTarea(id) {
-                await fetch(`http://localhost:8080/api/tareas/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
                 });
-                calendar.refetchEvents();
             }
         });
+
+        async function eliminarTarea(id, calendar) {
+            await fetch(`http://localhost:8080/api/tareas/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            calendar.refetchEvents();
+        }
 
         function ocultarRepasoActivoSiAdmin() {
             try {
@@ -495,7 +540,9 @@
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
                 const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
                 return JSON.parse(jsonPayload);
-            } catch (e) { return null; }
+            } catch (e) {
+                return null;
+            }
         }
 
         function goToDashboardSegunRol() {
@@ -510,6 +557,13 @@
                 window.location.href = 'dashboard-tutor.html';
             } else {
                 window.location.href = 'dashboard-estudiante.html';
+            }
+        }
+
+        function toggleNavbar() {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                navbar.classList.toggle('open');
             }
         }
 

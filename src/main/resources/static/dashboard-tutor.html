@@ -35,6 +35,15 @@
         .dropdown-content a:hover { background: #f5f5f5; color: var(--primary-color); }
         .dropdown.open .dropdown-content { display: block; }
 
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
         /* User Section */
         .user-section { display: flex; align-items: center; gap: 1rem; }
         .user-info-mini { display: flex; align-items: center; gap: 0.6rem; }
@@ -159,6 +168,32 @@
         .footer-social { display: flex; gap: 1rem; }
         .footer-social a { color: var(--white-color); text-decoration: none; font-size: 0.95rem; opacity: 0.85; }
         .footer-social a:hover { opacity: 1; }
+
+        /* Navbar responsive */
+        @media (max-width: 1200px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .nav-links,
+            .navbar .user-section {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 0.5rem;
+                display: none;
+                align-items: flex-start;
+            }
+
+            .navbar.open .nav-links,
+            .navbar.open .user-section {
+                display: flex;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -173,6 +208,7 @@
             <a href="dashboard-tutor.html" class="logo">
                 <img src="/images/1.png" alt="Sinergia Logo">
             </a>
+            <button class="navbar-toggle" aria-label="Abrir menú" onclick="toggleNavbar()">&#9776;</button>
             <ul class="nav-links">
                 <li><a href="dashboard-tutor.html" class="active">Inicio</a></li>
                 <li><a href="recursos.html">Recursos Educativos</a></li>
@@ -276,7 +312,6 @@
             </div>
             <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1rem;">
                 <button type="button" onclick="cerrarModalPerfilTutor()" style="padding:0.45rem 0.9rem; border-radius:5px; border:1px solid #ccc; background:#f5f5f5; cursor:pointer; font-size:0.85rem;">Cancelar</button>
-                <button type="button" onclick="guardarPerfilTutor()" style="padding:0.45rem 0.9rem; border-radius:5px; border:none; background: #ff6200; color:#fff; cursor:pointer; font-size:0.85rem; font-weight:bold;">Guardar cambios</button>
             </div>
         </div>
     </div>
@@ -440,7 +475,9 @@
                 if (!nombre) return 'TU';
                 const partes = nombre.trim().split(' ');
                 let iniciales = partes[0].charAt(0).toUpperCase();
-                if (partes.length > 1) iniciales += partes[1].charAt(0).toUpperCase();
+                if (partes.length > 1) {
+                    iniciales += partes[1].charAt(0).toUpperCase();
+                }
                 return iniciales;
             }
 
@@ -522,6 +559,15 @@
             }
 
         })(); 
+    </script>
+
+    <script>
+        function toggleNavbar() {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                navbar.classList.toggle('open');
+            }
+        }
     </script>
 
     <script>

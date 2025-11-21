@@ -122,6 +122,41 @@
         }
         .button-edit-profile:hover { background: #d65100; }
 
+        /* Navbar responsive */
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
+        @media (max-width: 1200px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .nav-links,
+            .navbar .user-section {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 0.5rem;
+                display: none;
+                align-items: flex-start;
+            }
+
+            .navbar.open .nav-links,
+            .navbar.open .user-section {
+                display: flex;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+        }
+
         /* --- Layout Principal --- */
         .dashboard-container { max-width: 1300px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr; gap: 2rem; }
         @media (min-width: 1024px) { .dashboard-container { grid-template-columns: 300px 1fr; align-items: start; } }
@@ -431,6 +466,7 @@
         <a href="#" class="logo" onclick="goToDashboardSegunRol()">
              <img src="/images/1.png" alt="Sinergia Logo">
         </a>
+        <button class="navbar-toggle" aria-label="Abrir menú" onclick="toggleNavbar()">&#9776;</button>
         
         <ul class="nav-links">
             <li><a href="#" onclick="goToDashboardSegunRol()">Inicio</a></li>
@@ -624,6 +660,13 @@
         let currentRole = 'ESTUDIANTE';
         let recursoIdEditando = null; // ID del recurso que se está editando
 
+        function toggleNavbar() {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                navbar.classList.toggle('open');
+            }
+        }
+
         // Paginación de recursos
         let recursosFiltrados = [];
         let paginaActualRecursos = 1;
@@ -641,6 +684,11 @@
                     userNameSpan.textContent = nombreCapitalizado;
                 }
                 currentRole = payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+
+                if (currentRole === 'ADMIN') {
+                    const editBtn = document.querySelector('.button-edit-profile');
+                    if (editBtn) editBtn.style.display = 'none';
+                }
             }
             cargarPerfilUsuarioNavbar();
             cargarDatosIniciales();
