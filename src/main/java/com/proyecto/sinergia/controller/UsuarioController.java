@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.HttpHeaders;
 
@@ -43,7 +44,13 @@ public class UsuarioController {
     private JwtService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<Usuario> registrar(@RequestBody RegistroRequest request) {
+    public ResponseEntity<?> registrar(@RequestBody RegistroRequest request) {
+        // Validar si el correo ya existe
+        if (usuarioService.buscarPorCorreo(request.usuario().getCorreo()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(java.util.Map.of("message", "El email ya existe"));
+        }
+
         // Usamos .usuario() y .tutor() porque es un 'record'
         Usuario usuarioRegistrado = usuarioService.registrarUsuario(
             request.usuario(), 

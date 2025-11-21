@@ -784,6 +784,37 @@
             }
         }
 
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function goToDashboardSegunRol() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const payload = parseJwt(token);
+            const role = payload && payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+
+            if (role === 'ADMIN') {
+                window.location.href = 'dashboard-admin.html';
+            } else if (role === 'TUTOR') {
+                window.location.href = 'dashboard-tutor.html';
+            } else {
+                window.location.href = 'dashboard-estudiante.html';
+            }
+        }
+
         // --- Función existente (sin cambios) ---
         function logout() {
             localStorage.removeItem('jwtToken');
@@ -807,10 +838,10 @@
             <div class="footer-column">
                 <h4>Enlaces rápidos</h4>
                 <ul class="footer-links">
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="#">Marketplace de tutores</a></li>
-                    <li><a href="#">Flashcards y quizzes</a></li>
-                    <li><a href="#">Planificador</a></li>
+                    <li><a href="#" onclick="goToDashboardSegunRol()">Inicio</a></li>
+                    <li><a href="marketplace.html">Marketplace de tutores</a></li>
+                    <li><a href="flashcards.html">Flashcards y quizzes</a></li>
+                    <li><a href="planificador.html">Planificador</a></li>
                 </ul>
             </div>
             <div class="footer-column">

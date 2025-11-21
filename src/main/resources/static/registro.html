@@ -85,6 +85,15 @@
             color: var(--primary-color);
         }
 
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
         /* --- Estilos Dropdown --- */
         .dropdown {
             position: relative;
@@ -131,6 +140,29 @@
         }
         .dropdown .dropbtn:hover {
             color: var(--primary-color);
+        }
+
+        @media (max-width: 1200px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .nav-links {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 0.5rem;
+                display: none;
+                align-items: flex-start;
+            }
+
+            .navbar.open .nav-links {
+                display: flex;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
         }
 
         /* --- Contenedor de Formulario Centrado --- */
@@ -321,6 +353,7 @@
         <a href="index.html" class="logo">
             <img src="/images/1.png" alt="Sinergia Logo">
         </a>
+        <button class="navbar-toggle" aria-label="Abrir menú" onclick="toggleNavbar()">&#9776;</button>
         <ul class="nav-links">
             <li><a href="index.html">Inicio</a></li>
             <li><a href="#">Recursos Educativos</a></li>
@@ -368,160 +401,113 @@
                           Los valores (value) deben coincidir con tu Enum de Java
                           Si tu RolUsuario.java usa @JsonValue("estudiante"), déjalo en minúsculas.
                           Si no lo usa, ponlos en MAYÚSCULAS: value="ESTUDIANTE"
+                          
+                          Asumiré que SÍ estás usando el @JsonValue que te di, así que los dejo en minúsculas.
+                        -->
+                        <option value="estudiante">Estudiante</option>
+                        <option value="tutor">Tutor</option>
+                    </select>
+                </div>
+        
+                <!-- Campos específicos del Tutor -->
+                <fieldset id="tutor-fields">
+                    <legend>Información de Tutor</legend>
+                    
                     <div class="form-group">
-                        <label for="nombre">Nombre:</label>
-                        <input type="text" id="nombre" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="apellido">Apellido:</label>
-                        <input type="text" id="apellido">
-                    </div>
-                    <div class="form-group">
-                        <label for="correo">Correo Electrónico:</label>
-                        <input type="email" id="correo" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="contraseña">Contraseña:</label>
-                        <input type="password" id="contraseña" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="rol">Quiero ser:</label>
-                        <select id="rol" onchange="toggleTutorFields()">
-                            <!-- 
-                              ¡IMPORTANTE!
-                              Los valores (value) deben coincidir con tu Enum de Java
-                              Si tu RolUsuario.java usa @JsonValue("estudiante"), déjalo en minúsculas.
-                              Si no lo usa, ponlos en MAYÚSCULAS: value="ESTUDIANTE"
-                              
-                              Asumiré que SÍ estás usando el @JsonValue que te di, así que los dejo en minúsculas.
-                            -->
-                            <option value="estudiante">Estudiante</option>
-                            <option value="tutor">Tutor</option>
+                        <label for="materia">Materia Principal:</label>
+                        <!-- 
+                          NOTA: El 'required' se añade y quita con JavaScript
+                        -->
+                        <select id="materia" name="materia">
+                            <option value="" disabled selected>Cargando materias...</option>
                         </select>
                     </div>
-        
-                    <!-- Campos específicos del Tutor -->
-                    <fieldset id="tutor-fields">
-                        <legend>Información de Tutor</legend>
-                        
-                        <div class="form-group">
-                            <label for="materia">Materia Principal:</label>
-                            <!-- 
-                              NOTA: El 'required' se añade y quita con JavaScript
-                            -->
-                            <select id="materia" name="materia">
-                                <option value="" disabled selected>Cargando materias...</option>
-                            </select>
-                        </div>
-                        
-                         <div class="form-group">
-                            <label for="evidencia">URL Evidencia (CV, Certificado):</label>
-                            <!-- 
-                              NOTA: El 'required' se añade y quita con JavaScript
-                            -->
-                            <input type="text" id="evidencia" placeholder="https://drive.google.com/...">
-                        </div>
-                    </fieldset>
-        
-                    <button type="submit" class="button-submit">Registrar</button>
-                </form>
+                </fieldset>
+
                 <p id="mensaje"></p>
-                <div class="form-link">
-                    <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
-                </div>
-            </div>
+            </form>
         </div>
+    </div>
 
         <!-- Script de funcionalidad -->
         <script>
-            
-            // --- FUNCIÓN DE CARGAR MATERIAS (NO CAMBIA) ---
+            // --- Cargar materias al iniciar ---
             document.addEventListener('DOMContentLoaded', function() {
                 const materiaSelect = document.getElementById('materia');
-                
+
                 async function cargarMaterias() {
                     try {
                         const response = await fetch('http://localhost:8080/api/public/materias');
                         if (!response.ok) throw new Error('No se pudieron cargar las materias.');
-                        const materias = await response.json(); 
-                        
-                        materiaSelect.innerHTML = ''; 
+                        const materias = await response.json();
+
+                        materiaSelect.innerHTML = '';
                         if (materias.length === 0) {
-                             materiaSelect.innerHTML = '<option value="">No hay materias disponibles</option>';
-                             return;
+                            materiaSelect.innerHTML = '<option value="">No hay materias disponibles</option>';
+                            return;
                         }
 
                         const defaultOption = document.createElement('option');
-                        defaultOption.value = "";
-                        defaultOption.textContent = "Selecciona una materia";
+                        defaultOption.value = '';
+                        defaultOption.textContent = 'Selecciona una materia';
                         defaultOption.disabled = true;
                         defaultOption.selected = true;
                         materiaSelect.appendChild(defaultOption);
 
                         materias.forEach(materia => {
                             const option = document.createElement('option');
-                            option.value = materia.id; 
-                            option.textContent = materia.nombre; 
+                            option.value = materia.id;
+                            option.textContent = materia.nombre;
                             materiaSelect.appendChild(option);
                         });
-                        
                     } catch (error) {
                         console.error('Error cargando materias:', error);
                         materiaSelect.innerHTML = '<option value="">Error al cargar materias</option>';
                         materiaSelect.disabled = true;
                     }
                 }
-                
+
                 cargarMaterias();
-                
-                // --- ¡NUEVO! ---
-                // Ejecutar esto al cargar la página para asegurar 
-                // que los campos de tutor estén des-requeridos al inicio.
                 toggleTutorFields();
             });
 
-
-            // --- ¡¡FUNCIÓN CORREGIDA!! ---
+            // --- Mostrar/ocultar campos de tutor ---
             function toggleTutorFields() {
                 var rol = document.getElementById('rol').value;
                 var tutorFields = document.getElementById('tutor-fields');
-                
-                // Obtenemos los campos que vamos a manipular
+
                 var materiaSelect = document.getElementById('materia');
                 var evidenciaInput = document.getElementById('evidencia');
 
-                // Asumimos que el value="tutor" (minúsculas)
                 if (rol === 'tutor') {
-                    // 1. Mostrar campos
                     tutorFields.style.display = 'block';
-                    
-                    // 2. Hacerlos OBLIGATORIOS
                     materiaSelect.setAttribute('required', 'true');
                     evidenciaInput.setAttribute('required', 'true');
-                    
-                } else { // Si es 'estudiante'
-                    // 1. Ocultar campos
+                } else {
                     tutorFields.style.display = 'none';
-                    
-                    // 2. QUITAR LO OBLIGATORIO (Esta es la corrección clave)
                     materiaSelect.removeAttribute('required');
                     evidenciaInput.removeAttribute('required');
-                    
-                    // 3. (Opcional) Limpiar los valores por si cambió de opinión
-                    materiaSelect.value = ""; 
-                    evidenciaInput.value = "";
+                    materiaSelect.value = '';
+                    evidenciaInput.value = '';
                 }
             }
 
+            // --- Menú hamburguesa ---
+            function toggleNavbar() {
+                const navbar = document.querySelector('.navbar');
+                if (navbar) {
+                    navbar.classList.toggle('open');
+                }
+            }
 
-            // --- FUNCIÓN DE ENVÍO (NO CAMBIA) ---
+            // --- Envío del formulario de registro ---
             document.getElementById('registro-form').addEventListener('submit', async function(event) {
                 event.preventDefault(); 
 
                 var rol = document.getElementById('rol').value;
                 var mensajeEl = document.getElementById('mensaje');
-                mensajeEl.textContent = 'Procesando...'; // Mensaje de carga
-                
+                mensajeEl.textContent = 'Procesando...';
+
                 var usuario = {
                     nombre: document.getElementById('nombre').value,
                     apellido: document.getElementById('apellido').value,
@@ -570,8 +556,15 @@
                         let errorMsg = `Error ${response.status}:`;
                         try {
                             const errorData = await response.json();
-                            // El error de Enum (si lo hay) vendrá aquí
-                            errorMsg += " " + (errorData.message || JSON.stringify(errorData));
+
+                            if (errorData && errorData.message) {
+                                mensajeEl.style.color = 'var(--error-color)';
+                                mensajeEl.textContent = errorData.message;
+                                console.error("Respuesta de error del backend:", errorData.message);
+                                return;
+                            }
+
+                            errorMsg += " " + JSON.stringify(errorData);
                         } catch(e) {
                             errorMsg += " " + response.statusText;
                         }

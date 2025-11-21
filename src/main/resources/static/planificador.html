@@ -536,20 +536,40 @@
                 }
 
                 if (avatar) {
+                    const baseNombre = (data && data.nombre)
+                        ? (data.apellido ? `${data.nombre} ${data.apellido}` : data.nombre)
+                        : (nameSpan ? nameSpan.textContent : '');
+
                     if (data && data.fotoPerfil) {
-                        avatar.style.backgroundImage = `url('${data.fotoPerfil}')`;
-                        avatar.textContent = '';
-                    } else {
-                        const baseNombre = (data && data.nombre) ? data.nombre : (nameSpan ? nameSpan.textContent : '');
-                        if (baseNombre) {
-                            const partes = baseNombre.split(' ');
-                            let iniciales = partes[0].charAt(0).toUpperCase();
-                            if (partes.length > 1) {
-                                iniciales += partes[1].charAt(0).toUpperCase();
+                        const urlFoto = data.fotoPerfil;
+                        const img = new Image();
+
+                        img.onload = function () {
+                            avatar.style.backgroundImage = `url('${urlFoto}')`;
+                            avatar.textContent = '';
+                        };
+
+                        img.onerror = function () {
+                            if (baseNombre) {
+                                const partes = baseNombre.split(' ');
+                                let iniciales = partes[0].charAt(0).toUpperCase();
+                                if (partes.length > 1) {
+                                    iniciales += partes[1].charAt(0).toUpperCase();
+                                }
+                                avatar.textContent = iniciales;
+                                avatar.style.backgroundImage = '';
                             }
-                            avatar.textContent = iniciales;
-                            avatar.style.backgroundImage = '';
+                        };
+
+                        img.src = urlFoto;
+                    } else if (baseNombre) {
+                        const partes = baseNombre.split(' ');
+                        let iniciales = partes[0].charAt(0).toUpperCase();
+                        if (partes.length > 1) {
+                            iniciales += partes[1].charAt(0).toUpperCase();
                         }
+                        avatar.textContent = iniciales;
+                        avatar.style.backgroundImage = '';
                     }
                 }
             } catch (e) {

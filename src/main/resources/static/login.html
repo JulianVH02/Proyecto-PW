@@ -99,6 +99,15 @@
             opacity: 0.9;
         }
 
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
         /* --- Estilos del Formulario (Login Card) --- */
         .form-container {
             display: flex;
@@ -269,6 +278,29 @@
         .footer-social a:hover {
             opacity: 1;
         }
+
+        @media (max-width: 1200px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .navbar .nav-links {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 0.5rem;
+                display: none;
+                align-items: flex-start;
+            }
+
+            .navbar.open .nav-links {
+                display: flex;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -277,6 +309,7 @@
         <a href="index.html" class="logo">
             <img src="/images/1.png" alt="Sinergia Logo">
         </a>
+        <button class="navbar-toggle" aria-label="Abrir menú" onclick="toggleNavbar()">&#9776;</button>
         <ul class="nav-links">
             <li><a href="index.html">Inicio</a></li>
             <li><a href="#">Recursos Educativos</a></li>
@@ -329,6 +362,13 @@
                 return JSON.parse(jsonPayload);
             } catch (e) {
                 return null;
+            }
+        }
+
+        function toggleNavbar() {
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                navbar.classList.toggle('open');
             }
         }
 
@@ -415,10 +455,10 @@
             <div class="footer-column">
                 <h4>Enlaces rápidos</h4>
                 <ul class="footer-links">
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="#">Marketplace de tutores</a></li>
-                    <li><a href="#">Flashcards y quizzes</a></li>
-                    <li><a href="#">Planificador</a></li>
+                    <li><a href="#" onclick="footerIrInicio(event)">Inicio</a></li>
+                    <li><a href="#" onclick="footerIrMarketplace(event)">Marketplace de tutores</a></li>
+                    <li><a href="#" onclick="footerIrFlashcardsQuizzes(event)">Flashcards y quizzes</a></li>
+                    <li><a href="#" onclick="footerIrPlanificador(event)">Planificador</a></li>
                 </ul>
             </div>
             <div class="footer-column">
@@ -441,5 +481,62 @@
             <span>Términos y condiciones · Política de privacidad</span>
         </div>
     </footer>
+
+    <script>
+        function irSegunRolInicioDesdeFooter() {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) { window.location.href = 'login.html'; return; }
+            const payload = parseJwt(token);
+            const role = payload && payload.role ? payload.role.toUpperCase() : 'ESTUDIANTE';
+
+            if (role === 'ADMIN') {
+                window.location.href = 'dashboard-admin.html';
+            } else if (role === 'TUTOR') {
+                window.location.href = 'dashboard-tutor.html';
+            } else {
+                window.location.href = 'dashboard-estudiante.html';
+            }
+        }
+
+        function footerIrInicio(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            irSegunRolInicioDesdeFooter();
+        }
+
+        function footerIrMarketplace(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            window.location.href = 'marketplace.html';
+        }
+
+        function footerIrFlashcardsQuizzes(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            window.location.href = 'flashcards.html';
+        }
+
+        function footerIrPlanificador(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            window.location.href = 'planificador.html';
+        }
+    </script>
 </body>
 </html>
